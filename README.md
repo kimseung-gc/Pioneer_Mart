@@ -1,6 +1,13 @@
 # Pioneer_Shop
 
-Group: Seunghyeon (Hyeon) Kim, Joyce Gill, Lydia Ye, Muhammed Khalid, Alan Zhang
+Group: 
+```
+Seunghyeon (Hyeon) Kim, 
+Joyce Gill, 
+Lydia Ye, 
+Muhammed Khalid, 
+Alan Zhang
+```
 
 ## Project Description
 
