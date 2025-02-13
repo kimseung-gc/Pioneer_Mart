@@ -18,14 +18,14 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
 
 ## Bibliography
 
-1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025, 
+1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
 from https://www.etsy.com 
 
-2. Facebook Marketplace. 2025. Buy and Sell Items Locally or Shipped. Retrieved February 13, 2025, 
+2. Facebook Marketplace. 2025. Buy and Sell Items Locally or Shipped. Retrieved February 13, 2025,  
 from https://www.facebook.com/marketplace 
 
-3. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025, 
+3. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025,  
 from https://www.poshmark.com
 
-4. Trello. (2025). Pioneer Mart Project Board. Retrieved February 13, 2025, 
+4. Trello. (2025). Pioneer Mart Project Board. Retrieved February 13, 2025,  
 from https://trello.com/b/HqVxVWt0/pioneer-mart
