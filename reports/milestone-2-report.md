@@ -12,6 +12,8 @@ Joyce Gill
 
 Muhammed Khalid
 - Cleaned README.md
+- Cleaned minestone-2-report.md
+- Added more details to "Important Decision" section
 
 Lydia Ye
 - Create issues
