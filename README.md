@@ -15,3 +15,13 @@ We plan to build a mobile application that provides a campus-based online platfo
 
 Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an online marketplace that allows users to buy and sell handmade items with an emphasis on arts & crafts. Poshmark is also an online marketplace that allows users to buy and sell clothing, home goods, beauty products and more. While platforms like Etsy and Poshmark serve as notable competitors, our app differentiates itself by being exclusively accessible to individuals with a Grinnell College email address. This ensures a secure, college-focused marketplace tailored specifically to the needs of Grinnellians. The common user will be Grinnell College students, faculty, and staff. 
 
+
+## Bibliography
+
+1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025, from https://www.etsy.com 
+
+2. Facebook Marketplace. 2025. Buy and Sell Items Locally or Shipped. Retrieved February 13, 2025, from https://www.facebook.com/marketplace 
+
+3. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025, from https://www.poshmark.com
+
+4. Trello. (2025). Pioneer Mart Project Board. Retrieved February 13, 2025, from https://trello.com/b/HqVxVWt0/pioneer-mart
