@@ -19,7 +19,6 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
 
 The sprint reports can be found in the "reports" folder along with the milestone reports.
 
-
 ## Bibliography
 
 1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
