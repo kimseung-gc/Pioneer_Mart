@@ -20,6 +20,7 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
 - reports
     - milestone-2-report.md
 - sprint_reports
+    - sprint_01_outcomes.md
     - sprint_01_planning.md
 - README.md
 
@@ -27,7 +28,9 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
 
 The sprint reports can be found in the "sprint_reports" folder along with the milestone reports.
 
-Sprint 01 planning can be found in the link in markdown file in the sprint_reports folder.
+Sprint 01 planning (named sprint_01_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 01 outcomes (named sprint_01_outcomes.md) can be found in the link in the markdown file in the sprint_reports folder.
 
 ## Bibliography
 
