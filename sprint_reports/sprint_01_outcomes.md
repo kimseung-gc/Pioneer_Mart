@@ -1,23 +1,23 @@
 # Sprint 01 Planning
 
-## Sprint planning document (commentable)
+## Sprint Planning Document (commentable)
 
 https://docs.google.com/document/d/1y3XsY-BUzvrzYwuXynA5vjFfnEna7CZKBUGjcZ7jSYk/edit?usp=sharing
 
 # Sprint 01 Outcomes
 
-## Sprint 01 Use Cases
+## Sprint 01 Use Cases (commentable)
 
 https://docs.google.com/document/d/1ju67WqUrIfr8L_M_s2jnVDC81LSQ4BAzWZxhg1GRnlY/edit?usp=sharing
 
-## Sprint 01 Journal
+## Sprint 01 Journal (commentable)
 
 https://docs.google.com/document/d/1BGeKoDETVyB4DSEHUr8wtWd5z0GYTFx2GblCtXlkowc/edit?usp=sharing
 
-## Sprint 01 Requirements
+## Sprint 01 Requirements (commentable)
 
 https://docs.google.com/document/d/1BGeKoDETVyB4DSEHUr8wtWd5z0GYTFx2GblCtXlkowc/edit?usp=sharing
 
-## Sprint 01 Review
+## Sprint 01 Review (commentable)
 
 https://docs.google.com/document/d/1cohJd4JWEmvuAXeG_R4HejmI35bScoSn3TGguqOXZZ0/edit?usp=sharing
