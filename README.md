@@ -46,5 +46,5 @@ from https://www.facebook.com/marketplace
 3. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025,  
 from https://www.poshmark.com
 
-4. Trello. (2025). Pioneer Mart Project Board. Retrieved February 13, 2025,  
+4. Trello. 2025. Pioneer Mart Project Board. Retrieved February 13, 2025,  
 from https://trello.com/b/HqVxVWt0/pioneer-mart
