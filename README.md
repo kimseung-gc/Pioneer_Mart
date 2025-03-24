@@ -1,13 +1,11 @@
 # Pioneer Mart
 
 Group: 
-```
-Seunghyeon (Hyeon) Kim, 
-Joyce Gill, 
-Lydia Ye, 
-Muhammed Khalid, 
-Alan Zhang
-```
+Seunghyeon (Hyeon) Kim [seunghk1206](https://github.com/seunghk1206), 
+Joyce Gill [joycegill](https://github.com/joycegill), 
+Lydia Ye [Lydia-Ye](https://github.com/Lydia-Ye), 
+Muhammed Khalid [muhammadkhalid-03](https://github.com/muhammadkhalid-03), 
+Alan Zhang [yiyZh](https://github.com/yiyZh)
 
 ## Project Description
 
