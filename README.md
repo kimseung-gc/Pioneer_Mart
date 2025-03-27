@@ -54,4 +54,4 @@ from https://trello.com/b/HqVxVWt0/pioneer-mart
 5. mCoding. 2025. Automated Testing in Python with pytest, tox, and GitHub Actions. Retrieved March 26, 2025, 
 from https://www.youtube.com/watch?v=DhUpxWjOhME
 
-![Tests](https://github.com/kimseung-gc/Pioneer_Mart/blob/main/.github/workflows/test_runs.yml/badge.svg)
+![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
