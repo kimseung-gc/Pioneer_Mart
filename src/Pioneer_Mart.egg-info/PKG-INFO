@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: Pioneer-Mart
+Version: 0.0.0
+Summary: Market software for Grinnell College
+Author: 
+License: MIT
+Requires-Python: >=3.6
+License-File: LICENSE
+Requires-Dist: requests>=2

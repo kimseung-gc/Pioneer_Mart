@@ -33,6 +33,10 @@ Sprint 01 outcomes (named sprint_01_outcomes.md) can be found in the link in the
 
 Sprint 02 planning (named sprint_02_planning.md) can be found in the link in markdown file in the sprint_reports folder.
 
+## Testing
+
+We are using pytest, flake8, and mypy in order to test our back-end code.
+
 ## Bibliography
 
 1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
@@ -46,3 +50,6 @@ from https://www.poshmark.com
 
 4. Trello. 2025. Pioneer Mart Project Board. Retrieved February 13, 2025,  
 from https://trello.com/b/HqVxVWt0/pioneer-mart
+
+5. mCoding. 2025. Automated Testing in Python with pytest, tox, and GitHub Actions. Retrieved March 26, 2025, 
+from https://www.youtube.com/watch?v=DhUpxWjOhME
