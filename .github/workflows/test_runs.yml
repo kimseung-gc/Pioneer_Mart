@@ -1,5 +1,5 @@
 # Basic workflow
-name: CI
+name: Sample-testing
 
 # Controls
 on:
