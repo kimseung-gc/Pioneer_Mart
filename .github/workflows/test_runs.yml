@@ -43,4 +43,4 @@ jobs:
         run: tox
       # Run pytest
       - name: pytest tests
-        run: pytest
+        run: pytest tests
