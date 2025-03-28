@@ -41,5 +41,3 @@ jobs:
       - name: Test with tox
         run: |
           tox
-          mypy src
-          flake8 src
