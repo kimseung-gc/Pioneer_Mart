@@ -14,13 +14,20 @@ We plan to build a mobile application that provides a campus-based online platfo
 Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an online marketplace that allows users to buy and sell handmade items with an emphasis on arts & crafts. Poshmark is also an online marketplace that allows users to buy and sell clothing, home goods, beauty products and more. While platforms like Etsy and Poshmark serve as notable competitors, our app differentiates itself by being exclusively accessible to individuals with a Grinnell College email address. This ensures a secure, college-focused marketplace tailored specifically to the needs of Grinnellians. The common user will be Grinnell College students, faculty, and staff. 
 
 ## Repository Layout
-
+- .github/workflows
+    - test_runs.yml
+    - tests_npm.yml
+    - tests_python.yml
 - reports
     - milestone-2-report.md
 - sprint_reports
     - sprint_01_outcomes.md
     - sprint_01_planning.md
     - sprint_02_planning.md
+- src
+    - basic_classes
+    - frontend
+- tests
 - README.md
 
 ## Sprint Reports
@@ -35,7 +42,7 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 
 ## Testing
 
-We are using pytest, flake8, and mypy in order to test our back-end code.
+We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
 
 ## Bibliography
 
