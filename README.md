@@ -54,4 +54,7 @@ from https://trello.com/b/HqVxVWt0/pioneer-mart
 5. mCoding. 2025. Automated Testing in Python with pytest, tox, and GitHub Actions. Retrieved March 26, 2025, 
 from https://www.youtube.com/watch?v=DhUpxWjOhME
 
+6. Andy's Tech Tutorials. 2025. GitHub Actions Tutorial | Run Automated Tests. Retrieved March 27, 2025, 
+from https://www.youtube.com/watch?v=uFcXrWT4f80
+
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)

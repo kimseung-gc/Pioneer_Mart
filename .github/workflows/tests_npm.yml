@@ -1,0 +1,39 @@
+# Basic workflow
+name: NPM/JS-testing
+
+# Controls
+on:
+  # Triggers the workflow on push or pull request events on "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Run this workflow manually?
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner
+    runs-on: [ubuntu-latest, windows-latest, macos-latest]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      # Setting up python
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          python-version: 16.18
+      # Install all the dependencies required for the testing
+      - name: Install Dependencies
+        working-directory: ./src/frontend
+        run: npm ci
+      # Run a test file
+      - name: Test
+        working-directory: ./src/frontend
+        run: |
+          npm test
