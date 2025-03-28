@@ -33,9 +33,11 @@ jobs:
       - name: Install Dependencies
         working-directory: ./src/frontend
         run: npm install
-      # Run the test files
-      - name: Run Jest Tests with given path
+        # Install yarn
+      - name: Install Dependencies
         working-directory: ./src/frontend
-        run: |
-          export PATH="./node_modules/.bin:$PATH"
-          jest --forceExit --detectOpenHandles
+        run: npm install yarn
+      # Run the test files
+      - name: Run Jest Tests in yarn
+        working-directory: ./src/frontend
+        run: yarn jest
