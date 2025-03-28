@@ -21,22 +21,20 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-      # Setting up python
-      - name: Setup Node
+      # Checks-out repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      # Setup node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          python-version: 16.18
+          node-version: '14'
       # Install all the dependencies required for the testing
       - name: Install Dependencies
         working-directory: ./src/frontend
-        run: npm ci
+        run: npm install
       # Run a test file
       - name: Test
         working-directory: ./src/frontend
-        run: |
-          npm test
-          q
-        env:
-          CI: true
+        run: npm test
+
