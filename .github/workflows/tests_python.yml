@@ -39,4 +39,7 @@ jobs:
           pip install tox tox-gh-actions
       # Run a test file
       - name: Test with tox
-        run: tox
+        run: |
+          tox
+          mypy src
+          flake8 src
