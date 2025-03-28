@@ -2,8 +2,10 @@ Metadata-Version: 2.1
 Name: Pioneer-Mart
 Version: 0.0.0
 Summary: Market software for Grinnell College
-Author: 
+Home-page: UNKNOWN
+Author: Muhammad Khalid, Yiyong (Alan) Zhang, Seunghyeon Kim, Lydia Ze, Joyce Gill
 License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
 Requires-Python: >=3.6
-License-File: LICENSE
-Requires-Dist: requests>=2
+Provides-Extra: testing
