@@ -36,4 +36,6 @@ jobs:
       - name: Test
         working-directory: ./src/frontend
         run: |
-          CI=true npm test
+          npm test
+        env:
+          CI: true
