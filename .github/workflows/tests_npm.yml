@@ -33,10 +33,9 @@ jobs:
       - name: Install Dependencies
         working-directory: ./src/frontend
         run: npm install
-      - name: Export Path/Setting up jest
+      # Run the test files
+      - name: Run Jest Tests with given path
         working-directory: ./src/frontend
-        run: export PATH="./node_modules/.bin:$PATH"
-      # Run a test file
-      - name: Run Jest Tests
-        working-directory: ./src/frontend
-        run: jest --forceExit --detectOpenHandles
+        run: |
+          export PATH="./node_modules/.bin:$PATH"
+          jest --forceExit --detectOpenHandles
