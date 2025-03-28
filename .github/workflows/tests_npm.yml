@@ -23,12 +23,10 @@ jobs:
     steps:
       # Checks-out repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
+        uses: actions/setup-node@v4
       # Install all the dependencies required for the testing
       - name: Install Dependencies
         working-directory: ./src/frontend
