@@ -31,11 +31,9 @@ jobs:
       - name: Install Dependencies
         working-directory: ./src/frontend
         run: npm install
-        # Install yarn
-      - name: Install Dependencies
-        working-directory: ./src/frontend
-        run: npm install yarn
       # Run the test files
-      - name: Run Jest Tests in yarn
+      - name: Run Jest Tests with different export path
         working-directory: ./src/frontend
-        run: yarn jest
+        run: |
+          export PATH="./node_modules/.bin:$PATH" 
+          yarn jest
