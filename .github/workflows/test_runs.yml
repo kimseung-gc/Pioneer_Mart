@@ -40,3 +40,6 @@ jobs:
       # Run a test file
       - name: Test with tox
         run: tox
+      # Run pytest
+      - name: pytest tests
+        run: pytest
