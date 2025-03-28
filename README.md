@@ -58,3 +58,5 @@ from https://www.youtube.com/watch?v=DhUpxWjOhME
 from https://www.youtube.com/watch?v=uFcXrWT4f80
 
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
+![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_npm.yml/badge.svg)
+![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_python.yml/badge.svg)

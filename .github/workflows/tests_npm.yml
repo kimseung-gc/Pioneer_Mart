@@ -37,5 +37,6 @@ jobs:
         working-directory: ./src/frontend
         run: |
           npm test
+          q
         env:
           CI: true
