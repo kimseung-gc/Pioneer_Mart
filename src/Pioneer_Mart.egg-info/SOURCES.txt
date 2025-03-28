@@ -3,6 +3,7 @@ README.md
 pyproject.toml
 setup.cfg
 setup.py
+src/Pioneer_Mart.egg-info/.gitignore
 src/Pioneer_Mart.egg-info/PKG-INFO
 src/Pioneer_Mart.egg-info/SOURCES.txt
 src/Pioneer_Mart.egg-info/dependency_links.txt
