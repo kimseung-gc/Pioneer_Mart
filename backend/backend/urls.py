@@ -14,9 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-]
+    # TODO
+    # 'include' is for better organization. All the urls are stored in each API folder
+    # path("api/", include("items.urls")),
+    # path("api/", include("categories.urls")),
+    # path("api/", include("userprofile.urls")),
+    # path("api/", include("purchase_requests.urls")),
+    # path("api/otpauth/", include("otpauth.urls")),
+    path("admin/", admin.site.urls),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
