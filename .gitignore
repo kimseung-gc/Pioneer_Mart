@@ -3,3 +3,6 @@
 .tox/
 .coverage
 frontend/
+backend/env/
+backend/config.py
+backend/backend/__pycache__/
