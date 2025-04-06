@@ -98,7 +98,7 @@ class VerifyOTPView(APIView):
                     response_data = {
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
-                        "user": UserSerializer(user).data,
+                        # "user": UserSerializer(user).data, #TODO: userprofile api
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:

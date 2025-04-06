@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from userprofile.serializers import UserSerializer
+
+# from userprofile.serializers import UserSerializer #TODO: uncomment when we make userprofile api
 
 
 class EmailSerializer(serializers.Serializer):
@@ -15,4 +16,4 @@ class OTPVerificationSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()
-    user = UserSerializer()
+    # user = UserSerializer() #TODO: same as above
