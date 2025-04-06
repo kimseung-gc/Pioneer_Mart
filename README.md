@@ -44,6 +44,10 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
 
+## Issue Managements
+
+All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)
+
 ## Bibliography
 
 1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
