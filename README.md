@@ -40,6 +40,10 @@ Sprint 01 outcomes (named sprint_01_outcomes.md) can be found in the link in the
 
 Sprint 02 planning (named sprint_02_planning.md) can be found in the link in markdown file in the sprint_reports folder.
 
+## Issue Managements
+
+All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)
+
 ## Testing
 
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
