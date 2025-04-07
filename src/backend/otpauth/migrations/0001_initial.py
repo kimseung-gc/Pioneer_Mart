@@ -4,6 +4,12 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+    """
+    Migration Class
+    Separated input fields for otpauth and userprofile. This one is the otpauth's input.
+    The two different packages require different migration input, so despite the same
+    name, they were separated.
+    """
 
     initial = True
 
@@ -11,6 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # This part is different to each other. For userprofile and otpauth. 
         migrations.CreateModel(
             name='OTP',
             fields=[
