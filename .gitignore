@@ -5,4 +5,4 @@
 frontend/
 backend/env/
 backend/config.py
-backend/backend/__pycache__/
+src/backend/backend/__pycache__/
