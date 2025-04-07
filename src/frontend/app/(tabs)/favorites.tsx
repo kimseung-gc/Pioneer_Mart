@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-export default function HomeScreen() {
+export default function FavoriteScreen() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Home Screen</Text>
+      <Text>Favorite Screen</Text>
     </View>
   );
 }
