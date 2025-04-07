@@ -1,3 +1,4 @@
 # ignore unrequired files
 AUTHKEY
 env
+__pycache__/
