@@ -18,6 +18,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { BASE_URL } from "@/config";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { OtpInput } from "react-native-otp-entry";
+import React from "react";
 
 const width = Dimensions.get("window").width;
 const OtpScreen = () => {
