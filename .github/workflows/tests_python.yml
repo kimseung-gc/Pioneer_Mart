@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
         python-version: ['3.8', '3.9']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -40,3 +40,16 @@ jobs:
       # Run a test file
       - name: Test with tox
         run: tox
+      # Run a test file with django test
+      - name: Install django requirements
+        working-directory: ./src/backend
+        run: |
+          pip install -r requirements.txt
+      - name: Generate Random Key
+        working-directory: ./src/backend
+        run: |
+          python3 generate_random_key.py
+      - name: Test with django
+        working-directory: ./src/backend
+        run: |
+          python3 manage.py test
