@@ -36,6 +36,7 @@ class PurchaseRequestTestCase (TestCase):
                 listing = self.listing2,
                 requester = self.user2
             )
+            assert False
         except ValueError:
             assert True
     def test_string_version(self):
