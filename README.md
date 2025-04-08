@@ -104,7 +104,10 @@ from https://www.youtube.com/watch?v=DhUpxWjOhME
 6. Andy's Tech Tutorials. 2025. GitHub Actions Tutorial | Run Automated Tests. Retrieved March 27, 2025, 
 from https://www.youtube.com/watch?v=uFcXrWT4f80
 
-7. Image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025.
+7. Test Item image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing  
+
+8. Source image for Test Item. Photomatic. Retrieved 14 August, 2024.
+https://drive.google.com/file/d/1AyQBq8Fw2hZqz5hLmVM9M0U-o-EBiySj/view?usp=sharing 
 
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_npm.yml/badge.svg)
