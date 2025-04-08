@@ -42,6 +42,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "otpauth",
     "userprofile",
+    "items",
+    "purchase_requests",
+    "categories",
+    "rest_framework",
+    "rest_framework_simplejwt"
+
 ]
 
 REST_FRAMEWORK = {
