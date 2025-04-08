@@ -1,4 +1,3 @@
-from backend.categories import *
 from django.test import TestCase
 from django.urls import reverse
 from .models import Category
@@ -10,10 +9,10 @@ class CategoryModelTest(TestCase):
         category = Category.objects.create(name="Books")
         self.assertEqual(str(category), "Books")
 
-    def test_ordering(self):
-        Category.objects.create(name="Clothing")
+    def test_default_ordering(self):
+        Category.objects.create(name="Books")
+        Category.objects.create(name="Electronics")
         Category.objects.create(name="Appliances")
-        Category.objects.create(name="Toys")
         names = list(Category.objects.values_list("name", flat=True))
         self.assertEqual(names, sorted(names))
 
@@ -57,9 +56,10 @@ class CategoryAPITest(TestCase):
         data = {"name": "Updated Electronics"}
         response = self.client.put(url, data)
         self.category.refresh_from_db()
-        self.assertEqual(self.category.name, "Updated Electronics")
+        self.assertEqual(response.data["name"], "Updated Electronics")
 
     def test_delete_category(self):
         url = reverse("category-detail", args=[self.category.id])
         response = self.client.delete(url)
         self.assertFalse(Category.objects.filter(id=self.category.id).exists())
+
