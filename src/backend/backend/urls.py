@@ -20,7 +20,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/otpauth/", include("otpauth.urls")),
+    path("api/", include("items.urls")),
+    path("api/", include("categories.urls")),
+    path("api/", include("userprofile.urls")),
+    path("api/", include("purchase_requests.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

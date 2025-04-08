@@ -3,20 +3,21 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from items.models import Listing
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
-    # favorites = models.ManyToManyField( #TODO: Commented out cause we haven't items api
-    #     Listing, blank=True, related_name="favorited_by"
-    # )  # each user profile has multiple favorite listings
+    favorites = models.ManyToManyField(
+        Listing, blank=True, related_name="favorited_by"
+    )  # each user profile has multiple favorite listings
     is_verified = models.BooleanField(default=False)
 
-    # TODO: Commented out cause we haven't implemented items & purchase requests api
-    # def get_purchase_requests(self):
-    #     """Returns all listings the user has requested to purchase"""
-    #     return Listing.objects.filter(
-    #         purchase_requests__requester=self.user, purchase_requests__is_active=True
-    #     )
+    def get_purchase_requests(self):
+        """Returns all listings the user has requested to purchase"""
+        return Listing.objects.filter(
+            purchase_requests__requester=self.user, purchase_requests__is_active=True
+        )
 
     def __str__(self):
         return f"{self.user.email}'s profile"
