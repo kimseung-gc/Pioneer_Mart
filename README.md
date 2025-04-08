@@ -44,6 +44,31 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
 
+### How to run the tests?
+Backend
+> pip install tox tox-gh-actions
+> tox
+
+Frontend
+> npm install
+> export PATH="./node_modules/.bin:$PATH" 
+> yarn jest
+
+## Running the Application
+
+Pre-requisites: 
+- XCode must be installed on Macbooks for simulations. Otherwise, Expo Go must be installed on either an iOS or Android.
+- The root directory must be within src, and depending on backend or frontend (there must also be 2 separate terminals to run the application)
+- npm must be installed. For more details about installing NPM, please refer to this [link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+Running the Backend (server)
+> pip install -r requirements.txt
+> python3 manage.py
+
+Running the Frontend (npm)
+> npm install
+> npx expo start
+
 ## Issue Managements
 
 All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)

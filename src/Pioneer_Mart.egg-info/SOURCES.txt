@@ -10,6 +10,7 @@ src/Pioneer_Mart.egg-info/dependency_links.txt
 src/Pioneer_Mart.egg-info/not-zip-safe
 src/Pioneer_Mart.egg-info/requires.txt
 src/Pioneer_Mart.egg-info/top_level.txt
+src/backend/manage.py
 src/basic_classes/User_example.py
 src/basic_classes/__init__.py
 src/basic_classes/py.typed
