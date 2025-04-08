@@ -1,5 +1,4 @@
 from django.db import models
-
 from items.models import Listing
 from django.contrib.auth.models import User
 
