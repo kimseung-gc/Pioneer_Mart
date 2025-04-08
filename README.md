@@ -74,7 +74,7 @@ Running the Frontend (npm)
 
 ## Operational Use Cases
 
-None of the use cases mentioned in the requirements documents are operational yet. However, a lot of the backend framework that are required for the use cases are developed, and login page for the users have been created. There is a home screen with several tabs that can be opened. However, it is yet to be functional, so there is more work to be done.
+Use Case 1, 3 are very doable right now with the current prototype that we have. For the other user cases, we have the backend framework constructed, but requires bridging with the frontend in order to actually be used. Some alternative flows such as contacting the other user or selecting the categories are some of the specific features that we are working on.
 
 ## Issue Managements
 
