@@ -44,6 +44,42 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
 
+### How to run the tests?
+Backend (Non-Django related)
+> pip install tox tox-gh-actions
+> tox
+
+Backend (Django related)
+Pre-requisite: be in the src/backend folder
+> python3 manage.py test
+
+Frontend
+> npm install
+> export PATH="./node_modules/.bin:$PATH" 
+> yarn jest
+
+## Running the Application
+
+Pre-requisites: 
+- XCode must be installed on Macbooks for simulations. Otherwise, Expo Go must be installed on either an iOS or Android.
+- The root directory must be within src, and depending on backend or frontend (there must also be 2 separate terminals to run the application)
+- npm must be installed. For more details about installing NPM, please refer to this [link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+Running the Backend (server)
+> pip install -r requirements.txt
+> python3 manage.py
+
+Running the Frontend (npm)
+> npm install
+> npx expo start
+
+* Please note that npm install may leave out some installations out, so it is highly recommended to install extra dependencies via following
+> npm install [name of extra package]
+
+## Operational Use Cases
+
+Use Case 1, 3 are very doable right now with the current prototype that we have. For the other user cases, we have the backend framework constructed, but requires bridging with the frontend in order to actually be used. Some alternative flows such as contacting the other user or selecting the categories are some of the specific features that we are working on.
+
 ## Issue Managements
 
 All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)
@@ -67,6 +103,8 @@ from https://www.youtube.com/watch?v=DhUpxWjOhME
 
 6. Andy's Tech Tutorials. 2025. GitHub Actions Tutorial | Run Automated Tests. Retrieved March 27, 2025, 
 from https://www.youtube.com/watch?v=uFcXrWT4f80
+
+7. Image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025.
 
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_npm.yml/badge.svg)
