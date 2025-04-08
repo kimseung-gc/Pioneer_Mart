@@ -2,6 +2,8 @@ import django
 from django.db import models
 import random
 from datetime import datetime, timedelta, timezone
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 
 class OTP (models.Model):
@@ -38,20 +40,10 @@ class OTP (models.Model):
         """
         returns if the email of the given OTP is valid or not.
         """
-        splitEmail = self.email.split("@")
-        if (len(splitEmail) != 2):
+        try:
+            validate_email(self.email)
+        except ValidationError as e:
             return False
-        if ("@" not in self.email) or (splitEmail[0] == "") or (splitEmail[1] == ""):
-            return False
-        elif ("." not in splitEmail[1]):
-            return False
-        else:
-            splitSecond = splitEmail[1].split('.')
-            if (len(splitSecond) != 2):
-                return False
-            elif ((splitSecond[0] == 0) or (splitSecond[1] == 0)):
-                return False
-        return True
-
+        
     def __str__ (self):
         return f"OTP for {self.email}"
