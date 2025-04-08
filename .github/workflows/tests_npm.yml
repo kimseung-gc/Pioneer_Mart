@@ -35,6 +35,6 @@ jobs:
       - name: Run Jest Tests with different export path
         working-directory: ./src/frontend
         run: |
-          export PATH="./node_modules/.bin:$PATH" 
+      #    export PATH="./node_modules/.bin:$PATH" 
       #    yarn jest
       # TEMPORARILY DISABLED TO NOT ALARM WHEN FRONTEND PUSHES
