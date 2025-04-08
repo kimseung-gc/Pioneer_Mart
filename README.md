@@ -69,6 +69,9 @@ Running the Frontend (npm)
 > npm install
 > npx expo start
 
+* Please note that npm install may leave out some installations out, so it is highly recommended to install extra dependencies via following
+> npm install [name of extra package]
+
 ## Operational Use Cases
 
 None of the use cases mentioned in the requirements documents are operational yet. However, a lot of the backend framework that are required for the use cases are developed, and login page for the users have been created. We will be creating other features in the future to match with our use cases mentioned.
