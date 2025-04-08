@@ -40,3 +40,12 @@ jobs:
       # Run a test file
       - name: Test with tox
         run: tox
+      # Run a test file with django test
+      - name: Install django requirements
+        working-directory: ./src/backend
+        run: |
+          pip install -r requirements.txt
+      - name: Test with django
+        working-directory: ./src/backend
+        run: |
+          python3 manage.py test
