@@ -45,9 +45,13 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
 
 ### How to run the tests?
-Backend
+Backend (Non-Django related)
 > pip install tox tox-gh-actions
 > tox
+
+Backend (Django related)
+Pre-requisite: be in the src/backend folder
+> python3 manage.py test
 
 Frontend
 > npm install
