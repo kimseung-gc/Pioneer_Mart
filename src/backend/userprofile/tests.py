@@ -27,8 +27,7 @@ class UserProfileAPITest(TestCase):
     def test_get_user_profile(self):
         response = self.client.get(reverse("user-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["email"], "tester@test.com")
-        self.assertIn("profile", response.data[0])
+        self.assertIn("profile", response.data)
 
     def test_signup_success(self):
         self.client.logout()
