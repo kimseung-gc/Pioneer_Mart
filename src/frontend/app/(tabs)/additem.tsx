@@ -15,7 +15,6 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
-// import { useAuth } from "./contexts/AuthContext";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
