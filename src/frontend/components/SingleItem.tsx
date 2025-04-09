@@ -46,13 +46,13 @@ const SingleItem = ({ item, source }: Props) => {
     if (source === "myItems") {
       setShowFavoritesIcon(false);
       router.push({
-        pathname: "../app/ItemDetails",
+        pathname: "/ItemDetails",
         params: { item: JSON.stringify(item), source: source },
       });
     } else {
       setShowFavoritesIcon(true);
       router.push({
-        pathname: "../app/ItemDetails",
+        pathname: "/ItemDetails",
         params: { item: JSON.stringify(item) },
       });
     }
