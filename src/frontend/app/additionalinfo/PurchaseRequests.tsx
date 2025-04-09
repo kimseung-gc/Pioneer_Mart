@@ -1,4 +1,4 @@
-import { ItemType, PurchaseRequest } from "@/types/types";
+import { PurchaseRequest } from "@/types/types";
 import { Entypo } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { useEffect, useState } from "react";
@@ -14,7 +14,6 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { BASE_URL } from "@/config";
 import axios from "axios";
-import ProductList from "@/components/ProductList";
 import SingleItem from "@/components/SingleItem";
 import React from "react";
 
@@ -81,11 +80,13 @@ const PurchaseRequests = () => {
         {},
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${cleanToken}`,
+            Accept: "application/json",
           },
         }
       );
+      console.log("hssello");
 
       // Update the local state to remove the cancelled request
       setSentRequests((prevRequests) =>
