@@ -108,11 +108,12 @@ const SingleItem = ({ item, source }: Props) => {
             style={styles.favBtn}
             onPress={handleFavoriteToggle}
           >
-            <AntDesign
-              name={latestItem.is_favorited ? "heart" : "hearto"} // Use currentItem from store
-              size={22}
-              color="black"
-            />
+        <AntDesign
+          testID={latestItem.is_favorited ? "heart-icon" : "hearto-icon"}
+          name={latestItem.is_favorited ? "heart" : "hearto"}
+          size={22}
+          color="black"
+        />
           </TouchableOpacity>
         ) : null}
         {route.name === "ItemDetails" ? null : (
