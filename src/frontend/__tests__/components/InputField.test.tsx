@@ -10,6 +10,7 @@ describe("InputField", () => {
     expect(getByPlaceholderText("Enter text")).toBeTruthy();
   });
 
+  // Simulate user typing "Hello" into the input field
   it("accepts text input", () => {
     const handleChange = jest.fn();
     const { getByPlaceholderText } = render(
@@ -34,6 +35,7 @@ describe("InputField", () => {
       <InputField placeholder="Email" keyboardType="email-address" />
     );
 
+    // Ensure the keyboard type prop is correctly applied
     const input = getByPlaceholderText("Email");
     expect(input.props.keyboardType).toBe("email-address");
   });
