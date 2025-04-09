@@ -28,7 +28,7 @@ SECRET_KEY = config.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "132.161.187.236"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     "purchase_requests",
     "categories",
     "rest_framework",
-    "rest_framework_simplejwt"
-
+    "rest_framework_simplejwt",
 ]
 
 REST_FRAMEWORK = {
