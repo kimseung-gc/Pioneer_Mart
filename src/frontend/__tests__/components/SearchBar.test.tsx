@@ -25,6 +25,7 @@ describe("SearchBar", () => {
   const mockPerformSearch = jest.fn();
   const mockClearSearch = jest.fn();
 
+  // Set up mock state before each test
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -47,6 +48,7 @@ describe("SearchBar", () => {
     });
   });
 
+  // Should start with an empty input for home screen
   it("renders correctly with initial empty searchQuery", () => {
     const { getByPlaceholderText } = render(<SearchBar screenId="home" />);
     const input = getByPlaceholderText("Search items...");
@@ -60,6 +62,7 @@ describe("SearchBar", () => {
     });
   });
 
+  // Should also trigger search when tapping the search icon
   it("calls performSearch on submit", () => {
     const { getByPlaceholderText } = render(<SearchBar screenId="home" />);
     const input = getByPlaceholderText("Search items...");
