@@ -3,13 +3,14 @@ import { render, fireEvent } from "@testing-library/react-native";
 import ItemPurchaseModal from "../../components/ItemPurchaseModal"; 
 
 describe("ItemPurchaseModal", () => {
-  const mockEmail = "test@example.com";
+  const mockEmail = "test@example.com"; // Sample email, has to be grinnell email later
 
   it("renders when visible", () => {
     const { getByText } = render(
       <ItemPurchaseModal isVisible={true} onClose={jest.fn()} email={mockEmail} />
     );
 
+    // Confirm that the success message appears
     expect(getByText(/We've notified the seller/i)).toBeTruthy();
     expect(getByText(mockEmail)).toBeTruthy();
     expect(getByText("Close")).toBeTruthy();
@@ -20,6 +21,8 @@ describe("ItemPurchaseModal", () => {
       <ItemPurchaseModal isVisible={false} onClose={jest.fn()} email={mockEmail} />
     );
 
+    // If the modal isn't visible, nothing should be rendered to the screen
+    // toJSON() returns null when there's no visible UI
     expect(toJSON()).toBeNull();
   });
 
