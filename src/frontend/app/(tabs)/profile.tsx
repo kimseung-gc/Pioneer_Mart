@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useUserStore } from "@/stores/userStore";
@@ -53,6 +54,22 @@ const ProfileScreen = () => {
 
   return (
     <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Top row with profile image and email */}
+      <View style={styles.topRowContainer}>
+        <View style={styles.profileContainer}>
+          <Image
+            source={require("../../assets/images/profile.jpeg")}
+            style={styles.profileImage}
+          />
+        </View>
+
+        <View style={styles.userInfoContainer}>
+          <View style={styles.userInfoEmailContainer}>
+            <MaterialIcons name="email" size={22} color="#555" />
+            <Text style={styles.userEmail}>{userData?.email}</Text>
+          </View>
+        </View>
+      </View>
       <Text>Hello</Text>
       <TouchableOpacity style={styles.logoutButton} onPress={openLogoutModal}>
         <MaterialIcons
@@ -88,6 +105,35 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#333",
+  },
+  topRowContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+    padding: 10,
+  },
+  profileContainer: {
+    position: "relative",
+    marginRight: 15,
+  },
+  profileImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 40,
+  },
+  userInfoContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  userInfoEmailContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userEmail: {
+    fontSize: 16,
+    color: "#666",
+    marginLeft: 8,
   },
   divider: {
     height: 1,
