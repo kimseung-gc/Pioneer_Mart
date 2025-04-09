@@ -4,6 +4,7 @@ import SearchBar from "./SearchBar";
 import { useRoute } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
+import React from "react";
 
 type HeaderProps = {
   screenId: "home" | "favorites" | "myItems";
@@ -20,6 +21,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
+            testID="back-button" 
           >
             <Entypo name="chevron-left" size={24} color="black" />
           </TouchableOpacity>
