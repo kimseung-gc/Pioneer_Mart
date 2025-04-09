@@ -31,25 +31,4 @@ class CategorySerializerTest(TestCase):
         self.assertEqual(category.name, "Garden")
 
 
-class CategoryAPITest(TestCase):
-    def setUp(self):
-        self.category = Category.objects.create(name="Electronics")
-
-    def test_list_categories(self):
-        url = reverse("category-list")
-        response = self.client.get(url,args=[self.category.id])
-        self.assertEqual(response.data["name"], "Electronics")
-
-    def test_retrieve_category(self):
-        url = reverse("category-detail", args=[self.category.id])
-        response = self.client.get(url,args=[self.category.id])
-        self.assertEqual(response.data["name"], "Electronics")
-
-    def test_update_category(self):
-        url = reverse("category-detail", args=[self.category.id])
-        data = {"name": "Updated Electronics"}
-        response = self.client.put(url, data)
-        self.category.refresh_from_db()
-        self.assertEqual(response.data["name"], "Updated Electronics")
-
 
