@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "@/app/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
+import React from "react";
 
 // mocking dependencies
 jest.mock("@react-native-async-storage/async-storage", () => ({

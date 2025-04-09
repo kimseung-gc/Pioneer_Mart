@@ -2,6 +2,7 @@
 import AuthLayout from "@/app/(auth)/_layout";
 import { render } from "@testing-library/react-native";
 import { Stack } from "expo-router";
+import React from "react";
 import { Text } from "react-native";
 // Mock expo-router
 jest.mock("expo-router", () => ({
