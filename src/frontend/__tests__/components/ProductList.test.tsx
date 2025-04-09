@@ -19,6 +19,7 @@ jest.mock("@/app/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
+// May cause interaction bugs so double check later
 jest.mock("../../components/SingleItem", () => {
   const React = require("react");
   const { Text } = require("react-native");
@@ -27,6 +28,7 @@ jest.mock("../../components/SingleItem", () => {
   );
 });
 
+//Mock items that will be rendered in the list
 describe("ProductList", () => {
     const mockItems: ItemType[] = [
         {
@@ -107,6 +109,7 @@ describe("ProductList", () => {
     expect(getByText("Latest Items")).toBeTruthy();
   });
 
+  // This might cause bugs so be careful
   it("calls refreshItems when pull-to-refresh is triggered", () => {
     const mockRefresh = jest.fn();
   
