@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import axios from "axios";
 import { router } from "expo-router";
+import React from "react";
 import { Alert } from "react-native";
 
 jest.mock("expo-font");
