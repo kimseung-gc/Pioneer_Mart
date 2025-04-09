@@ -1,7 +1,6 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import AddItemScreen from "../../../app/(tabs)/additem";
-import { Alert } from "react-native";
 
 // Mocks
 jest.mock("axios");
@@ -82,6 +81,4 @@ describe("AddItemScreen", () => {
     jest.clearAllMocks();
     jest.clearAllTimers();
   });
-
-  // You can also add a test for successful submit using mocked axios.post and userData
 });
