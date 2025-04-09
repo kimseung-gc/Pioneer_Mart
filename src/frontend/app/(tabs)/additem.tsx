@@ -15,13 +15,14 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
-// import { useAuth } from "./contexts/AuthContext";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CameraModal from "@/components/CameraModal";
+import { MaterialIcons } from "@expo/vector-icons";
 
-// TODO: Camera feature
+// TODO: make Camera feature better
 
 // I also have a categories endpoint which I'm considering removing cause
 // we could honestly just hardcode all the categories. Getting these from
@@ -45,6 +46,7 @@ const AddItemScreen = () => {
     category: "other", //default category
   });
   const [image, setImage] = useState<string>("");
+  const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserInfo>();
   const { authToken } = useAuth();
@@ -90,6 +92,17 @@ const AddItemScreen = () => {
       console.error("Error getting user profile:", error);
       Alert.alert("Error", "Failed to load profile. Please try again.");
     }
+  };
+
+  // Function to open camera
+  const openCamera = () => {
+    setShowCamera(true);
+  };
+
+  // Function to handle this image
+  const handleCapturedImage = (imageUri: string) => {
+    setImage(imageUri);
+    setShowCamera(false);
   };
 
   // Function to pick an image from the phone's gallery
@@ -249,13 +262,28 @@ const AddItemScreen = () => {
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Image *</Text>
-        <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+        <View style={styles.imagePicker}>
           {image ? (
             <Image source={{ uri: image }} style={styles.image} />
           ) : (
-            <Text style={styles.imagePickerText}>Tap to select an image</Text>
+            <Text style={styles.imagePickerText}>No Image Selected</Text>
           )}
-        </TouchableOpacity>
+        </View>
+        <View style={styles.imageActions}>
+          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+            <MaterialIcons name="photo-library" size={24} color="#007BFF" />
+            <Text style={styles.imageButtonText}>Gallery</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.imageButton} onPress={openCamera}>
+            <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
+            <Text style={styles.imageButtonText}>Camera</Text>
+          </TouchableOpacity>
+        </View>
+        <CameraModal
+          visible={showCamera}
+          onClose={() => setShowCamera(false)}
+          onCapture={handleCapturedImage}
+        />
       </View>
 
       <TouchableOpacity
@@ -308,6 +336,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
+  },
+  imageActions: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  imageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+  },
+  imageButtonText: {
+    marginLeft: 8,
+    color: "#007BFF",
+    fontWeight: "500",
   },
   imagePicker: {
     height: 200,

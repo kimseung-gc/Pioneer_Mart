@@ -33,7 +33,7 @@ jest.mock("@/components/InputField", () => {
   );
 });
 
-global.alert = jest.fn(); //can't use spyOn
+global.alert = jest.fn(() => {}); //can't use spyOn
 
 describe("WelcomeScreen Component", () => {
   beforeEach(() => {
@@ -43,6 +43,7 @@ describe("WelcomeScreen Component", () => {
   it("renders correctly with all UI elements", async () => {
     const component = render(<WelcomeScreen />);
 
+    //will do this later
     await act(async () => {
       // Ensure all effects complete
     });
