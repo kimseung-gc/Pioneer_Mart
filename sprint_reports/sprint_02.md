@@ -1,4 +1,4 @@
-# Sprint 02 Planning
+# Sprint 02
 
 ## Sprint 02 planning document (commentable)
 
