@@ -4,7 +4,7 @@ Group:
 Seunghyeon (Hyeon) Kim [seunghk1206](https://github.com/seunghk1206), 
 Joyce Gill [joycegill](https://github.com/joycegill), 
 Lydia Ye [Lydia-Ye](https://github.com/Lydia-Ye), 
-Muhammed Khalid [muhammadkhalid-03](https://github.com/muhammadkhalid-03), 
+Muhammad Khalid [muhammadkhalid-03](https://github.com/muhammadkhalid-03), 
 Alan Zhang [yiyZh](https://github.com/yiyZh)
 
 ## Project Description
@@ -42,7 +42,7 @@ Sprint 02 planning (named sprint_02_planning.md) can be found in the link in mar
 
 ## Testing
 
-We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
+We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using Jest, React Testing Library, and human-driven testing. The git actions are set up in the repository.
 
 ### How to run the tests?
 Backend (Non-Django related)
