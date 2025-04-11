@@ -13,7 +13,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
-from AUTHKEY import config
+# import secret keys. This distinction is required due to different secret keys for github and project.
+try:
+    from AUTHKEY import config
+except:
+    from AUTHKEY import config_github
+    config = config_github
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

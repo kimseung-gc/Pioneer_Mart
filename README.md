@@ -24,6 +24,9 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
     - sprint_01_outcomes.md
     - sprint_01_planning.md
     - sprint_02_planning.md
+    - sprint_02.md
+    - sprint_03_planning.md
+    - sprint_03.md
 - src
     - basic_classes
     - frontend
@@ -39,6 +42,12 @@ Sprint 01 planning (named sprint_01_planning.md) can be found in the link in mar
 Sprint 01 outcomes (named sprint_01_outcomes.md) can be found in the link in the markdown file in the sprint_reports folder.
 
 Sprint 02 planning (named sprint_02_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 02 outcomes (named sprint_02.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 03 planning (named sprint_03_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 03 outcomes (named sprint_03.md) can be found in the link in markdown file in the sprint_reports folder.
 
 ## Testing
 
