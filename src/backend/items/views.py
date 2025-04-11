@@ -73,6 +73,19 @@ class ItemViewSet(viewsets.ModelViewSet):
         """Set seller to current user when creating listing."""
         serializer.save(seller=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.seller != request.user:
+            return Response(
+                {"error": "You do not have permission to edit this listing"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        print("\n\n", serializer.data)
+        return Response(serializer.data)
+
     def get_serializer_context(self):
         """Add request to serializer context to check if item is favorited by user."""
         context = super().get_serializer_context()
