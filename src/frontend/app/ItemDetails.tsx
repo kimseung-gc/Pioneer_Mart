@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useEffect, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
@@ -21,16 +21,26 @@ import React from "react";
 const width = Dimensions.get("window").width; // -40 b/c marginHorizontal in index.tsx is 20 so we need to reduce the width by 20x2
 
 const ItemDetails = () => {
-  const { item: itemString, source } = useLocalSearchParams(); // access the item parameter as a string
-  const item = JSON.parse(itemString as string); // turn into JSON object for details page
-
+  const router = useRouter();
+  const { item: itemString, source, refreshKey } = useLocalSearchParams();
+  // const item = JSON.parse(itemString as string); // turn into JSON object for details page
+  const [item, setItem] = useState(JSON.parse(itemString as string));
   const [isVisible, setIsVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const token = useAuth();
   const { userData } = useUserStore();
   // const { hasRequestedItem, setHasRequestedItem } = useSingleItemStore();
-
+  useEffect(() => {
+    if (itemString) {
+      try {
+        const parsedItem = JSON.parse(itemString as string);
+        setItem(parsedItem);
+      } catch (err) {
+        console.error("Failed to parse item string:", err);
+      }
+    }
+  }, [refreshKey]);
   // Will run whenever user wants to see ItemDetails
   useEffect(() => {
     const checkPurchaseRequest = async (authToken: string | null) => {
@@ -57,7 +67,7 @@ const ItemDetails = () => {
       }
     };
     checkPurchaseRequest(token.authToken);
-  }, [item.id, token, hasRequestedItem]);
+  }, [item.id, token, hasRequestedItem, itemString]);
 
   const openModal = () => {
     setIsVisible(true);
@@ -127,6 +137,27 @@ const ItemDetails = () => {
         <Text style={styles.title}>Seller: {item.seller_name}</Text>
         <Text style={styles.title}>Date Posted: {item.created_at}</Text>
         <Text style={styles.title}>Category: {item.category_name}</Text>
+        {isOwner && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#4CAF50",
+              padding: 15,
+              borderRadius: 5,
+              marginTop: 20,
+              width: "100%",
+              alignItems: "center",
+            }}
+            onPress={() => {
+              router.push({
+                pathname: "/EditItem",
+                params: { item: JSON.stringify(item) },
+              });
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 16 }}>Edit Listing</Text>
+          </TouchableOpacity>
+        )}
+
         {isLoading ? (
           <ActivityIndicator
             style={{ marginTop: 20 }}
