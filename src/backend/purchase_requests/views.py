@@ -10,6 +10,7 @@ class PurchaseRequestViewSet(viewsets.ModelViewSet):
     PurchaseRequestViewSet class
     Contains some actions for users (i.e. retrieves the information for "sent" or "received")
     """
+
     queryset = PurchaseRequest.objects.all()
     serializer_class = PurchaseRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
