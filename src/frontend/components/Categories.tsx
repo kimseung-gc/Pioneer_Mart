@@ -9,11 +9,24 @@ import {
 import { CategoryType } from "@/types/types";
 import { useItemsStore } from "@/stores/useSearchStore";
 
+/**
+ * Props for the Categories component.
+ */
 type CategoriesProps = {
+  /** Identifier for the screen using this component */
   screenId: "home" | "favorites" | "myItems";
+
+  /** List of available categories to display */
   categories: CategoryType[] | null;
 };
 
+/**
+ * A horizontal scrollable list of category filters used in different screens (Home, Favorites, MyItems).
+ * Users can select a category to filter the displayed items by category.
+ *
+ * @param screenId - Screen context in which this component is rendered
+ * @param categories - List of available categories to choose from
+ */
 const Categories: React.FC<CategoriesProps> = ({
   screenId,
   categories,
@@ -24,12 +37,13 @@ const Categories: React.FC<CategoriesProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Categories</Text>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {/* "All" category option  because all is currently null so we need to handle it separately*/}
+        {/* "All" category option — represented by `null` in selectedCategory */}
         <TouchableOpacity
           style={[
             styles.categoryItem,
@@ -47,7 +61,7 @@ const Categories: React.FC<CategoriesProps> = ({
           </Text>
         </TouchableOpacity>
 
-        {/* list of categories */}
+        {/* Render each category as a touchable button */}
         {categories &&
           categories.map((category) => (
             <TouchableOpacity
@@ -76,6 +90,9 @@ const Categories: React.FC<CategoriesProps> = ({
 
 export default Categories;
 
+/**
+ * Styles for the Categories component layout and buttons.
+ */
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 15,

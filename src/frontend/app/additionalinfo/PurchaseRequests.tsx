@@ -1,3 +1,33 @@
+/**
+ * PurchaseRequests.tsx
+ *
+ * This screen displays all active purchase requests for a user, separated into two tabs:
+ *  - Sent Requests: Items the user has requested to purchase
+ *  - Received Requests: Requests received for items the user is selling
+ *
+ * Functionality:
+ * - Fetches and filters active purchase requests from the backend API.
+ * - Allows users to cancel their sent requests.
+ * - Uses FlatList with pull-to-refresh functionality.
+ * - Dynamically renders content based on tab selection and request availability.
+ *
+ * Features:
+ * - Tab interface to toggle between "Sent" and "Received" requests
+ * - Header navigation with back button using Expo Router
+ * - Custom rendering of each item using the <SingleItem /> component
+ * - Responsive design and empty state handling
+ *
+ * Dependencies:
+ * - React Navigation (Expo Router)
+ * - Axios for HTTP requests
+ * - Zustand/Context for auth state
+ * - React Native FlatList & RefreshControl
+ * - Custom components: SingleItem
+ *
+ * Author: Joyce Gill
+ * Date: April 2025
+ */
+
 import { PurchaseRequest } from "@/types/types";
 import { Entypo } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
