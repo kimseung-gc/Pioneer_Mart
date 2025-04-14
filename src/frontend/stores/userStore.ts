@@ -31,7 +31,6 @@ export const useUserStore = create<UserState>((set, get) => ({
         },
       });
       if (response.data.results) {
-        console.log("User data:", response.data.results);
         set({ userData: response.data.results[0], isLoading: false });
         return response.data.results;
       } else {

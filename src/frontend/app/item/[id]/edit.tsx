@@ -1,5 +1,4 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useAuth } from "./contexts/AuthContext";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "@/config";
@@ -23,6 +22,8 @@ import CameraModal from "@/components/CameraModal";
 import { UserInfo } from "@/types/types";
 import { PaginatedResponse } from "@/types/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useItemsStore } from "@/stores/useSearchStore";
 
 const CATEGORIES = [
   { label: "Electronics", value: "electronics", id: 2 },
@@ -47,10 +48,8 @@ const EditItem = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     originalItem.category
   );
-  const [userData, setUserData] = useState<UserInfo>();
   const [image, setImage] = useState(originalItem.image || null);
   const [isNewImage, setIsNewImage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,40 +109,7 @@ const EditItem = () => {
     setShowCamera(true);
   };
 
-  // const getProfile = async () => {
-  //   if (!authToken) {
-  //     // check if authenticated
-  //     Alert.alert("Error", "You must be logged in to add items.");
-  //     router.back();
-  //     return;
-  //   }
-  //   // this gets the user's data but I don't think we need it paginated. I'll keep it for nw tho
-  //   try {
-  //     const cleanToken = authToken.trim();
-  //     const response = await axios.get<PaginatedResponse<UserInfo>>(
-  //       `${BASE_URL}/api/users/`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${cleanToken}`,
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     if (response.data.results) {
-  //       setUserData(response.data.results[0]);
-  //     } else {
-  //       Alert.alert("Error", "No user data found.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting user profile:", error);
-  //     Alert.alert("Error", "Failed to load profile. Please try again.");
-  //   }
-  // };
-
   const handleSubmit = async () => {
-    // if (!prepareFormData()) return;
     if (!title || !price || !selectedCategory) {
       Alert.alert("Validation Error", "Please fill in all required fields.");
       return;
@@ -235,6 +201,7 @@ const EditItem = () => {
         config
       );
       setIsSaving(false);
+      useItemsStore.getState().updateItem(response.data);
 
       Alert.alert("Success", "Item edited successfully", [
         {

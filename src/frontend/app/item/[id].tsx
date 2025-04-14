@@ -11,41 +11,69 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useEffect, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
 import SingleItem from "@/components/SingleItem";
-import { useAuth } from "./contexts/AuthContext";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import useSingleItemStore from "@/stores/singleItemStore";
 import { useUserStore } from "@/stores/userStore";
 import React from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../contexts/AuthContext";
 
-const width = Dimensions.get("window").width; // -40 b/c marginHorizontal in index.tsx is 20 so we need to reduce the width by 20x2
+const width = Dimensions.get("window").width;
 
 const ItemDetails = () => {
   const router = useRouter();
-  const { item: itemString, source, refreshKey } = useLocalSearchParams();
-  // const item = JSON.parse(itemString as string); // turn into JSON object for details page
-  const [item, setItem] = useState(JSON.parse(itemString as string));
+  const { id, item: itemString, source, refreshKey } = useLocalSearchParams();
+  const [item, setItem] = useState(
+    itemString ? JSON.parse(itemString as string) : null
+  );
   const [isVisible, setIsVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const token = useAuth();
+  const authToken = useAuth();
   const { userData } = useUserStore();
-  // const { hasRequestedItem, setHasRequestedItem } = useSingleItemStore();
-  useEffect(() => {
-    if (itemString) {
-      try {
-        const parsedItem = JSON.parse(itemString as string);
-        setItem(parsedItem);
-      } catch (err) {
-        console.error("Failed to parse item string:", err);
-      }
+
+  // Fetch the latest item data from the API
+  const fetchItemDetails = async () => {
+    if (!id) {
+      console.log("No item Id provided");
+      setIsLoading(false);
+      return;
     }
-  }, [refreshKey]);
-  // Will run whenever user wants to see ItemDetails
+    try {
+      setIsLoading(true);
+      const cleanToken = authToken.authToken?.trim();
+      const response = await axios.get(`${BASE_URL}/api/items/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      setItem(response.data);
+    } catch (error) {
+      console.error("Error fetching item details:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchItemDetails();
+      return () => {
+        // Optional cleanup
+      };
+    }, [id, authToken])
+  );
+
+  // Check if user has requested this item
   useEffect(() => {
     const checkPurchaseRequest = async (authToken: string | null) => {
+      if (!item || !authToken) return;
+
       try {
-        setIsLoading(true);
         const cleanToken = authToken?.trim();
         const response = await axios.get(`${BASE_URL}/api/requests/sent/`, {
           headers: {
@@ -60,19 +88,20 @@ const ItemDetails = () => {
           (request: any) => request.listing.id === item.id && request.is_active
         );
         setHasRequestedItem(hasRequested);
-        setIsLoading(false);
+        //   setIsLoading(false);
       } catch (error) {
         console.error("Error checking purchase request:", error);
         setIsLoading(false);
       }
     };
-    checkPurchaseRequest(token.authToken);
-  }, [item.id, token, hasRequestedItem, itemString]);
+
+    checkPurchaseRequest(authToken.authToken);
+  }, [item, authToken.authToken]);
 
   const openModal = () => {
     setIsVisible(true);
     console.log("Requested purchase...");
-    console.log("Seller: ", item.seller_name);
+    console.log("Seller: ", item?.seller_name);
   };
 
   const closeModal = () => {
@@ -80,6 +109,8 @@ const ItemDetails = () => {
   };
 
   const handlePurchaseRequest = async (authToken: string | null) => {
+    if (!item) return;
+
     try {
       const cleanToken = authToken?.trim();
       const response = await axios.post(
@@ -102,7 +133,15 @@ const ItemDetails = () => {
   };
 
   // Find out if the user is the owner of the item
-  const isOwner = userData && item.seller === userData.id;
+  const isOwner = userData && item && item.seller === userData.id;
+
+  if (isLoading || !item) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -149,8 +188,8 @@ const ItemDetails = () => {
             }}
             onPress={() => {
               router.push({
-                pathname: "/EditItem",
-                params: { item: JSON.stringify(item) },
+                pathname: "/item/[id]/edit",
+                params: { id: item.id.toString(), item: JSON.stringify(item) },
               });
             }}
           >
@@ -176,11 +215,11 @@ const ItemDetails = () => {
                 width: "100%",
                 alignItems: "center",
               }}
-              onPress={() => handlePurchaseRequest(token.authToken)}
+              onPress={() => handlePurchaseRequest(authToken.authToken)}
               disabled={hasRequestedItem}
             >
               <Text style={{ color: "white", fontSize: 16 }}>
-                {hasRequestedItem ? "Purchase Requested" : "Request Puchase"}
+                {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
               </Text>
             </TouchableOpacity>
           )

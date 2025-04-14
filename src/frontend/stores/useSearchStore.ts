@@ -27,6 +27,7 @@ interface ItemsStoreState {
   activeScreen: ScreenId;
   categories: Array<{ id: number; name: string }>;
   refreshItems: (screenId: ScreenId, authToken: string) => Promise<void>; // New function to force refresh
+  updateItem: (updatedItem: ItemType) => void;
 
   //actions
   setIsReturningFromDetails: (value: boolean) => void;
@@ -78,6 +79,27 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
 
   //set active screen
   setActiveScreen: (screenId) => set({ activeScreen: screenId }),
+
+  updateItem: (updatedItem: ItemType) => {
+    set((state) => {
+      const updatedScreens = { ...state.screens };
+      for (const screenId in updatedScreens) {
+        const screen = updatedScreens[screenId as ScreenId];
+        const updatedItems = screen.items.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+        const updatedFilteredItems = screen.filteredItems.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+        updatedScreens[screenId as ScreenId] = {
+          ...screen,
+          items: updatedItems,
+          filteredItems: updatedFilteredItems,
+        };
+      }
+      return { screens: updatedScreens };
+    });
+  },
 
   /**
    * Function to refresh items on screen.
@@ -233,7 +255,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         },
       }));
-      // console.log(response.data);
     } catch (error) {
       console.error(`Error loading items for ${screenId}:`, error);
 
