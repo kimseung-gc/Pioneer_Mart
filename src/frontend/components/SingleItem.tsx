@@ -45,17 +45,13 @@ const SingleItem = ({ item, source }: Props) => {
   const handleItemPress = () => {
     if (source === "myItems") {
       setShowFavoritesIcon(false);
-      router.push({
-        pathname: "/ItemDetails",
-        params: { item: JSON.stringify(item), source: source },
-      });
     } else {
       setShowFavoritesIcon(true);
-      router.push({
-        pathname: "/ItemDetails",
-        params: { item: JSON.stringify(item) },
-      });
     }
+    router.push({
+      pathname: `/item/[id]`,
+      params: { id: item.id.toString(), source },
+    });
   };
 
   // Get all items from all screens to find the most up-to-date version
@@ -75,14 +71,11 @@ const SingleItem = ({ item, source }: Props) => {
   const handleFavoriteToggle = async () => {
     await toggleFavorite(item.id, authToken || "");
   };
-
+  // Check if we're already on the item details page
+  const isDetailsPage = route.name === "item/[id]";
   return (
     <TouchableOpacity
-      onPress={
-        route.name === "ItemDetails"
-          ? () => setIsZoomVisible(true)
-          : handleItemPress
-      }
+      onPress={isDetailsPage ? () => setIsZoomVisible(true) : handleItemPress}
     >
       <View
         style={[
@@ -108,19 +101,19 @@ const SingleItem = ({ item, source }: Props) => {
             style={styles.favBtn}
             onPress={handleFavoriteToggle}
           >
-        <AntDesign
-          testID={latestItem.is_favorited ? "heart-icon" : "hearto-icon"}
-          name={latestItem.is_favorited ? "heart" : "hearto"}
-          size={22}
-          color="black"
-        />
+            <AntDesign
+              testID={latestItem.is_favorited ? "heart-icon" : "hearto-icon"}
+              name={latestItem.is_favorited ? "heart" : "hearto"}
+              size={22}
+              color="black"
+            />
           </TouchableOpacity>
         ) : null}
-        {route.name === "ItemDetails" ? null : (
-          <Text style={styles.title}>${currentItem.price}</Text>
-        )}
-        {route.name === "ItemDetails" ? null : (
-          <Text style={styles.title}>{currentItem.title}</Text>
+        {!isDetailsPage && (
+          <>
+            <Text style={styles.title}>${currentItem.price}</Text>
+            <Text style={styles.title}>{currentItem.title}</Text>
+          </>
         )}
       </View>
     </TouchableOpacity>
