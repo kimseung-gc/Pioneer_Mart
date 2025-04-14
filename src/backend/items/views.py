@@ -1,3 +1,4 @@
+# Import Modules
 from rest_framework import viewsets
 from categories.serializers import CategorySerializer
 from .models import Listing
@@ -70,24 +71,36 @@ class ItemViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
 
     def perform_create(self, serializer):
-        """Set seller to current user when creating listing."""
+        """
+        Set seller to current user when creating listing.
+        """
         serializer.save(seller=self.request.user)
 
     def update(self, request, *args, **kwargs):
+        """
+        Overrides default update behavior to enforce ownership:
+        Only the original seller can update the listing.
+        """
         instance = self.get_object()
+        # get the instance object
         if instance.seller != request.user:
+            # When the user is not the seller
             return Response(
-                {"error": "You do not have permission to edit this listing"},
+                # Print error message
+                {"error": "You do not have permission to edit this listing"}, 
                 status=status.HTTP_403_FORBIDDEN,
             )
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         print("\n\n", serializer.data)
+        # Otherwise, response with the data without error
         return Response(serializer.data)
 
     def get_serializer_context(self):
-        """Add request to serializer context to check if item is favorited by user."""
+        """
+        Add request to serializer context to check if item is favorited by user.
+        """
         context = super().get_serializer_context()
         return context
 
@@ -117,11 +130,13 @@ class ItemViewSet(viewsets.ModelViewSet):
                 user_profile.favorites.remove(
                     listing
                 )  # if item is already in favorites, remove it
+                # A message indicating whether the listing was removed.
                 return Response({"message": "Listing removed from favorites."})
             else:
                 user_profile.favorites.add(
                     listing
                 )  # if item is not in favorites, add it
+                # A message indicating whether the listing was added.
                 return Response({"message": "Listing added to favorites."})
         except Listing.DoesNotExist:
             return Response({"error": "Listing not found."}, status=404)
