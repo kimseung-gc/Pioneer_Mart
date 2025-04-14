@@ -1,3 +1,31 @@
+/**
+* ItemDetails.tsx
+*
+* This screen displays the detailed view of a marketplace item.
+* It shows the item's image, description, price, seller info, and category.
+* Users can:
+*  - View the item's full details.
+*  - Request to purchase the item (unless they are the seller).
+*  - Edit their listing if they are the item owner.
+*  - See confirmation of a submitted purchase request.
+*
+* Features:
+* - Uses React Navigation (Expo Router) for navigation stack handling.
+* - Uses Axios to fetch and post purchase request data from backend API.
+* - Uses AuthContext and Zustand stores for user and item state.
+* - Includes a modal component to confirm request submission.
+* - Displays loading state while fetching request status.
+*
+* Props:
+* - Receives item data via URL params (`item`, `source`, `refreshKey`).
+*
+* Dependencies:
+* - React Native components
+* - Expo Router for navigation
+* - Zustand for state management
+* - Axios for HTTP requests
+* - Custom components: ItemPurchaseModal, SingleItem
+*/
 import {
   Dimensions,
   View,
@@ -17,9 +45,9 @@ import { BASE_URL } from "@/config";
 import useSingleItemStore from "@/stores/singleItemStore";
 import { useUserStore } from "@/stores/userStore";
 import React from "react";
-
+ 
 const width = Dimensions.get("window").width; // -40 b/c marginHorizontal in index.tsx is 20 so we need to reduce the width by 20x2
-
+ 
 const ItemDetails = () => {
   const router = useRouter();
   const { item: itemString, source, refreshKey } = useLocalSearchParams();
@@ -31,6 +59,8 @@ const ItemDetails = () => {
   const token = useAuth();
   const { userData } = useUserStore();
   // const { hasRequestedItem, setHasRequestedItem } = useSingleItemStore();
+ 
+  // Re-parse for live updates
   useEffect(() => {
     if (itemString) {
       try {
@@ -54,7 +84,7 @@ const ItemDetails = () => {
             Accept: "application/json",
           },
         });
-
+ 
         // Check if any of the sent requests match this item
         const hasRequested = response.data.some(
           (request: any) => request.listing.id === item.id && request.is_active
@@ -68,17 +98,20 @@ const ItemDetails = () => {
     };
     checkPurchaseRequest(token.authToken);
   }, [item.id, token, hasRequestedItem, itemString]);
-
+ 
+  // Show modal on purchase request submission
   const openModal = () => {
     setIsVisible(true);
     console.log("Requested purchase...");
     console.log("Seller: ", item.seller_name);
   };
-
+ 
+  // Hide modal
   const closeModal = () => {
     setIsVisible(false);
   };
-
+ 
+  // Send purchase request to backend
   const handlePurchaseRequest = async (authToken: string | null) => {
     try {
       const cleanToken = authToken?.trim();
@@ -100,10 +133,10 @@ const ItemDetails = () => {
       alert("Failed to send purchase request. Please try again.");
     }
   };
-
+ 
   // Find out if the user is the owner of the item
   const isOwner = userData && item.seller === userData.id;
-
+ 
   return (
     <>
       <Stack.Screen
@@ -157,7 +190,7 @@ const ItemDetails = () => {
             <Text style={{ color: "white", fontSize: 16 }}>Edit Listing</Text>
           </TouchableOpacity>
         )}
-
+ 
         {isLoading ? (
           <ActivityIndicator
             style={{ marginTop: 20 }}
@@ -189,9 +222,9 @@ const ItemDetails = () => {
     </>
   );
 };
-
+ 
 export default ItemDetails;
-
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
