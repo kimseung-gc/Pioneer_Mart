@@ -1,15 +1,18 @@
+# serializers.py - Serializers for PurchaseRequest and Listing
+#  This module defines two serializers:
+#  1. ListingDetailSerializer - Adds purchase-related fields to the listing view.
+#  2. PurchaseRequestSerializer - Handles creation and representation of purchase requests.
+
 from rest_framework import serializers
 from .models import PurchaseRequest, Listing
 
-# We have two different serializers to provide a more tailored & efficient response.
-# Because of this we can present different views of the data.
-
-
-# This class has two additional fields and methods for specific data
-class ListingDetailSerializer ( serializers.ModelSerializer ):
+# ListingDetailSerializer extends the default listing with request-related metadata.
+class ListingDetailSerializer(serializers.ModelSerializer):
     """
-    ListingDetailSerializer class
-    Retrieves details from the given requester.
+    ListingDetailSerializer
+    Serializes Listing objects with additional fields related to purchase requests:
+    - purchase_request_count: total number of active requests for the listing
+    - purchase_requesters: a list of users who requested to buy the item (visible only to seller)
     """
     purchase_request_count = serializers.SerializerMethodField()
     purchase_requesters = serializers.SerializerMethodField()
@@ -28,31 +31,31 @@ class ListingDetailSerializer ( serializers.ModelSerializer ):
             "seller",
             "seller_name",
             "created_at",
-            "purchase_request_count",  # not part of original Listing model
-            "purchase_requesters",  # not part of original Listing model
+            "purchase_request_count",   # Custom field
+            "purchase_requesters",      # Custom field, conditionally shown
         ]
 
     def get_purchase_request_count(self, obj):
         """
-        Returns the count of purchase requests for the listing.
+        Get the number of purchase requests for the listing.
 
         Args:
-            obj (Listing): The Listing object being serialized.
+            obj (Listing): The listing being serialized.
 
         Returns:
-            int: The count of purchase requests.
+            int: Number of requests linked to this listing.
         """
         return obj.get_purchase_request_count()
 
     def get_purchase_requesters(self, obj):
         """
-        Returns a list of requesters (seller only) or an empty list.
+        Get a list of users who requested the item (visible only to seller).
 
         Args:
-            obj (Listing): The Listing object being serialized.
+            obj (Listing): The listing being serialized.
 
         Returns:
-            list: A list of dictionaries containing requester IDs and usernames, or an empty list.
+            list: List of dicts with requester 'id' and 'username'.
         """
         request = self.context.get("request")
         if request and request.user == obj.seller:
@@ -60,20 +63,16 @@ class ListingDetailSerializer ( serializers.ModelSerializer ):
             return [{"id": user.id, "username": user.username} for user in users]
         return []
 
-
-# This class will handle the serialization of PurchaseRequest objects
-class PurchaseRequestSerializer ( serializers.ModelSerializer ):
+# PurchaseRequestSerializer handles serialization of purchase request records.
+class PurchaseRequestSerializer(serializers.ModelSerializer):
     """
-    PurchaseRequestSerializer class
-    retrieves data from a given object
+    PurchaseRequestSerializer
+    Serializes PurchaseRequest instances including nested listing and requester's name.
     """
     requester_name = serializers.SerializerMethodField()
-    listing = ListingDetailSerializer(read_only=True)  # Use the previous serializer
+    listing = ListingDetailSerializer(read_only=True)
 
     class Meta:
-        """
-        Local class for preventing duplication
-        """
         model = PurchaseRequest
         fields = [
             "id",
@@ -87,12 +86,12 @@ class PurchaseRequestSerializer ( serializers.ModelSerializer ):
 
     def get_requester_name(self, obj):
         """
-        Returns the username of the requester.
+        Get the username of the user who made the request.
 
         Args:
-            obj (PurchaseRequest): The PurchaseRequest object being serialized.
+            obj (PurchaseRequest): The object being serialized.
 
         Returns:
-            str: The username of the requester.
+            str: Username of the requester.
         """
         return obj.requester.username
