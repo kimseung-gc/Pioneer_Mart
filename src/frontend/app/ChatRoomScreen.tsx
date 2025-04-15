@@ -68,7 +68,6 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const enterRoom = (room: ChatRoom): void => {
-    // console.log("entering room:", room.id, room.user1, room.user2);
     if (!userData?.id) {
       Alert.alert("Error", "User not authenticated");
       return;
@@ -78,7 +77,11 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
     // Use router.push instead of navigation.navigate
     router.push({
       pathname: "/chat/[id]",
-      params: { id: room.id.toString(), name: otherUser.username },
+      params: {
+        id: room.id.toString(),
+        name: otherUser.username,
+        itemTitle: room.item_title || "No item",
+      },
     });
   };
 
@@ -87,7 +90,10 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity style={styles.roomItem} onPress={() => enterRoom(item)}>
         <Text style={styles.roomName}>{otherUser.username}</Text>
-        <Text style={styles.roomDetails}>{item.message_count} messages</Text>
+        <Text style={styles.roomDetails}>
+          {item.item_title ? `Item: ${item.item_title}` : "No item"} |{" "}
+          {item.message_count} messages
+        </Text>
       </TouchableOpacity>
     );
   };
