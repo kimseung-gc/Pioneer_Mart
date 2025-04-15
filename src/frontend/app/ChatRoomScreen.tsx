@@ -119,15 +119,6 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
         }}
       />
       <View style={styles.container}>
-        {/* <View style={styles.header}>
-          <Text style={styles.title}>Chat Rooms</Text>
-          <TouchableOpacity
-            style={styles.createButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.createButtonText}>+ New Room</Text>
-          </TouchableOpacity>
-        </View> */}
         <FlatList
           data={rooms}
           renderItem={renderRoom}
@@ -162,12 +153,6 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
                 >
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-                  style={[styles.modalButton, styles.createModalButton]}
-                  onPress={createRoom}
-                >
-                  <Text style={styles.createButtonText}>Create</Text>
-                </TouchableOpacity> */}
               </View>
             </View>
           </View>

@@ -136,22 +136,6 @@ const ItemDetails = () => {
     }
   };
 
-  // const enterRoom = (room: ChatRoom): void => {
-  //   if (!userData?.id) {
-  //     Alert.alert("Error", "User not authenticated");
-  //     return;
-  //   }
-
-  //   const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
-  //   const chatName = room.item_id
-  //     ? `${otherUser.username} - ${room.item_title}`
-  //     : otherUser.username; // Use router.push instead of navigation.navigate
-  //   console.log("Hello1:", chatName);
-  //   router.push({
-  //     pathname: "/chat/[id]",
-  //     params: { id: room.id.toString(), name: chatName },
-  //   });
-  // };
   // Find out if the user is the owner of the item
   const isOwner = userData && item && item.seller === userData.id;
 
@@ -190,7 +174,6 @@ const ItemDetails = () => {
       if (!chatRoom || !chatRoom.id) {
         throw new Error("Invalid room data received");
       }
-      // const chatName = `${item.seller_name} - ${item.title}`;
       // Navigate to the chat room
       router.push({
         pathname: `/chat/[id]`,

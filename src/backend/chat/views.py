@@ -6,14 +6,15 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from chat.serializers import ChatRoomSerializer, MessageSerializer
 from .models import ChatRoom, Message
+from django.db.models import Q
 
 # using api_view here cause I'm scared I'll break something
 
 
 @api_view(["GET"])
 def room_list(request):
-    rooms = ChatRoom.objects.all()
-    print("\n\n\nhello\n\n\n")
+    user = request.user
+    rooms = ChatRoom.objects.filter(Q(user1=user) | Q(user2=user))
     serializer = ChatRoomSerializer(rooms, many=True)
     return Response({"rooms": serializer.data})
 

@@ -25,13 +25,32 @@ class ChatRoomSerializer(serializers.ModelSerializer):
     user2 = UserSerializer(read_only=True)
     user_count = serializers.SerializerMethodField()
     message_count = serializers.SerializerMethodField()
+    item_title = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatRoom
-        fields = ["id", "user1", "user2", "created_at", "user_count", "message_count"]
+        fields = [
+            "id",
+            "user1",
+            "user2",
+            "item_id",
+            "item_title",
+            "created_at",
+            "user_count",
+            "message_count",
+        ]
 
     def get_user_count(self, obj):
         return 2  # there will always be 2 users in a private room
 
     def get_message_count(self, obj):
         return obj.messages.count()
+
+    def get_item_title(self, obj):
+        from items.models import Listing
+
+        try:
+            item = Listing.objects.get(id=obj.item_id)
+            return item.title
+        except Listing.DoesNotExist:
+            return None
