@@ -135,33 +135,23 @@ const ItemDetails = () => {
       alert("Failed to send purchase request. Please try again.");
     }
   };
-  // const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
-  //   const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
-  //   return (
-  //     <TouchableOpacity style={styles.roomItem} onPress={() => enterRoom(item)}>
-  //       <Text style={styles.roomName}>{otherUser.username}</Text>
-  //       <Text style={styles.roomDetails}>{item.message_count} messages</Text>
-  //     </TouchableOpacity>
-  //   );
+
+  // const enterRoom = (room: ChatRoom): void => {
+  //   if (!userData?.id) {
+  //     Alert.alert("Error", "User not authenticated");
+  //     return;
+  //   }
+
+  //   const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
+  //   const chatName = room.item_id
+  //     ? `${otherUser.username} - ${room.item_title}`
+  //     : otherUser.username; // Use router.push instead of navigation.navigate
+  //   console.log("Hello1:", chatName);
+  //   router.push({
+  //     pathname: "/chat/[id]",
+  //     params: { id: room.id.toString(), name: chatName },
+  //   });
   // };
-
-  const enterRoom = (room: ChatRoom): void => {
-    // console.log("entering room:", room.id, room.user1, room.user2);
-    if (!userData?.id) {
-      Alert.alert("Error", "User not authenticated");
-      return;
-    }
-
-    const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
-    const chatName = room.item
-      ? `${otherUser.username} - ${room.item.title}`
-      : otherUser.username; // Use router.push instead of navigation.navigate
-    console.log("Hello1:", chatName);
-    router.push({
-      pathname: "/chat/[id]",
-      params: { id: room.id.toString(), name: chatName },
-    });
-  };
   // Find out if the user is the owner of the item
   const isOwner = userData && item && item.seller === userData.id;
 
@@ -200,11 +190,15 @@ const ItemDetails = () => {
       if (!chatRoom || !chatRoom.id) {
         throw new Error("Invalid room data received");
       }
-      const chatName = `${item.seller_name} - ${item.title}`;
+      // const chatName = `${item.seller_name} - ${item.title}`;
       // Navigate to the chat room
       router.push({
         pathname: `/chat/[id]`,
-        params: { id: chatRoom.id.toString(), name: chatName }, // Assuming item.seller_name is the seller's name
+        params: {
+          id: chatRoom.id.toString(),
+          name: item.seller_name,
+          itemTitle: item.title || "No item",
+        }, // Assuming item.seller_name is the seller's name
       });
     } catch (error) {
       console.error("Error starting chat:", error);

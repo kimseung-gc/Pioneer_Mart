@@ -15,7 +15,8 @@ export interface Message {
 
 export interface ChatRoom {
   id: string;
-  item: ItemType;
+  item_id: number | null;
+  item_title: string | null;
   user1: { id: number; username: string };
   user2: { id: number; username: string };
   created_at: string;

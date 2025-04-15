@@ -21,10 +21,10 @@ import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 
 const ChatScreen = () => {
-  const { id, name } = useLocalSearchParams();
+  const { id, name, itemTitle } = useLocalSearchParams();
   const roomId = typeof id === "string" ? id : "";
-  console.log("hello:", name);
   const roomName = typeof name === "string" ? name : "Chat Room";
+  const item = typeof itemTitle === "string" ? itemTitle : "Item";
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState<string>("");
   const [connected, setConnected] = useState<boolean>(false);
@@ -155,7 +155,7 @@ const ChatScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerTitle: roomName,
+          headerTitle: `${roomName} - ${item}`,
           headerTitleAlign: "center",
           headerShown: true,
           headerLeft: () => (
