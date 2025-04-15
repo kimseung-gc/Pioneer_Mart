@@ -21,16 +21,25 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
-            testID="back-button" 
+            testID="back-button"
           >
             <Entypo name="chevron-left" size={24} color="black" />
           </TouchableOpacity>
           <View style={styles.searchContainer}>
             <SearchBar screenId={screenId} />
           </View>
+          <Entypo name="chat" size={24} color="black" />
         </View>
       ) : (
-        <SearchBar screenId={screenId} />
+        <View style={styles.myItemsContainer}>
+          <SearchBar screenId={screenId} />
+          <Entypo
+            name="chat"
+            size={24}
+            color="black"
+            onPress={() => router.push("/ChatRoomScreen")}
+          />
+        </View>
       )}
     </View>
   );

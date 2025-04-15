@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
+  ListRenderItemInfo,
 } from "react-native";
 import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -18,6 +20,7 @@ import { useUserStore } from "@/stores/userStore";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
+import { ChatRoom } from "@/types/chat";
 
 const width = Dimensions.get("window").width;
 
@@ -30,6 +33,7 @@ const ItemDetails = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [chatLoading, setChatLoading] = useState(false);
   const authToken = useAuth();
   const { userData } = useUserStore();
 
@@ -131,7 +135,33 @@ const ItemDetails = () => {
       alert("Failed to send purchase request. Please try again.");
     }
   };
+  // const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
+  //   const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
+  //   return (
+  //     <TouchableOpacity style={styles.roomItem} onPress={() => enterRoom(item)}>
+  //       <Text style={styles.roomName}>{otherUser.username}</Text>
+  //       <Text style={styles.roomDetails}>{item.message_count} messages</Text>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
+  const enterRoom = (room: ChatRoom): void => {
+    // console.log("entering room:", room.id, room.user1, room.user2);
+    if (!userData?.id) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
+
+    const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
+    const chatName = room.item
+      ? `${otherUser.username} - ${room.item.title}`
+      : otherUser.username; // Use router.push instead of navigation.navigate
+    console.log("Hello1:", chatName);
+    router.push({
+      pathname: "/chat/[id]",
+      params: { id: room.id.toString(), name: chatName },
+    });
+  };
   // Find out if the user is the owner of the item
   const isOwner = userData && item && item.seller === userData.id;
 
@@ -142,6 +172,47 @@ const ItemDetails = () => {
       </View>
     );
   }
+
+  const startChat = async () => {
+    if (!item || !userData) return;
+
+    setChatLoading(true);
+
+    try {
+      const cleanToken = authToken.authToken?.trim();
+      console.log(
+        "Starting chat about item:",
+        item.id,
+        "with seller ID:",
+        item.seller
+      );
+      const response = await axios.get(
+        `${BASE_URL}/api/chat/get-or-create-room/`,
+        {
+          params: { user_id: item.seller, item_id: item.id }, // Assuming item.seller contains the seller's user id
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
+        }
+      );
+      const chatRoom = response.data.room;
+      console.log("Chat room created/retrieved:", chatRoom);
+      if (!chatRoom || !chatRoom.id) {
+        throw new Error("Invalid room data received");
+      }
+      const chatName = `${item.seller_name} - ${item.title}`;
+      // Navigate to the chat room
+      router.push({
+        pathname: `/chat/[id]`,
+        params: { id: chatRoom.id.toString(), name: chatName }, // Assuming item.seller_name is the seller's name
+      });
+    } catch (error) {
+      console.error("Error starting chat:", error);
+      Alert.alert("Error", "Failed to start a chat. Please try again.");
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   return (
     <>
@@ -206,22 +277,38 @@ const ItemDetails = () => {
         ) : (
           source !== "myItems" &&
           !isOwner && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: hasRequestedItem ? "gray" : "blue",
-                padding: 15,
-                borderRadius: 5,
-                marginTop: 20,
-                width: "100%",
-                alignItems: "center",
-              }}
-              onPress={() => handlePurchaseRequest(authToken.authToken)}
-              disabled={hasRequestedItem}
-            >
-              <Text style={{ color: "white", fontSize: 16 }}>
-                {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
-              </Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: hasRequestedItem ? "gray" : "blue",
+                  padding: 15,
+                  borderRadius: 5,
+                  marginTop: 20,
+                  width: "100%",
+                  alignItems: "center",
+                }}
+                onPress={() => handlePurchaseRequest(authToken.authToken)}
+                disabled={hasRequestedItem}
+              >
+                <Text style={{ color: "white", fontSize: 16 }}>
+                  {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.chatButton}
+                onPress={startChat}
+                disabled={chatLoading}
+              >
+                {chatLoading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <>
+                    <Entypo name="chat" size={20} color="white" />
+                    <Text style={styles.chatButtonText}>Message Seller</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </>
           )
         )}
       </View>
@@ -257,5 +344,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "black",
+  },
+  roomItem: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  roomName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  roomDetails: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 4,
+  },
+  chatButton: {
+    backgroundColor: "#22a45d",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 15,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chatButtonText: {
+    color: "white",
+    fontSize: 16,
+    marginLeft: 8,
   },
 });

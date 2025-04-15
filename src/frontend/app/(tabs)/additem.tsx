@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "@/config";
@@ -165,9 +166,15 @@ const AddItemScreen = () => {
       const imageType = imageFileName.endsWith("png")
         ? "image/png"
         : "image/jpeg";
+      const fileUri =
+        Platform.OS === "android"
+          ? image
+          : image.startsWith("file://")
+          ? image
+          : `file://${image}`;
 
       formDataObj.append("image", {
-        uri: image,
+        uri: Platform.OS === "android" ? image : image.replace("file://", ""),
         name: imageFileName,
         type: imageType,
       } as unknown as Blob);
@@ -249,19 +256,46 @@ const AddItemScreen = () => {
 
       const formDataObj = createFormData();
       const cleanToken = authToken?.trim();
-
-      await axios.post(`${BASE_URL}/api/items/`, formDataObj, {
+      console.log("Making request to:", `${BASE_URL}/api/items/`);
+      const response = await axios.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${cleanToken}`,
+          Accept: "application/json",
+        },
+        transformRequest: (data) => {
+          return data;
         },
       });
+      console.log("yeyyy");
 
       Alert.alert("Success", "Item added successfully");
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);
-      Alert.alert("Error", "Could not add item. Please try again later.");
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", JSON.stringify(error.response.data));
+
+        // Display specific validation errors
+        let errorMessage = "Could not add item. Please try again later.";
+        if (error.response.data) {
+          if (typeof error.response.data === "object") {
+            const errorDetails = Object.entries(error.response.data)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join("\n");
+            if (errorDetails) {
+              errorMessage = `Validation errors:\n${errorDetails}`;
+            }
+          }
+        }
+        Alert.alert("Error", errorMessage);
+      } else {
+        Alert.alert(
+          "Connection Error",
+          "Could not connect to the server. Please check your network and try again."
+        );
+      }
     } finally {
       setLoading(false);
     }

@@ -71,6 +71,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Set seller to current user when creating listing."""
+        print("hello")
         serializer.save(seller=self.request.user)
 
     def update(self, request, *args, **kwargs):

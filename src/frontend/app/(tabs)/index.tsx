@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { Stack, useFocusEffect } from "expo-router";
 
-
 import { useAuth } from "../contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import Header from "@/components/Header";

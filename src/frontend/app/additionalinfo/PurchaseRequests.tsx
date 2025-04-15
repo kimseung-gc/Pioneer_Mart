@@ -18,6 +18,7 @@ import SingleItem from "@/components/SingleItem";
 import React from "react";
 
 const PurchaseRequests = () => {
+  // States for PurchaseRequest screen
   const [activeTab, setActiveTab] = useState("sent");
   const [sentRequests, setSentRequests] = useState<PurchaseRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<PurchaseRequest[]>(
@@ -25,15 +26,23 @@ const PurchaseRequests = () => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const { authToken } = useAuth();
+  const { authToken } = useAuth(); // auth context
 
+  // On initial render of this screen, fetch all the requests
   useEffect(() => {
     fetchRequests();
   }, []);
 
+  /**
+   * @function fetchRequests
+   * @async
+   * @description Fetches both sent and received purchase requests from the backend API.
+   * It updates the `sentRequests` and `receivedRequests` state variables with the active requests.
+   * Handles loading and error states.
+   */
   const fetchRequests = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true); // start loading
       const sentResponse = await axios.get(`${BASE_URL}/api/requests/sent/`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -67,11 +76,23 @@ const PurchaseRequests = () => {
     }
   };
 
+  /**
+   * @function onRefresh
+   * @description Handles the refresh action of the FlatList by setting the `refreshing` state to true and calling `fetchRequests`.
+   */
   const onRefresh = () => {
     setRefreshing(true);
     fetchRequests();
   };
 
+  /**
+   * @function cancelRequest
+   * @async
+   * @param {number} requestId - The ID of the purchase request to cancel.
+   * @description Sends a request to the backend API to cancel a specific purchase request.
+   * Upon successful cancellation, it updates the local `sentRequests` state to remove the cancelled request.
+   * Handles potential errors during the cancellation process.
+   */
   const cancelRequest = async (requestId: number) => {
     try {
       const cleanToken = authToken?.trim();
@@ -86,7 +107,6 @@ const PurchaseRequests = () => {
           },
         }
       );
-      console.log("hssello");
 
       // Update the local state to remove the cancelled request
       setSentRequests((prevRequests) =>
@@ -99,6 +119,13 @@ const PurchaseRequests = () => {
     }
   };
 
+  /**
+   * @function renderRequestItem
+   * @param {object} { item } - An object containing the `PurchaseRequest` item to render.
+   * @returns {JSX.Element} - A View component representing a single purchase request item in the list.
+   * @description Renders a single purchase request item, displaying the associated listing details and the request date.
+   * For sent requests, it also includes a "Cancel" button.
+   */
   const renderRequestItem = ({ item }: { item: PurchaseRequest }) => {
     const formattedDate = new Date(item.created_at).toLocaleDateString();
 
@@ -123,6 +150,7 @@ const PurchaseRequests = () => {
   };
   return (
     <>
+      {/* Stack Screen configuration for the header */}
       <Stack.Screen
         options={{
           headerTitle: "Purchase Requests",
@@ -138,7 +166,9 @@ const PurchaseRequests = () => {
           ),
         }}
       />
+      {/* Main container for the component */}
       <View style={styles.container}>
+        {/* Tabs for switching between sent and received requests */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === "sent" && styles.activeTab]}
@@ -167,23 +197,27 @@ const PurchaseRequests = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        {/* Conditional rendering based on loading state */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="blue" />
           </View>
         ) : (
+          /* FlatList to display the list of purchase requests */
           <FlatList
             data={activeTab === "sent" ? sentRequests : receivedRequests}
             renderItem={renderRequestItem}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.listContent}
             refreshControl={
+              /* Refresh control for pull-to-refresh functionality */
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 colors={["#4285F4"]}
               />
             }
+            /* Component to display when the list is empty */
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>
@@ -200,6 +234,10 @@ const PurchaseRequests = () => {
 
 export default PurchaseRequests;
 
+/**
+ * @constant styles
+ * @description StyleSheet for the PurchaseRequests component.
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
