@@ -4,7 +4,7 @@ Group:
 Seunghyeon (Hyeon) Kim [seunghk1206](https://github.com/seunghk1206), 
 Joyce Gill [joycegill](https://github.com/joycegill), 
 Lydia Ye [Lydia-Ye](https://github.com/Lydia-Ye), 
-Muhammed Khalid [muhammadkhalid-03](https://github.com/muhammadkhalid-03), 
+Muhammad Khalid [muhammadkhalid-03](https://github.com/muhammadkhalid-03), 
 Alan Zhang [yiyZh](https://github.com/yiyZh)
 
 ## Project Description
@@ -24,6 +24,9 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
     - sprint_01_outcomes.md
     - sprint_01_planning.md
     - sprint_02_planning.md
+    - sprint_02.md
+    - sprint_03_planning.md
+    - sprint_03.md
 - src
     - basic_classes
     - frontend
@@ -40,9 +43,15 @@ Sprint 01 outcomes (named sprint_01_outcomes.md) can be found in the link in the
 
 Sprint 02 planning (named sprint_02_planning.md) can be found in the link in markdown file in the sprint_reports folder.
 
+Sprint 02 outcomes (named sprint_02.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 03 planning (named sprint_03_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 03 outcomes (named sprint_03.md) can be found in the link in markdown file in the sprint_reports folder.
+
 ## Testing
 
-We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using a human-driven test and Jest. The git actions are set up in the repository.
+We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using Jest, React Testing Library, and human-driven testing. The git actions are set up in the repository.
 
 ### How to run the tests?
 Backend (Non-Django related)
@@ -107,7 +116,11 @@ from https://www.youtube.com/watch?v=uFcXrWT4f80
 7. Test Item image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing  
 
 8. Source image for Test Item. Photomatic. Retrieved 14 August, 2024.
-https://drive.google.com/file/d/1AyQBq8Fw2hZqz5hLmVM9M0U-o-EBiySj/view?usp=sharing 
+https://drive.google.com/file/d/1AyQBq8Fw2hZqz5hLmVM9M0U-o-EBiySj/view?usp=sharing
+
+9. Freecodecamp.org. (2023, February 1). Learn Django by Building an Online Marketplace – Python Tutorial for Beginners [Video]. YouTube.com. https://www.youtube.com/watch?v=ZxMB6Njs3ck&t=1411s
+
+10. Pradip Debnath. (2024, October 16). 🔴#1 - eCommerce App in React Native | Home, Login, SignUp, Onboarding UI of eCommerce App [Video]. YouTube.com. https://www.youtube.com/watch?v=y4vNZQpJrdc&t=4729s
 
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_npm.yml/badge.svg)
