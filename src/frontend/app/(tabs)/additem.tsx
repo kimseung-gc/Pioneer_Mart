@@ -109,13 +109,21 @@ const AddItemScreen = () => {
 
   // Function to pick an image from the phone's gallery
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission needed",
-        "Please allow access to your photo library"
-      );
+    if (permissionResult.status !== "granted") {
+      if (!permissionResult.canAskAgain) {
+        Alert.alert(
+          "Permission required",
+          "You've previously denied access to your photo library. Please enable it from your phone's settings to continue."
+        );
+      } else {
+        Alert.alert(
+          "Permission needed",
+          "Please allow access to your photo library to select an image."
+        );
+      }
       return;
     }
 
