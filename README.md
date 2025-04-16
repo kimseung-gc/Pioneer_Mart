@@ -57,6 +57,7 @@ We are using pytest, flake8, and mypy in order to test our back-end code. For th
 ### How to run the tests?
 Backend (Non-Django related)
 > pip install tox tox-gh-actions
+
 > tox
 
 Backend (Django related)
@@ -65,7 +66,9 @@ Pre-requisite: be in the src/backend folder
 
 Frontend
 > npm install
+
 > export PATH="./node_modules/.bin:$PATH" 
+
 > yarn jest
 
 ## Running the Application
@@ -77,10 +80,12 @@ Pre-requisites:
 
 Running the Backend (server)
 > pip install -r requirements.txt
+
 > python3 manage.py runserver
 
 Running the Frontend (npm)
 > npm install
+
 > npx expo start
 
 * Please note that npm install may leave out some installations out, so it is highly recommended to install extra dependencies via following
