@@ -27,6 +27,7 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
     - sprint_02.md
     - sprint_03_planning.md
     - sprint_03.md
+    - sprint_04_planning.md
 - src
     - basic_classes
     - frontend
@@ -76,7 +77,7 @@ Pre-requisites:
 
 Running the Backend (server)
 > pip install -r requirements.txt
-> python3 manage.py
+> python3 manage.py runserver
 
 Running the Frontend (npm)
 > npm install
