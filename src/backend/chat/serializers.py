@@ -14,7 +14,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ["id", "content", "user", "timestamp"]
+        fields = ["id", "content", "user", "timestamp", "is_read", "read_at"]
 
     def get_username(self, obj):
         return obj.user.username if obj.user else "Unknown"
@@ -26,6 +26,8 @@ class ChatRoomSerializer(serializers.ModelSerializer):
     user_count = serializers.SerializerMethodField()
     message_count = serializers.SerializerMethodField()
     item_title = serializers.SerializerMethodField()
+    unread_count = serializers.IntegerField(read_only=True, default=0)
+    last_message_time = serializers.DateTimeField(read_only=True, allow_null=True)
 
     class Meta:
         model = ChatRoom
@@ -38,6 +40,8 @@ class ChatRoomSerializer(serializers.ModelSerializer):
             "created_at",
             "user_count",
             "message_count",
+            "unread_count",
+            "last_message_time",
         ]
 
     def get_user_count(self, obj):

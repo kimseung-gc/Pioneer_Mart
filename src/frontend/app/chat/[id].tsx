@@ -38,9 +38,9 @@ const ChatScreen = () => {
     setMessages([]);
     let socketUrl = "";
     const baseUrlObj = new URL(BASE_URL);
-    const host = baseUrlObj.host; // This includes hostname and port
+    const host = baseUrlObj.host; // this includes hostname and port
 
-    // Construct WebSocket URL with trailing slash
+    // construct WebSocket URL with trailing slash
     socketUrl = `ws://${host}/ws/chat/${roomId}/`;
     ws.current = new WebSocket(socketUrl);
     ws.current.onopen = () => {
@@ -49,7 +49,7 @@ const ChatScreen = () => {
 
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data) as WebSocketMessage;
-      console.log("Received message:", data); // Debug the incoming data
+      console.log("Received message:", data); // debug the incoming data
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -72,6 +72,7 @@ const ChatScreen = () => {
     };
 
     fetchChatHistory();
+    markRoomAsRead(); // mark messages as read when opening the chat
 
     return () => {
       if (ws.current) {
@@ -82,6 +83,23 @@ const ChatScreen = () => {
     };
   }, [roomId]);
 
+  const markRoomAsRead = async (): Promise<void> => {
+    try {
+      const cleanToken = authToken.authToken?.trim();
+      await axios.post(
+        `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error marking room as read:", error);
+    }
+  };
   const fetchChatHistory = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();

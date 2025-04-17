@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -15,28 +16,70 @@ from django.db.models import Q
 def room_list(request):
     user = request.user
     rooms = ChatRoom.objects.filter(Q(user1=user) | Q(user2=user))
-    serializer = ChatRoomSerializer(rooms, many=True)
-    return Response({"rooms": serializer.data})
 
+    # get unread counts for each room
+    room_data = []
+    for room in rooms:
+        # get unread message count for this user
+        unread_count = (
+            Message.objects.filter(
+                room=room,
+                is_read=False,
+            )
+            .exclude(user=user)
+            .count()
+        )
 
-@api_view(["POST"])
-def create_room(request):
-    serializer = ChatRoomSerializer(data=request.data)
-    if serializer.is_valid():
-        room = serializer.save()
-        return Response({"room": serializer.data}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # now get the timestamp of the last message
+        last_message = Message.objects.filter(room=room).order_by("-timestamp").first()
+        last_message_time = last_message.timestamp if last_message else None
+
+        # create a temporary dict with room data
+        room_dict = {
+            "room": room,
+            "unread_count": unread_count,
+            "last_message_time": last_message_time,
+        }
+        room_data.append(room_dict)
+
+    # serialize the rooms with additional data
+    serialized_rooms = []
+    for item in room_data:
+        serializer = ChatRoomSerializer(item["room"])
+        data = serializer.data
+        data["unread_count"] = item["unread_count"]
+        data["last_message_time"] = item["last_message_time"]
+        serialized_rooms.append(data)
+    return Response({"rooms": serialized_rooms})
 
 
 @api_view(["GET"])
 def chat_history(request, room_id):
     try:
         room = ChatRoom.objects.get(id=room_id)
+        user = request.user
+
+        # check if the user has access to this room
+        if user != room.user1 and user != room.user2:
+            return Response(
+                {"error": "You don't have access to this room"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        messages = Message.objects.filter(room=room).order_by("timestamp")
+
+        # filter messages that are read when history is fetched
+        unread_messagees = messages.filter(is_read=False).exclude(user=user)
+        current_time = timezone.now()
+
+        # mark those messages as read
+        for message in unread_messagees:
+            message.is_read = True
+            message.read_at = current_time
+            message.save()
+        serializer = MessageSerializer(messages, many=True)
+        return Response({"messages": serializer.data})
     except ChatRoom.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    messages = Message.objects.filter(room=room).order_by("timestamp")
-    serializer = MessageSerializer(messages, many=True)
-    return Response({"messages": serializer.data})
 
 
 @api_view(["GET"])
@@ -70,3 +113,50 @@ def get_or_create_room(request):
         return Response({"room": serializer.data})
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_room_as_read(request, room_id):
+    """
+    Mark all unread messages in a room as read for the current user
+    """
+    try:
+        # first we get the room
+        room = ChatRoom.objects.get(id=room_id)
+        user = request.user
+
+        # Then check if the user is part of this room
+        if user != room.user1 and user != room.user2:
+            return Response(
+                {"error": "You don't have access to this room"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        print("hello")
+        # Now find the messagees that are unread nad not sent by the current user
+        unread_messages = Message.objects.filter(
+            room=room,
+            is_read=False,
+        ).exclude(user=user)
+
+        # Mark messages as read with a timestamp
+        unread_count = unread_messages.count()
+        current_time = timezone.now()
+        for message in unread_messages:
+            message.is_read = True
+            message.read_at = current_time
+            message.save()
+        return Response(
+            {
+                "success": True,
+                "message": f"Marked {unread_count} messages as read",
+                "unread_count": 0,
+            }
+        )
+    except ChatRoom.DoesNotExist:
+        return Response(
+            {"error": "Chat room not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

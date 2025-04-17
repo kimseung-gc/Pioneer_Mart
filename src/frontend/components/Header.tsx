@@ -25,20 +25,28 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
           >
             <Entypo name="chevron-left" size={24} color="black" />
           </TouchableOpacity>
-          <View style={styles.searchContainer}>
-            <SearchBar screenId={screenId} />
+          <View style={styles.myItemsContainer}>
+            <View style={styles.searchContainer}>
+              <SearchBar screenId={screenId} />
+            </View>
+            <View style={styles.iconContainer}>
+              <Entypo name="chat" size={24} color="black" />
+            </View>
           </View>
-          <Entypo name="chat" size={24} color="black" />
         </View>
       ) : (
         <View style={styles.myItemsContainer}>
-          <SearchBar screenId={screenId} />
-          <Entypo
-            name="chat"
-            size={24}
-            color="black"
-            onPress={() => router.push("/ChatRoomScreen")}
-          />
+          <View style={styles.searchContainer}>
+            <SearchBar screenId={screenId} />
+          </View>
+          <View style={styles.iconContainer}>
+            <Entypo
+              name="chat"
+              size={24}
+              color="black"
+              onPress={() => router.push("/ChatRoomScreen")}
+            />
+          </View>
         </View>
       )}
     </View>
@@ -56,6 +64,7 @@ const styles = StyleSheet.create({
   myItemsContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     width: "100%",
   },
   backButton: {
@@ -64,5 +73,10 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 1,
+    marginRight: 16,
+  },
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

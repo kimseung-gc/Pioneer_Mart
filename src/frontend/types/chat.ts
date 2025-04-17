@@ -21,6 +21,8 @@ export interface ChatRoom {
   user2: { id: number; username: string };
   created_at: string;
   message_count: number;
+  unread_count?: number;
+  last_message_time?: string;
 }
 
 export interface WebSocketMessage {

@@ -1,8 +1,8 @@
 import { useUserStore } from "@/stores/userStore";
 import { ChatRoom, ChatRoomsScreenRouteParams } from "@/types/chat";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./contexts/AuthContext";
 import axios from "axios";
 import { BASE_URL } from "@/config";
@@ -13,14 +13,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
-  Touchable,
   FlatList,
-  Modal,
-  TextInput,
+  RefreshControl,
 } from "react-native";
 import React from "react";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
+
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
   Chat: {
@@ -42,13 +41,22 @@ interface Props {
 
 const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [newRoomName, setNewRoomName] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const { userData } = useUserStore();
   const authToken = useAuth();
-  useEffect(() => {
-    fetchRooms();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchRooms();
+      return () => {};
+    }, [])
+  );
+  // // This routinely refreshes the messages
+  // const refreshInterval = setInterval(() => {
+  //   fetchRooms();
+  // }, 60000); // refresh every minute
+  // return () => clearInterval(refreshInterval);
+  // }, []);
 
   const fetchRooms = async (): Promise<void> => {
     try {
@@ -61,9 +69,47 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
         },
       });
       const data = response.data;
-      setRooms(data.rooms);
+
+      // Sort the rooms by last message time (i.e. newest first)
+      const sortedRooms = data.rooms.sort((a: ChatRoom, b: ChatRoom) => {
+        if (!a.last_message_time || !b.last_message_time) return 0;
+        return (
+          new Date(b.last_message_time).getTime() -
+          new Date(a.last_message_time).getTime()
+        );
+      });
+      setRooms(sortedRooms);
     } catch (error) {
       console.error("Error fetching rooms:", error);
+    }
+  };
+
+  const handleRefresh = async (): Promise<void> => {
+    setIsRefreshing(true);
+    await fetchRooms();
+    setIsRefreshing(false);
+  };
+
+  const markRoomAsRead = async (roomId: number): Promise<void> => {
+    try {
+      const cleanToken = authToken.authToken?.trim();
+      await axios.post(
+        `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setRooms((prevRooms) =>
+        prevRooms.map((room) =>
+          room.id === roomId.toString() ? { ...room, unread_count: 0 } : room
+        )
+      );
+    } catch (error) {
+      console.error("Error marking room as read:", error);
     }
   };
 
@@ -75,6 +121,9 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
 
     const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
     // Use router.push instead of navigation.navigate
+    if (room.unread_count && room.unread_count > 0) {
+      markRoomAsRead(Number(room.id));
+    }
     router.push({
       pathname: "/chat/[id]",
       params: {
@@ -87,13 +136,32 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
 
   const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
+    console.log("Unread count:", item.unread_count);
     return (
-      <TouchableOpacity style={styles.roomItem} onPress={() => enterRoom(item)}>
-        <Text style={styles.roomName}>{otherUser.username}</Text>
-        <Text style={styles.roomDetails}>
-          {item.item_title ? `Item: ${item.item_title}` : "No item"} |{" "}
-          {item.message_count} messages
-        </Text>
+      <TouchableOpacity
+        style={[
+          styles.roomItem,
+          item.unread_count && item.unread_count > 0 ? styles.unreadRoom : null,
+        ]}
+        onPress={() => enterRoom(item)}
+      >
+        <View style={styles.roomContent}>
+          <Text style={styles.roomName}>{otherUser.username}</Text>
+          <View style={styles.detailsContainer}>
+            <Text style={styles.roomDetails}>
+              {item.item_title ? `Item: ${item.item_title}` : "No item"}
+            </Text>
+            <Text style={styles.roomDetails}> | </Text>
+            <Text style={styles.roomDetails}>
+              {item.message_count} messages
+            </Text>
+          </View>
+        </View>
+        {Number(item.unread_count) > 0 && (
+          <View style={styles.unreadBadge}>
+            <Text style={styles.unreadText}>{item.unread_count}</Text>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -116,6 +184,11 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
               <Entypo name="chevron-left" size={24} color="black" />
             </TouchableOpacity>
           ),
+          headerRight: () => (
+            <TouchableOpacity style={{ padding: 8 }} onPress={handleRefresh}>
+              <EvilIcons name="refresh" size={24} color="black" />
+            </TouchableOpacity>
+          ),
         }}
       />
       <View style={styles.container}>
@@ -130,33 +203,15 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
           ListEmptyComponent={
             <Text style={styles.emptyText}>No Chat rooms available</Text>
           }
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={["#4caf50"]}
+              tintColor="#4caf50"
+            />
+          }
         />
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Create new Room</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={newRoomName}
-                onChangeText={setNewRoomName}
-                placeholder="Room name"
-              />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
       </View>
     </>
   );
@@ -207,70 +262,43 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   roomName: {
     fontSize: 18,
     fontWeight: "bold",
   },
+  detailsContainer: {
+    flexDirection: "row",
+    marginTop: 4,
+  },
   roomDetails: {
     fontSize: 14,
     color: "#888",
-    marginTop: 4,
   },
-  modalOverlay: {
+  roomContent: {
     flex: 1,
+  },
+  unreadBadge: {
+    backgroundColor: "#2196f3",
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingHorizontal: 8,
   },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  modalInput: {
-    width: "100%",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  modalButton: {
-    borderRadius: 8,
-    padding: 12,
-    flex: 1,
-    alignItems: "center",
-    marginHorizontal: 8,
-  },
-  cancelButton: {
-    backgroundColor: "#f0f0f0",
-  },
-  cancelButtonText: {
-    color: "#333",
+  unreadText: {
+    color: "white",
+    fontSize: 12,
     fontWeight: "bold",
   },
-  createModalButton: {
-    backgroundColor: "#007bff",
+  unreadRoom: {
+    backgroundColor: "#f0f7ff", // Light blue background for unread messages
+    borderLeftWidth: 4,
+    borderLeftColor: "#2196f3",
   },
 });
 
