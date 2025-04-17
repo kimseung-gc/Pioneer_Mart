@@ -25,13 +25,13 @@ const ChatScreen = () => {
   const roomId = typeof id === "string" ? id : "";
   const roomName = typeof name === "string" ? name : "Chat Room";
   const item = typeof itemTitle === "string" ? itemTitle : "Item";
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [messageText, setMessageText] = useState<string>("");
-  const [connected, setConnected] = useState<boolean>(false);
-  const ws = useRef<WebSocket | null>(null);
-  const flatListRef = useRef<FlatList | null>(null);
-  const authToken = useAuth();
-  const { userData } = useUserStore();
+  const [messages, setMessages] = useState<Message[]>([]); // state for all messagees in the chat
+  const [messageText, setMessageText] = useState<string>(""); // state for the actual content of a message
+  const [connected, setConnected] = useState<boolean>(false); // state for whether websocket is connected
+  const ws = useRef<WebSocket | null>(null); // react ref for websocket needed for chatting w/ persistent connection
+  const flatListRef = useRef<FlatList | null>(null); // react ref for interacting with FlatList
+  const authToken = useAuth(); // auth token
+  const { userData } = useUserStore(); //userData from user store
 
   useEffect(() => {
     // connect to websocket
@@ -42,14 +42,16 @@ const ChatScreen = () => {
 
     // construct WebSocket URL with trailing slash
     socketUrl = `ws://${host}/ws/chat/${roomId}/`;
+
+    //setup event handlers for websocket connection
     ws.current = new WebSocket(socketUrl);
     ws.current.onopen = () => {
       setConnected(true); //socket now connected
     };
-
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data) as WebSocketMessage;
       console.log("Received message:", data); // debug the incoming data
+      // update state for messages when user receives a message
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -61,19 +63,21 @@ const ChatScreen = () => {
         },
       ]);
     };
-
     ws.current.onerror = (e) => {
       console.error("WebSocket error:", e);
     };
-
     ws.current.onclose = () => {
       console.log("WebSocket disconnected");
       setConnected(false);
     };
 
+    // once event handlers are setup, fetch chat history & mark room
+    // as read cause we're already in chat room
     fetchChatHistory();
-    markRoomAsRead(); // mark messages as read when opening the chat
+    markRoomAsRead();
 
+    // this return is essentially a cleanup function. React will
+    // automatically call this if roomId changes or the component unmounts
     return () => {
       if (ws.current) {
         ws.current.close();
@@ -81,7 +85,7 @@ const ChatScreen = () => {
       }
       setMessages([]);
     };
-  }, [roomId]);
+  }, [roomId]); // this hook runs whenever roomId changes. In other words, whenever the user navigates to a new chat room
 
   const markRoomAsRead = async (): Promise<void> => {
     try {
@@ -100,6 +104,7 @@ const ChatScreen = () => {
       console.error("Error marking room as read:", error);
     }
   };
+
   const fetchChatHistory = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();
@@ -135,17 +140,19 @@ const ChatScreen = () => {
       user_id: userData?.id,
     };
 
+    // send a message
     ws.current.send(JSON.stringify(messageData));
     setMessageText("");
   };
 
   const renderMessage = ({ item }: ListRenderItemInfo<Message>) => {
+    // this might seem useless but my stupid ass messed up the
+    // chat.ts types and have been working with those so now we
+    // need to convert all id's to string to use them w/ the backend
     const currentUserId = userData?.id?.toString();
     const messageUserId = item.userId?.toString();
 
-    console.log(
-      `Comparing message: ${messageUserId} with current user: ${currentUserId}`
-    );
+    // check if message is sent by user for UI stuff
     const isMyMessage = messageUserId === currentUserId;
 
     return (
@@ -194,15 +201,6 @@ const ChatScreen = () => {
           style={styles.keyboardAvoid}
           keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
         >
-          {/* <View style={styles.header}>
-            <Text style={styles.roomName}>Room: {roomName}</Text>
-            <View
-              style={[
-                styles.connectionIndicator,
-                connected ? styles.connected : styles.disconnected,
-              ]}
-            />
-          </View> */}
           <FlatList
             ref={flatListRef}
             data={messages}

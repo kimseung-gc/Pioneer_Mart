@@ -14,7 +14,10 @@ from django.db.models import Q
 
 @api_view(["GET"])
 def room_list(request):
+    # get current user
     user = request.user
+
+    # find rooms for current user
     rooms = ChatRoom.objects.filter(Q(user1=user) | Q(user2=user))
 
     # get unread counts for each room
@@ -56,7 +59,10 @@ def room_list(request):
 @api_view(["GET"])
 def chat_history(request, room_id):
     try:
+        # get room
         room = ChatRoom.objects.get(id=room_id)
+
+        # get user
         user = request.user
 
         # check if the user has access to this room
@@ -65,6 +71,7 @@ def chat_history(request, room_id):
                 {"error": "You don't have access to this room"},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        # find messages for current room & sort by timestamp
         messages = Message.objects.filter(room=room).order_by("timestamp")
 
         # filter messages that are read when history is fetched
@@ -76,6 +83,7 @@ def chat_history(request, room_id):
             message.is_read = True
             message.read_at = current_time
             message.save()
+        # serialize messages for response
         serializer = MessageSerializer(messages, many=True)
         return Response({"messages": serializer.data})
     except ChatRoom.DoesNotExist:
@@ -85,16 +93,23 @@ def chat_history(request, room_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_or_create_room(request):
-    other_user_id = request.GET.get("user_id")  # get the user id
-    item_id = request.GET.get("item_id")  # get the item id
+    """
+    Get a room if it exists and create one if it doesn't
+    """
+    # check if we have an item AND user in the request otherwise return error
+    other_user_id = request.GET.get("user_id")
+    item_id = request.GET.get("item_id")
     if not other_user_id or not item_id:  # need both for new chat room
         return Response(
             {"error": "Both user_id and item_id are required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
     try:
+        # get the user that the current user is chatting with
         other_user = User.objects.get(id=other_user_id)  # get other user
         me = request.user  # this is current user
+
         # We wanna first check if a room already exists for this user item combo
         existing_rooms = ChatRoom.objects.filter(
             item_id=item_id, user1__in=[me, other_user], user2__in=[me, other_user]
@@ -108,7 +123,6 @@ def get_or_create_room(request):
             )  # sort by my name first
             room = ChatRoom.objects.create(user1=user1, user2=user2, item_id=item_id)
 
-        # room, created = ChatRoom.objects.get_or_create(user1=user1, user2=user2)
         serializer = ChatRoomSerializer(room)
         return Response({"room": serializer.data})
     except User.DoesNotExist:

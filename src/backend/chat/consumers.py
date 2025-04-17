@@ -67,6 +67,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(f"[ERROR] No room found with id={self.room_id}")
             raise
         user = User.objects.get(id=user_id)
+
         # create message with is_read=False by defualt
         message_obj = Message.objects.create(
             user=user,

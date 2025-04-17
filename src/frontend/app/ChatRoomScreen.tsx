@@ -51,12 +51,6 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
       return () => {};
     }, [])
   );
-  // // This routinely refreshes the messages
-  // const refreshInterval = setInterval(() => {
-  //   fetchRooms();
-  // }, 60000); // refresh every minute
-  // return () => clearInterval(refreshInterval);
-  // }, []);
 
   const fetchRooms = async (): Promise<void> => {
     try {
@@ -103,6 +97,7 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
           },
         }
       );
+      // set the unread_count for a room as 0 to mark it as read
       setRooms((prevRooms) =>
         prevRooms.map((room) =>
           room.id === roomId.toString() ? { ...room, unread_count: 0 } : room
@@ -118,12 +113,15 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
       Alert.alert("Error", "User not authenticated");
       return;
     }
-
+    // figure out who's sending the messages for UI stuff
     const otherUser = userData.id === room.user1.id ? room.user2 : room.user1;
-    // Use router.push instead of navigation.navigate
+
+    // if there are unread messages in this room, mark them as read
     if (room.unread_count && room.unread_count > 0) {
       markRoomAsRead(Number(room.id));
     }
+
+    // navigate to the chat room
     router.push({
       pathname: "/chat/[id]",
       params: {
@@ -135,8 +133,9 @@ const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
+    // figure out who's sending the messages for UI stuff
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
-    console.log("Unread count:", item.unread_count);
+    console.log("Unread count:", item.unread_count); //debug line
     return (
       <TouchableOpacity
         style={[
