@@ -13,11 +13,13 @@ import { useRoute } from "@react-navigation/native";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { useAuth } from "@/app/contexts/AuthContext";
 import useSingleItemStore from "@/stores/singleItemStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useUserStore } from "@/stores/userStore";
 import ZoomModal from "./ZoomModal";
 import React from "react";
+import ReportModal from "./ReportModal";
+import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   item: ItemType;
@@ -41,7 +43,7 @@ const SingleItem = ({ item, source }: Props) => {
   const currentItem = items.find((i) => i.id === item.id) || item;
 
   const [isZoomVisible, setIsZoomVisible] = useState(false);
-
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const handleItemPress = () => {
     if (source === "myItems") {
       setShowFavoritesIcon(false);
@@ -90,25 +92,66 @@ const SingleItem = ({ item, source }: Props) => {
             item={currentItem} // Use the updated item
           />
         )}
+
+        <ReportModal
+          isVisible={isReportModalVisible}
+          onClose={() => setIsReportModalVisible(false)}
+          itemId={currentItem.id}
+        />
         <Image source={{ uri: currentItem.image }} style={styles.itemImage} />
         {currentItem.seller === userData?.id && (
           <View style={styles.myItemTag} />
         )}
-        {showFavoritesIcon &&
-        currentItem.seller !== userData?.id &&
-        route.name !== "additionalinfo/MyItems" ? (
-          <TouchableOpacity
-            style={styles.favBtn}
-            onPress={handleFavoriteToggle}
-          >
-            <AntDesign
-              testID={latestItem.is_favorited ? "heart-icon" : "hearto-icon"}
-              name={latestItem.is_favorited ? "heart" : "hearto"}
-              size={22}
-              color="black"
-            />
-          </TouchableOpacity>
-        ) : null}
+        <View style={styles.buttonsContainer}>
+          {showFavoritesIcon &&
+          currentItem.seller !== userData?.id &&
+          route.name !== "additionalinfo/MyItems" ? (
+            <>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setIsReportModalVisible(true);
+                }}
+              >
+                <MaterialIcons
+                  testID={
+                    latestItem.is_reported ? "flag-icon" : "outlined-flag-icon"
+                  }
+                  name={latestItem.is_reported ? "flag" : "outlined-flag"}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.favBtn}
+                onPress={handleFavoriteToggle}
+              >
+                <AntDesign
+                  testID={
+                    latestItem.is_favorited ? "heart-icon" : "hearto-icon"
+                  }
+                  name={latestItem.is_favorited ? "heart" : "hearto"}
+                  size={22}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </>
+          ) : null}
+
+          {/* Show the report button if user is not the owner
+          {!isOwner && (
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={(e) => {
+                e.stopPropagation();
+                setIsReportModalVisible(true);
+              }}
+            >
+              <Entypo name="flag" size={20} color="black" />
+            </TouchableOpacity>
+          )} */}
+        </View>
         {!isDetailsPage && (
           <>
             <Text style={styles.title}>${currentItem.price}</Text>
@@ -122,12 +165,10 @@ const SingleItem = ({ item, source }: Props) => {
 
 export default SingleItem;
 
-// Styles remain unchanged
-
 const styles = StyleSheet.create({
   container: {
-    width: (width - 10) / 2, // Ensure spacing works correctly
-    marginHorizontal: 5, // Add margin for spacing
+    width: (width - 10) / 2,
+    marginHorizontal: 5,
   },
   itemImage: {
     width: "100%",
@@ -136,10 +177,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
-  favBtn: {
+  buttonsContainer: {
     position: "absolute",
-    right: 20,
+    right: 10,
     top: 20,
+    flexDirection: "row",
+    gap: 10,
+  },
+  iconBtn: {
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    padding: 5,
+    borderRadius: 30,
+  },
+  favBtn: {
+    // position: "absolute",
+    // right: 20,
+    // top: 20,
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     padding: 5,
     borderRadius: 30,

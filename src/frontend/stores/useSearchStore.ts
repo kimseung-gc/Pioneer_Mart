@@ -5,8 +5,6 @@ import { CategoryType, ItemType, ScreenId } from "@/types/types";
 import axios from "axios";
 import { create } from "zustand";
 
-// type ScreenId = "home" | "myItems" | "favorites";
-
 // interface for the state and actions of each screen
 interface ScreenState {
   items: ItemType[]; //all the items that could appear on the screen
@@ -50,6 +48,7 @@ interface ItemsStoreState {
 
   //toggling favorites function
   toggleFavorite: (itemId: number, authToken: string) => Promise<void>;
+  toggleReport: (itemId: number, authToken: string) => Promise<void>;
 }
 
 //initial state for a screen
@@ -70,6 +69,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   screens: {
     home: { ...initialScreenState },
     favorites: { ...initialScreenState },
+    reported: { ...initialScreenState },
     myItems: { ...initialScreenState },
   },
   activeScreen: "home",
@@ -553,7 +553,12 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       const state = get();
 
       // Check if item exists in any screen to get its current status and details
-      for (const screenKey of ["home", "favorites", "myItems"] as ScreenId[]) {
+      for (const screenKey of [
+        "home",
+        "favorites",
+        "myItems",
+        "reported",
+      ] as ScreenId[]) {
         const item = state.screens[screenKey].items.find(
           (item) => item.id === itemId
         );
@@ -590,7 +595,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems"] as ScreenId[]).forEach(
+        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
           (screenKey) => {
             const screen = updatedScreens[screenKey];
 
@@ -659,6 +664,137 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       });
     } catch (error) {
       console.log("Error toggling favorite:", error);
+    }
+  },
+  /**
+   * Function to report an item
+   * @param {number} itemId - The item that needs to be reported
+   * @param {string} authToken - User's authentication token
+   * @example
+   *  await toggleReport(item.id, authToken || "");
+   */
+  toggleReport: async (itemId: number, authToken: string) => {
+    try {
+      // const cleanToken = authToken?.trim();
+      // const URL = `${BASE_URL}/api/items/${itemId}/toggle_favorite/`;
+
+      // First determine the current reported status from the item in any screen
+      let currentReportedStatus = false;
+      let currentItem: ItemType | undefined;
+      const state = get();
+
+      // Check if item exists in any screen to get its current status and details
+      for (const screenKey of [
+        "home",
+        "favorites",
+        "myItems",
+        "reported",
+      ] as ScreenId[]) {
+        const item = state.screens[screenKey].items.find(
+          (item) => item.id === itemId
+        );
+        if (item) {
+          currentReportedStatus = item.is_reported;
+          currentItem = item;
+          break;
+        }
+      }
+
+      if (!currentItem) {
+        console.error("Item not found in any screen");
+        return;
+      }
+
+      // Toggle the status - calculate new status ahead of time
+      const newReportedStatus = !currentReportedStatus;
+
+      // // Make the API call
+      // await axios.post(
+      //   URL,
+      //   {},
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${cleanToken}`,
+      //       "Content-Type": "application/json",
+      //       Accept: "application/json",
+      //     },
+      //   }
+      // );
+
+      // Now update all screens with the known new status
+      set((state) => {
+        const updatedScreens = { ...state.screens };
+
+        // Update existing items in each screen
+        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
+          (screenKey) => {
+            const screen = updatedScreens[screenKey];
+
+            // Update items array with the new status
+            const updatedItems = screen.items.map((item) =>
+              item.id === itemId
+                ? { ...item, is_reported: newReportedStatus }
+                : item
+            );
+
+            // Update filtered items array with the new status
+            const updatedFilteredItems = screen.filteredItems.map((item) =>
+              item.id === itemId
+                ? { ...item, is_reported: newReportedStatus }
+                : item
+            );
+
+            // Handle special cases for the favorites screen
+            if (screenKey === "reported") {
+              if (!newReportedStatus) {
+                // If unreporting, remove from reported screen
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: updatedItems.filter((item) => item.id !== itemId),
+                  filteredItems: updatedFilteredItems.filter(
+                    (item) => item.id !== itemId
+                  ),
+                };
+              } else if (
+                newReportedStatus &&
+                !screen.items.some((item) => item.id === itemId)
+              ) {
+                // If reporting AND the item isn't already in reported screen, add it
+                const itemToAdd = { ...currentItem!, is_reported: true };
+
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: [itemToAdd, ...screen.items],
+                  filteredItems:
+                    screen.selectedCategory === null ||
+                    Number(itemToAdd.category) === screen.selectedCategory
+                      ? [itemToAdd, ...screen.filteredItems]
+                      : screen.filteredItems,
+                };
+              } else {
+                // Just update status
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: updatedItems,
+                  filteredItems: updatedFilteredItems,
+                };
+              }
+            } else {
+              // For non-favorites screens, just update the items
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems,
+                filteredItems: updatedFilteredItems,
+              };
+            }
+          }
+        );
+
+        return { screens: updatedScreens };
+      });
+      console.log("\n\nreported:", itemId, "\n\n");
+    } catch (error) {
+      console.log("Error reporting item:", error);
     }
   },
 }));

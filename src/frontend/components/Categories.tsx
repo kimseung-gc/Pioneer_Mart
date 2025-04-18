@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { CategoryType } from "@/types/types";
+import { CategoryType, ScreenId } from "@/types/types";
 import { useItemsStore } from "@/stores/useSearchStore";
 
 /**
@@ -14,8 +14,7 @@ import { useItemsStore } from "@/stores/useSearchStore";
  */
 type CategoriesProps = {
   /** Identifier for the screen using this component */
-  screenId: "home" | "favorites" | "myItems";
-
+  screenId: ScreenId;
   /** List of available categories to display */
   categories: CategoryType[] | null;
 };

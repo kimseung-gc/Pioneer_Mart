@@ -5,9 +5,10 @@ import { useRoute } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
 import React from "react";
+import { ScreenId } from "@/types/types";
 
 type HeaderProps = {
-  screenId: "home" | "favorites" | "myItems";
+  screenId: ScreenId;
 };
 
 const Header: React.FC<HeaderProps> = ({ screenId }) => {
@@ -16,7 +17,8 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {route.name === "additionalinfo/MyItems" ? (
+      {route.name === "additionalinfo/MyItems" ||
+      route.name == "additionalinfo/ReportedItems" ? (
         <View style={styles.myItemsContainer}>
           <TouchableOpacity
             style={styles.backButton}
@@ -65,15 +67,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: "100%",
+    width: "95%",
   },
   backButton: {
-    marginRight: 8,
     marginTop: 16,
   },
   searchContainer: {
     flex: 1,
-    marginRight: 16,
   },
   iconContainer: {
     justifyContent: "center",

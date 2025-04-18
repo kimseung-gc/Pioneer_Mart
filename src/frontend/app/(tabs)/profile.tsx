@@ -126,6 +126,18 @@ const ProfileScreen = () => {
           <MaterialIcons name="chevron-right" size={22} color="#999" />
         </TouchableOpacity>
 
+        {/* Reported Items */}
+        <TouchableOpacity
+          style={styles.infoItem}
+          onPress={() => router.push("../additionalinfo/ReportedItems")}
+        >
+          <View style={styles.infoItemLeft}>
+            <MaterialIcons name="flag" size={22} color="#555" />
+            <Text style={styles.infoItemText}>Reported Items</Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={22} color="#999" />
+        </TouchableOpacity>
+
         {/* Divider */}
         <View style={styles.divider} />
 
