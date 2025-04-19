@@ -1,7 +1,7 @@
 import { useUserStore } from "@/stores/userStore";
 import { ChatRoom, ChatRoomsScreenRouteParams } from "@/types/chat";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+// import { StackNavigationProp } from "@react-navigation/stack";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./contexts/AuthContext";
 import axios from "axios";
@@ -28,18 +28,18 @@ type RootStackParamList = {
   };
 };
 
-type ChatRoomsScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "ChatRooms"
->;
+// type ChatRoomsScreenNavigationProp = StackNavigationProp<
+//   RootStackParamList,
+//   "ChatRooms"
+// >;
 type ChatRoomsScreenRouteProp = RouteProp<RootStackParamList, "ChatRooms">;
 
 interface Props {
-  navigation: ChatRoomsScreenNavigationProp;
+  // navigation: ChatRoomsScreenNavigationProp;
   route: ChatRoomsScreenRouteProp;
 }
 
-const ChatRoomsScreen: React.FC<Props> = ({ navigation }) => {
+const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const { userData } = useUserStore();
