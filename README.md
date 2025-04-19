@@ -126,7 +126,7 @@ https://drive.google.com/file/d/1AyQBq8Fw2hZqz5hLmVM9M0U-o-EBiySj/view?usp=shari
 9. Trello. 2025. Pioneer Mart Project Board. Retrieved February 13, 2025,  
 from https://trello.com/b/HqVxVWt0/pioneer-mart
 
-10. Test Item image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing  
+10. Test Item image used in DEMO1. "Generate Studio Ghibli style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing  
 
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/test_runs.yml/badge.svg)
 ![Tests](https://github.com/kimseung-gc/Pioneer_Mart/actions/workflows/tests_npm.yml/badge.svg)
