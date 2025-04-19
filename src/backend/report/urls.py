@@ -5,5 +5,9 @@ urlpatterns = [
     path(
         "report/<int:item_id>/toggle_report/", views.toggle_report, name="toggle_report"
     ),
-    # path("report/reported_items/", views.reported_items, name="reported_items"),
+    path(
+        "report/reported-items/",
+        views.UserReportedItemsView.as_view(),
+        name="reported_items",
+    ),
 ]

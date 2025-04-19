@@ -2,6 +2,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import ListAPIView
+
+from .serializers import ReportedItemSerializer
 from .models import Listing, ItemReport
 from django.shortcuts import get_object_or_404
 
@@ -41,3 +44,23 @@ def toggle_report(request, item_id):
     return Response(
         {"success": "Item reported successfully"}, status=status.HTTP_201_CREATED
     )
+
+
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def get_user_reported_items(request):
+#     reports = ItemReport.objects.filter(reporter=request.user)
+#     serializer = ReportedItemSerializer(reports, many=True)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
+class UserReportedItemsView(ListAPIView):
+    serializer_class = ReportedItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ItemReport.objects.filter(reporter=self.request.user)
+
+    # override get_serializer_context to include the request
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context

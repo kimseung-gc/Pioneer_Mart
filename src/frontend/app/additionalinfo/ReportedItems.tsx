@@ -23,7 +23,13 @@ const ReportedItemsScreen = () => {
     loadItems(screenId, authToken || "");
     loadCategories(authToken || "");
   }, [authToken]);
-  console.log("reported items:", filteredItems);
+
+  const reportedItems =
+    screenId === "reported"
+      ? filteredItems
+          .filter((report: any) => report.item) // only keep reports with items
+          .map((report: any) => report.item)
+      : filteredItems;
 
   return (
     <>
@@ -43,7 +49,7 @@ const ReportedItemsScreen = () => {
       />
       <Categories screenId={screenId} categories={categories} />
       <ProductList
-        items={filteredItems}
+        items={reportedItems}
         isLoading={isLoading}
         source={"reported"}
       />

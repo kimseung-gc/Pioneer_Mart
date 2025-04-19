@@ -143,7 +143,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else if (screenId === "favorites") {
         endpoint = "api/items/favorites/";
       } else if (screenId === "reported") {
-        endpoint = "api/report/reported_items/";
+        endpoint = "api/report/reported-items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -234,7 +234,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else if (screenId == "favorites") {
         endpoint = "api/items/favorites/";
       } else if (screenId === "reported") {
-        endpoint = "api/report/reported_items/";
+        endpoint = "api/report/reported-items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -370,7 +370,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         }
       );
-      console.log("Categories in loadCategories:", response.data.results);
       set({ categories: response.data["results"] });
     } catch (error) {
       set({ categories: [] });
@@ -414,7 +413,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else if (screenId === "myItems") {
         endpoint = `api/items/search_my_items/?q${query}`;
       } else if (screenId === "reported") {
-        endpoint = `api/items/search_reported_items/?${query}`;
+        endpoint = `api/items/search_reported_items/?${query}`; // TODO
       }
       console.log("This is the endpoint:", endpoint);
       const response = await axios.get<PaginatedResponse<ItemType>>(

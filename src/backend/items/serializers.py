@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from report.models import ItemReport
 from .models import Listing
 
 
@@ -49,5 +51,7 @@ class ItemSerializer(serializers.ModelSerializer):
         Returns:
             bool: True if the listing is reported, False otherwise.
         """
-        user = self.context.get("request").user
-        return obj in user.profile.reported.all()
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return ItemReport.objects.filter(item=obj, reporter=request.user).exists()
+        return False

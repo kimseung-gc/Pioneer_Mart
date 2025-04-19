@@ -22,7 +22,7 @@ const MyItems = () => {
     setActiveScreen(screenId);
     loadItems(screenId, authToken || "");
     loadCategories(authToken || "");
-    return () => {}; //cleanup when navigating away
+    // return () => {}; //cleanup when navigating away
   }, [authToken]);
 
   return (
