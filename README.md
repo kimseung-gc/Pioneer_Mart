@@ -28,6 +28,7 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
   - sprint_02.md
   - sprint_03_planning.md
   - sprint_03.md
+  - sprint_04_planning.md
 - src
   - basic_classes
   - frontend
@@ -59,6 +60,7 @@ We are using pytest, flake8, and mypy in order to test our back-end code. For th
 Backend (Non-Django related)
 
 > pip install tox tox-gh-actions
+
 > tox
 
 Backend (Django related)
@@ -69,7 +71,9 @@ Pre-requisite: be in the src/backend folder
 Frontend
 
 > npm install
+
 > export PATH="./node_modules/.bin:$PATH"
+
 > yarn jest
 
 ## Running the Application
@@ -83,11 +87,13 @@ Pre-requisites:
 Running the Backend (server)
 
 > pip install -r requirements.txt
-> python3 manage.py
+
+> python3 manage.py runserver
 
 Running the Frontend (npm)
 
 > npm install
+
 > npx expo start
 
 - Please note that npm install may leave out some installations out, so it is highly recommended to install extra dependencies via following
@@ -101,34 +107,34 @@ Use Case 1, 3 are very doable right now with the current prototype that we have.
 
 All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)
 
-## Bibliography
+## Citations
 
-1. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
+1. Andy's Tech Tutorials. 2025. GitHub Actions Tutorial | Run Automated Tests. Retrieved March 27, 2025,
+   from https://www.youtube.com/watch?v=uFcXrWT4f80
+
+2. Etsy. 2025. Etsy: Shop for Handmade, Vintage, Custom, and Unique Gifts. Retrieved February 13, 2025,  
    from https://www.etsy.com
 
-2. Facebook Marketplace. 2025. Buy and Sell Items Locally or Shipped. Retrieved February 13, 2025,  
+3. Facebook Marketplace. 2025. Buy and Sell Items Locally or Shipped. Retrieved February 13, 2025,  
    from https://www.facebook.com/marketplace
 
-3. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025,  
-   from https://www.poshmark.com
-
-4. Trello. 2025. Pioneer Mart Project Board. Retrieved February 13, 2025,  
-   from https://trello.com/b/HqVxVWt0/pioneer-mart
+4. Freecodecamp.org. (2023, February 1). Learn Django by Building an Online Marketplace – Python Tutorial for Beginners [Video]. YouTube.com. https://www.youtube.com/watch?v=ZxMB6Njs3ck&t=1411s
 
 5. mCoding. 2025. Automated Testing in Python with pytest, tox, and GitHub Actions. Retrieved March 26, 2025,
    from https://www.youtube.com/watch?v=DhUpxWjOhME
 
-6. Andy's Tech Tutorials. 2025. GitHub Actions Tutorial | Run Automated Tests. Retrieved March 27, 2025,
-   from https://www.youtube.com/watch?v=uFcXrWT4f80
+6. Poshmark. 2025. Poshmark: Buy & Sell Fashion. Retrieved February 13, 2025,  
+   from https://www.poshmark.com
 
-7. Test Item image used in DEMO1. "Generate Studio Ghibili style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing
+7. Pradip Debnath. (2024, October 16). 🔴#1 - eCommerce App in React Native | Home, Login, SignUp, Onboarding UI of eCommerce App [Video]. YouTube.com. https://www.youtube.com/watch?v=y4vNZQpJrdc&t=4729s
 
 8. Source image for Test Item. Photomatic. Retrieved 14 August, 2024.
    https://drive.google.com/file/d/1AyQBq8Fw2hZqz5hLmVM9M0U-o-EBiySj/view?usp=sharing
 
-9. Freecodecamp.org. (2023, February 1). Learn Django by Building an Online Marketplace – Python Tutorial for Beginners [Video]. YouTube.com. https://www.youtube.com/watch?v=ZxMB6Njs3ck&t=1411s
+9. Trello. 2025. Pioneer Mart Project Board. Retrieved February 13, 2025,  
+   from https://trello.com/b/HqVxVWt0/pioneer-mart
 
-10. Pradip Debnath. (2024, October 16). 🔴#1 - eCommerce App in React Native | Home, Login, SignUp, Onboarding UI of eCommerce App [Video]. YouTube.com. https://www.youtube.com/watch?v=y4vNZQpJrdc&t=4729s
+10. Test Item image used in DEMO1. "Generate Studio Ghibli style image with this, ensure all bits remain as is" prompt. DALL·E 3, GPT-4o, OpenAI, 2 April 2025. https://drive.google.com/file/d/1YvxUX4z8xLfF9RNFW1dwGyyMnKmlH--g/view?usp=sharing
 
 11. John Owolabi Idogun. Retrieved 14th March 2025. https://dev.to/sirneij/backend-one-on-one-duologue-chatting-application-with-django-channels-and-sveltekit-1bim
 

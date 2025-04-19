@@ -1,3 +1,31 @@
+/**
+ * ItemDetails.tsx
+ *
+ * This screen displays the detailed view of a marketplace item.
+ * It shows the item's image, description, price, seller info, and category.
+ * Users can:
+ *  - View the item's full details.
+ *  - Request to purchase the item (unless they are the seller).
+ *  - Edit their listing if they are the item owner.
+ *  - See confirmation of a submitted purchase request.
+ *
+ * Features:
+ * - Uses React Navigation (Expo Router) for navigation stack handling.
+ * - Uses Axios to fetch and post purchase request data from backend API.
+ * - Uses AuthContext and Zustand stores for user and item state.
+ * - Includes a modal component to confirm request submission.
+ * - Displays loading state while fetching request status.
+ *
+ * Props:
+ * - Receives item data via URL params (`item`, `source`, `refreshKey`).
+ *
+ * Dependencies:
+ * - React Native components
+ * - Expo Router for navigation
+ * - Zustand for state management
+ * - Axios for HTTP requests
+ * - Custom components: ItemPurchaseModal, SingleItem
+ */
 import {
   Dimensions,
   View,
