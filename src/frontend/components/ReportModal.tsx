@@ -39,7 +39,7 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
       Alert.alert("Error", "Please select a reason for reporting");
       return;
     }
-    toggleReport(itemId, authToken || "");
+    toggleReport(itemId, authToken || "", selectedReason);
     setIsSubmitting(true);
     try {
       setSelectedReason(null);

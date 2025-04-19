@@ -48,7 +48,11 @@ interface ItemsStoreState {
 
   //toggling favorites function
   toggleFavorite: (itemId: number, authToken: string) => Promise<void>;
-  toggleReport: (itemId: number, authToken: string) => Promise<void>;
+  toggleReport: (
+    itemId: number,
+    authToken: string,
+    reason: string | ""
+  ) => Promise<void>;
 }
 
 //initial state for a screen
@@ -138,6 +142,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = "api/items/";
       } else if (screenId === "favorites") {
         endpoint = "api/items/favorites/";
+      } else if (screenId === "reported") {
+        endpoint = "api/report/reported_items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -155,7 +161,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           params: { _t: Date.now() },
         }
       );
-      console.log("here");
       set((state) => ({
         //take state of screens
         screens: {
@@ -228,6 +233,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = "api/items/";
       } else if (screenId == "favorites") {
         endpoint = "api/items/favorites/";
+      } else if (screenId === "reported") {
+        endpoint = "api/report/reported_items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -406,6 +413,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = `api/items/search_favorites/?q=${query}`;
       } else if (screenId === "myItems") {
         endpoint = `api/items/search_my_items/?q${query}`;
+      } else if (screenId === "reported") {
+        endpoint = `api/items/search_reported_items/?${query}`;
       }
       console.log("This is the endpoint:", endpoint);
       const response = await axios.get<PaginatedResponse<ItemType>>(
@@ -673,10 +682,14 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
    * @example
    *  await toggleReport(item.id, authToken || "");
    */
-  toggleReport: async (itemId: number, authToken: string) => {
+  toggleReport: async (
+    itemId: number,
+    authToken: string,
+    reason: string | ""
+  ) => {
     try {
-      // const cleanToken = authToken?.trim();
-      // const URL = `${BASE_URL}/api/items/${itemId}/toggle_favorite/`;
+      const cleanToken = authToken?.trim();
+      const URL = `${BASE_URL}/api/report/${itemId}/toggle_report/`;
 
       // First determine the current reported status from the item in any screen
       let currentReportedStatus = false;
@@ -704,22 +717,20 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         console.error("Item not found in any screen");
         return;
       }
-
+      const payload = currentReportedStatus ? {} : { reason: reason };
       // Toggle the status - calculate new status ahead of time
       const newReportedStatus = !currentReportedStatus;
-
-      // // Make the API call
-      // await axios.post(
-      //   URL,
-      //   {},
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${cleanToken}`,
-      //       "Content-Type": "application/json",
-      //       Accept: "application/json",
-      //     },
-      //   }
-      // );
+      // Make the API call
+      await axios.post(URL, payload, {
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      console.log(
+        `Item ${itemId} reported from toggleReport with ${reason} reason`
+      );
 
       // Now update all screens with the known new status
       set((state) => {
@@ -793,8 +804,12 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         return { screens: updatedScreens };
       });
       console.log("\n\nreported:", itemId, "\n\n");
-    } catch (error) {
-      console.log("Error reporting item:", error);
+    } catch (error: any) {
+      if (error.response) {
+        console.log("Error reporting item:", error.response.data);
+      } else {
+        console.log("Error reporting item:", error.message);
+      }
     }
   },
 }));

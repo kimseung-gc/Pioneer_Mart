@@ -30,7 +30,7 @@ const width = Dimensions.get("window").width - 40;
 
 const SingleItem = ({ item, source }: Props) => {
   const route = useRoute();
-  const { toggleFavorite } = useItemsStore();
+  const { toggleFavorite, toggleReport } = useItemsStore();
   const { authToken } = useAuth();
   const { showFavoritesIcon, setShowFavoritesIcon } = useSingleItemStore();
   const { userData } = useUserStore();
@@ -109,9 +109,13 @@ const SingleItem = ({ item, source }: Props) => {
             <>
               <TouchableOpacity
                 style={styles.iconBtn}
-                onPress={(e) => {
+                onPress={async (e) => {
                   e.stopPropagation();
-                  setIsReportModalVisible(true);
+                  if (latestItem.is_reported) {
+                    await toggleReport(latestItem.id, authToken || "", "");
+                  } else {
+                    setIsReportModalVisible(true);
+                  }
                 }}
               >
                 <MaterialIcons

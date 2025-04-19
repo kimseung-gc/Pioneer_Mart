@@ -18,6 +18,7 @@ try:
     from AUTHKEY import config
 except:
     from AUTHKEY import config_github
+
     config = config_github
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "channels",
     "chat",
+    "report",
 ]
 
 REST_FRAMEWORK = {
