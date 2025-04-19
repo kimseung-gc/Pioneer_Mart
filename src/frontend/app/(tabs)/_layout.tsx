@@ -1,6 +1,5 @@
-import { useEffect } from "react";
-import { router, Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 
@@ -38,10 +37,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="settings"
         options={{
-          title: "Profile",
-          tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
+          title: "Settings",
+          tabBarIcon: () => (
+            <Ionicons name="settings-outline" size={22} color="black" />
+          ),
         }}
       />
     </Tabs>
