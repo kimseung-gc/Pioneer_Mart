@@ -100,9 +100,9 @@ describe("TabLayout Component", () => {
 
     expect(Tabs.Screen).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: "profile",
+        name: "settings",
         options: expect.objectContaining({
-          title: "Profile",
+          title: "Settings",
           tabBarIcon: expect.any(Function),
         }),
       }),
