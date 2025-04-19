@@ -34,6 +34,7 @@ const mockItem: ItemType = {
   category_name: "Clothing",
   seller: 100,
   is_favorited: false,
+  is_reported: false,
   is_sold: false,
   created_at: "2025-04-01T00:00:00Z",
   purchase_request_count: 2,

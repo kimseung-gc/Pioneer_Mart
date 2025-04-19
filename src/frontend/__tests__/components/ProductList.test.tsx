@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
-import ProductList from "../../components/ProductList"; 
+import ProductList from "../../components/ProductList";
 import { useRoute } from "@react-navigation/native";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -30,37 +30,38 @@ jest.mock("../../components/SingleItem", () => {
 
 //Mock items that will be rendered in the list
 describe("ProductList", () => {
-    const mockItems: ItemType[] = [
-        {
-            id: 1,
-            title: "Test Item 1",
-            description: "A nice item",
-            price: 20,
-            image: "https://example.com/image1.jpg",
-            category: 2,
-            seller: 1001,
-            created_at: "2025-04-08T00:00:00Z",
-            is_favorited: false,
-            is_sold: false,
-            category_name: "Book",
-            purchase_request_count: 0
-        },
-        {
-            id: 2,
-            title: "Test Item 2",
-            description: "Another nice item",
-            price: 35,
-            image: "https://example.com/image2.jpg",
-            category: 3,
-            seller: 1002,
-            created_at: "2025-04-08T00:00:00Z",
-            is_favorited: true,
-            is_sold: false,
-            category_name: "Clothing",
-            purchase_request_count: 0
-        },
-      ];
-      
+  const mockItems: ItemType[] = [
+    {
+      id: 1,
+      title: "Test Item 1",
+      description: "A nice item",
+      price: 20,
+      image: "https://example.com/image1.jpg",
+      category: 2,
+      seller: 1001,
+      created_at: "2025-04-08T00:00:00Z",
+      is_favorited: false,
+      is_reported: false,
+      is_sold: false,
+      category_name: "Book",
+      purchase_request_count: 0,
+    },
+    {
+      id: 2,
+      title: "Test Item 2",
+      description: "Another nice item",
+      price: 35,
+      image: "https://example.com/image2.jpg",
+      category: 3,
+      seller: 1002,
+      created_at: "2025-04-08T00:00:00Z",
+      is_favorited: true,
+      is_reported: false,
+      is_sold: false,
+      category_name: "Clothing",
+      purchase_request_count: 0,
+    },
+  ];
 
   const mockScreens = {
     home: {
@@ -112,7 +113,7 @@ describe("ProductList", () => {
   // This might cause bugs so be careful
   it("calls refreshItems when pull-to-refresh is triggered", () => {
     const mockRefresh = jest.fn();
-  
+
     (useItemsStore as unknown as jest.Mock).mockReturnValue({
       refreshItems: mockRefresh,
       loadMoreItems: jest.fn(),
@@ -123,17 +124,17 @@ describe("ProductList", () => {
         },
       },
     });
-  
+
     const { UNSAFE_getByType } = render(
       <ProductList items={mockItems} isLoading={false} source="home" />
     );
-  
+
     const flatList = UNSAFE_getByType(require("react-native").FlatList);
     const refreshControl = flatList.props.refreshControl;
-  
+
     // Call the onRefresh manually
     refreshControl.props.onRefresh();
-  
+
     expect(mockRefresh).toHaveBeenCalledWith("home", "fake-token");
   });
 

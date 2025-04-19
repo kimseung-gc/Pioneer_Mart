@@ -4,11 +4,11 @@ import AddItemScreen from "../../../app/(tabs)/additem";
 
 // Mocks
 
-jest.mock("expo-font", () => ({
-  useFonts: () => [true, null],
-  loadAsync: jest.fn(() => Promise.resolve()),
-  isLoaded: jest.fn(() => true), // <-- Add this line
-}));
+// jest.mock("expo-font", () => ({
+//   useFonts: () => [true, null],
+//   loadAsync: jest.fn(() => Promise.resolve()),
+//   isLoaded: jest.fn(() => true), // <-- Add this line
+// }));
 
 jest.mock("axios");
 import axios from "axios";

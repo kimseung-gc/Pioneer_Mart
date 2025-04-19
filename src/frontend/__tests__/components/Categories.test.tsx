@@ -10,7 +10,7 @@ describe("Categories Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useItemsStore as jest.Mock).mockReturnValue({
+    (useItemsStore as unknown as jest.Mock).mockReturnValue({
       screens: {
         home: {
           selectedCategory: null,
@@ -21,8 +21,8 @@ describe("Categories Component", () => {
   });
 
   const categories = [
-    { id: "1", name: "Books" },
-    { id: "2", name: "Electronics" },
+    { id: 1, name: "Books" },
+    { id: 2, name: "Electronics" },
   ];
 
   it("renders the title and all category", () => {
@@ -51,17 +51,17 @@ describe("Categories Component", () => {
     );
 
     fireEvent.press(getByText("Books"));
-    expect(mockFilterByCategory).toHaveBeenCalledWith("home", "1");
+    expect(mockFilterByCategory).toHaveBeenCalledWith("home", 1);
 
     fireEvent.press(getByText("Electronics"));
-    expect(mockFilterByCategory).toHaveBeenCalledWith("home", "2");
+    expect(mockFilterByCategory).toHaveBeenCalledWith("home", 2);
   });
 
   it("applies selected style when a category is selected", () => {
-    (useItemsStore as jest.Mock).mockReturnValue({
+    (useItemsStore as unknown as jest.Mock).mockReturnValue({
       screens: {
         home: {
-          selectedCategory: "2",
+          selectedCategory: 2,
         },
       },
       filterByCategory: mockFilterByCategory,

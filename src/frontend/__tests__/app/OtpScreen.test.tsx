@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
 
-jest.mock("expo-font");
+// jest.mock("expo-font");
 jest.mock("axios");
 jest.mock("expo-router", () => ({
   router: {
