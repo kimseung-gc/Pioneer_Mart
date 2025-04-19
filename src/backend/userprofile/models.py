@@ -22,10 +22,6 @@ class UserProfile(models.Model):
     favorites = models.ManyToManyField(
         Listing, blank=True, related_name="favorited_by"
     )  # each user profile has multiple favorite listings
-    reported = models.ManyToManyField(
-        Listing, blank=True, related_name="reported_by"
-    )  # each user profile has multiple favorite listing
-
     is_verified = models.BooleanField(default=False)
 
     def get_purchase_requests(self):
