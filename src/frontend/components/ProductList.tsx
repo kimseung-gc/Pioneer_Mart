@@ -65,7 +65,6 @@ const ProductList = ({
       </View>
     );
   };
-  console.log(route.name);
 
   return (
     <View style={styles.container}>

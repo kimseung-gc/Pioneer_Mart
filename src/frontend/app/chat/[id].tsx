@@ -181,7 +181,14 @@ const ChatScreen = () => {
       <Stack.Screen
         options={{
           headerTitle: () => (
-            <TouchableOpacity onPress={() => console.log("header pressed")}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: `/item/[id]`,
+                  params: { id: id.toString() },
+                })
+              }
+            >
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 {roomName} - {item}
               </Text>
