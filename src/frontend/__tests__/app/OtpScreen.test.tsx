@@ -6,18 +6,6 @@ import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
 
-// jest.mock("expo-font");
-jest.mock("axios");
-jest.mock("expo-router", () => ({
-  router: {
-    push: jest.fn(),
-    back: jest.fn(),
-  },
-  useLocalSearchParams: jest
-    .fn()
-    .mockReturnValue({ email: "test@example.com" }),
-}));
-
 jest.mock("frontend/app/contexts/AuthContext.tsx", () => ({
   useAuth: jest.fn().mockReturnValue({
     setAuthToken: jest.fn(),
@@ -101,7 +89,7 @@ describe("OtpScreen Component", () => {
         mockAuthToken
       );
       expect(Alert.alert).toHaveBeenCalledWith("Success", "Login successful!");
-      expect(router.push).toHaveBeenCalledWith("/(tabs)");
+      expect(router.replace).toHaveBeenCalledWith("/(tabs)");
     });
   });
 

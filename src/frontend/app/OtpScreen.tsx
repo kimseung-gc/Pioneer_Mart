@@ -38,7 +38,7 @@ const OtpScreen = () => {
         // await AsyncStorage.setItem("refreshToken", refresh); //added this for testing
         setAuthToken(access); //update the context
         Alert.alert("Success", "Login successful!");
-        router.push("/(tabs)");
+        router.replace("/(tabs)");
       } else {
         Alert.alert("Error", "Token not received from server.");
       }
