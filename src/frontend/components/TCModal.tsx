@@ -82,7 +82,9 @@ const TCModal: React.FC<TCModalProps> = ({
               style={[styles.button, styles.buttonAccept]}
               onPress={onAccept}
             >
-              <Text style={styles.buttonTextAccept}>Accept</Text>
+              <Text testID="accept-button" style={styles.buttonTextAccept}>
+                Accept
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
