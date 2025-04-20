@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchBar from "./SearchBar";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect } from "react";
 import { ScreenId } from "@/types/types";
 import { useChatStore } from "@/stores/chatStore";

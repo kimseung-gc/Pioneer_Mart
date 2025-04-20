@@ -12,6 +12,17 @@ jest.mock("@expo/vector-icons/Entypo", () => {
   return () => <View testID="mock-icon" />;
 });
 
+jest.mock("@/app/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    authToken: "mock-token",
+  }),
+}));
+
+jest.mock("@react-navigation/native", () => ({
+  useRoute: jest.fn(),
+  useFocusEffect: jest.fn((fn) => fn()), // just calls the effect immediately
+}));
+
 // Mock router
 jest.mock("expo-router", () => ({
   router: {
@@ -24,9 +35,11 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: jest.fn(),
 }));
 
-// Mock route
-jest.mock("@react-navigation/native", () => ({
-  useRoute: jest.fn(),
+jest.mock("@/stores/chatStore", () => ({
+  useChatStore: () => ({
+    unreadCount: 3,
+    fetchUnreadCount: jest.fn().mockResolvedValue(undefined), // mock async function cause otherwise it'll run forever
+  }),
 }));
 
 // Mock SearchBar
@@ -63,7 +76,7 @@ describe("Header Component", () => {
     (useRoute as jest.Mock).mockReturnValue({ name: "additionalinfo/MyItems" });
 
     const { getByTestId } = render(<Header screenId="myItems" />);
-    fireEvent.press(getByTestId("back-button")); 
+    fireEvent.press(getByTestId("back-button"));
 
     expect(router.router.back).toHaveBeenCalled();
   });
