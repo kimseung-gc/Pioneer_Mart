@@ -4,6 +4,7 @@
 
 # Import Modules
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 from items.models import Listing
 from django.contrib.auth.models import User
 
@@ -22,6 +23,14 @@ class PurchaseRequest(models.Model):
     - unique_together: Ensures a user cannot send multiple requests for the same listing.
     """
 
+    # status choices for the purchase requests
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("accepted", "Accepted"),
+        ("declines", "Declined"),
+        ("cancelled", "Cancelled"),
+    )
+
     listing = models.ForeignKey(
         Listing, related_name="purchase_requests", on_delete=models.CASCADE
     )
@@ -30,16 +39,22 @@ class PurchaseRequest(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
         """
         Local class to prevent duplicate requests for the same "listing" and "requester"
         """
 
-        unique_together = (
-            "listing",
-            "requester",
-        )  # this will prevent duplicate requests
+        # this should allow multiple 'cancelled', 'declined', or 'accepted' requests & no errors when cancelling repeatedly
+        constraints = [
+            UniqueConstraint(
+                fields=["listing", "requester"],
+                condition=Q(status="pending"),
+                name="unique_pending_purchase_request",
+            )
+        ]
+        ordering = ["-created_at"]  # get the newest purchase request first
 
     def __str__(self):
         """

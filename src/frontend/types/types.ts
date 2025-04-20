@@ -15,14 +15,12 @@ export interface ItemType {
   purchase_requesters?: Array<{ id: number; username: string }>;
 }
 
-//adding this for now... we'll connect to backend purchase requests later
 export interface PurchaseRequest {
   id: number;
   listing: ItemType;
   requester: number;
-  // seller: number;
   requester_name: string;
-  // status: "pending" | "accepted" | "rejected" | "cancelled";
+  status: "pending" | "accepted" | "declined" | "cancelled";
   created_at: string;
   is_active: boolean;
 }

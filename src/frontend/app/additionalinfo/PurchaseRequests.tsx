@@ -90,13 +90,17 @@ const PurchaseRequests = () => {
           },
         }
       );
-      // Filter active requests only
-      setSentRequests(
-        sentResponse.data.filter((req: PurchaseRequest) => req.is_active)
-      );
-      setReceivedRequests(
-        receivedResponse.data.filter((req: PurchaseRequest) => req.is_active)
-      );
+      // // Filter active requests only
+      // setSentRequests(
+      //   sentResponse.data.filter((req: PurchaseRequest) => req.is_active)
+      // );
+      // setReceivedRequests(
+      //   receivedResponse.data.filter((req: PurchaseRequest) => req.is_active)
+      // );
+
+      // we wanna set all requests not just active ones after status update
+      setSentRequests(sentResponse.data);
+      setReceivedRequests(receivedResponse.data);
     } catch (error) {
       console.error("Error fetching purchase requests:", error);
       alert("Failed to load purchase requests. Please try again later");
@@ -138,14 +142,111 @@ const PurchaseRequests = () => {
         }
       );
 
-      // Update the local state to remove the cancelled request
+      // // Update the local state to remove the cancelled request
+      // setSentRequests((prevRequests) =>
+      //   prevRequests.filter((request) => request.id !== requestId)
+      // );
+
+      // update each cancelled request's staate to cancelled & is active to false
       setSentRequests((prevRequests) =>
-        prevRequests.filter((request) => request.id !== requestId)
+        prevRequests.map((request) =>
+          request.id === requestId
+            ? { ...request, status: "cancelled", is_active: false }
+            : request
+        )
       );
       alert("Purchase request cancelled successfully");
     } catch (error) {
       console.error("Error cancelling request:", error);
       alert("Failed to cancel purchase request. Please try again later.");
+    }
+  };
+
+  /**
+   * @function acceptRequest
+   * @async
+   * @param {number} requestId - The ID of the purchase request to accept.
+   * @description Sends a request to the backend API to accept a specific purchase request.
+   * Upon successful acceptance, it updates the local `receivedRequests` state.
+   */
+  const acceptRequest = async (requestId: number) => {
+    try {
+      const cleanToken = authToken?.trim();
+      await axios.post(
+        `${BASE_URL}/api/requests/${requestId}/accept/`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
+      // update all requests related to this listing
+      fetchRequests(); // we need to re-fetch everything since multiple listings might be affected?
+      alert("Purchase request accepted successfully");
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      alert("Failed to accept purchase request. Please try again later");
+    }
+  };
+
+  /**
+   * @function declineRequest
+   * @async
+   * @param {number} requestId - The ID of the purchase request to decline.
+   * @description Sends a request to the backend API to decline a specific purchase request.
+   * Upon successful decline, it updates the local `receivedRequests` state.
+   */
+  const declineRequest = async (requestId: number) => {
+    try {
+      const cleanToken = authToken?.trim();
+      await axios.post(
+        `${BASE_URL}/api/requests/${requestId}/decline/`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanToken}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      // update the local state with the new status
+      setReceivedRequests((prevRequests) =>
+        prevRequests.map((request) =>
+          request.id === requestId
+            ? { ...request, status: "declined", is_active: false }
+            : request
+        )
+      );
+      alert("Purchase request declined successfully");
+    } catch (error) {
+      console.error("Error declining request:", error);
+      alert("Failed to decline purchase request. Please try again later");
+    }
+  };
+
+  /**
+   * @function getStatusColor
+   * @param {string} status - The status of the purchase request.
+   * @returns {string} - The color code corresponding to the status.
+   * @description Returns a color code based on the status of the purchase request.
+   */
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "#f39c12"; // Amber
+      case "accepted":
+        return "#2ecc71"; // Green
+      case "declined":
+        return "#e74c3c"; // Red
+      case "cancelled":
+        return "#95a5a6"; // Gray
+      default:
+        return "#3498db"; // Blue (default)
     }
   };
 
@@ -158,21 +259,53 @@ const PurchaseRequests = () => {
    */
   const renderRequestItem = ({ item }: { item: PurchaseRequest }) => {
     const formattedDate = new Date(item.created_at).toLocaleDateString();
+    const statusColor = getStatusColor(item.status);
 
     return (
       <View style={styles.requestItem}>
         <SingleItem item={item.listing} source="purchaseRequests" />
         <View style={styles.requestInfo}>
-          <Text style={styles.requestDate}>
-            Requested on: {new Date(item.created_at).toLocaleDateString()}
-          </Text>
-          {activeTab === "sent" && (
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => cancelRequest(item.id)}
+          <View style={styles.statusContainer}>
+            <Text style={styles.requestDate}>
+              Requested on: {new Date(item.created_at).toLocaleDateString()}
+            </Text>
+            <View
+              style={[styles.statusBadge, { backgroundColor: statusColor }]}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+              <Text style={styles.statusText}>
+                {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+              </Text>
+            </View>
+          </View>
+
+          {item.status === "pending" && (
+            <View style={styles.actionButtonsContainer}>
+              {activeTab === "sent" && (
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => cancelRequest(item.id)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              )}
+
+              {activeTab === "received" && (
+                <>
+                  <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => acceptRequest(item.id)}
+                  >
+                    <Text style={styles.acceptButtonText}>Accept</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.declineButton}
+                    onPress={() => declineRequest(item.id)}
+                  >
+                    <Text style={styles.declineButtonText}>Decline</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           )}
         </View>
       </View>
@@ -286,6 +419,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  statusBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+  },
+  actionButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: 10,
+  },
   activeTab: {
     backgroundColor: "#4285F4",
   },
@@ -339,6 +488,26 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   cancelButtonText: {
+    color: "white",
+    fontWeight: "500",
+  },
+  acceptButton: {
+    backgroundColor: "#2ecc71",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  acceptButtonText: {
+    color: "white",
+    fontWeight: "500",
+  },
+  declineButton: {
+    backgroundColor: "#e74c3c",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  declineButtonText: {
     color: "white",
     fontWeight: "500",
   },
