@@ -40,6 +40,7 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { BASE_URL } from "@/config";
@@ -90,14 +91,6 @@ const PurchaseRequests = () => {
           },
         }
       );
-      // // Filter active requests only
-      // setSentRequests(
-      //   sentResponse.data.filter((req: PurchaseRequest) => req.is_active)
-      // );
-      // setReceivedRequests(
-      //   receivedResponse.data.filter((req: PurchaseRequest) => req.is_active)
-      // );
-
       // we wanna set all requests not just active ones after status update
       setSentRequests(sentResponse.data);
       setReceivedRequests(receivedResponse.data);
@@ -151,7 +144,7 @@ const PurchaseRequests = () => {
       setSentRequests((prevRequests) =>
         prevRequests.map((request) =>
           request.id === requestId
-            ? { ...request, status: "cancelled", is_active: false }
+            ? { ...request, status: "cancelled" }
             : request
         )
       );
@@ -218,7 +211,7 @@ const PurchaseRequests = () => {
       setReceivedRequests((prevRequests) =>
         prevRequests.map((request) =>
           request.id === requestId
-            ? { ...request, status: "declined", is_active: false }
+            ? { ...request, status: "declined" }
             : request
         )
       );
@@ -227,6 +220,55 @@ const PurchaseRequests = () => {
       console.error("Error declining request:", error);
       alert("Failed to decline purchase request. Please try again later");
     }
+  };
+
+  /**
+   * @function removeRequest
+   * @async
+   * @param {number} requestId - The ID of the purchase request to remove.
+   * @description Sends a request to the backend API to remove a specific purchase request.
+   * Upon successful removal, it updates the local state to remove the item from the view.
+   */
+  const removeRequest = async (requestId: number) => {
+    Alert.alert(
+      "Remove Request",
+      "Are you sure you want to delete this request? This will also cancel the request.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const cleanToken = authToken?.trim();
+              await axios.delete(
+                `${BASE_URL}/api/requests/${requestId}/remove/`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${cleanToken}`,
+                  },
+                }
+              );
+
+              //remove the request from the appropriate list
+              if (activeTab === "sent") {
+                setSentRequests((prevRequests) =>
+                  prevRequests.filter((request) => request.id !== requestId)
+                );
+              } else {
+                setReceivedRequests((prevRequests) =>
+                  prevRequests.filter((request) => request.id !== requestId)
+                );
+              }
+              alert("Request cancelled & removed");
+            } catch (error) {
+              console.error("Error removing request:", error);
+              alert("Failed to remove request. Please try again later");
+            }
+          },
+        },
+      ]
+    );
   };
 
   /**
@@ -254,8 +296,10 @@ const PurchaseRequests = () => {
    * @function renderRequestItem
    * @param {object} { item } - An object containing the `PurchaseRequest` item to render.
    * @returns {JSX.Element} - A View component representing a single purchase request item in the list.
-   * @description Renders a single purchase request item, displaying the associated listing details and the request date.
-   * For sent requests, it also includes a "Cancel" button.
+   * @description Renders a single purchase request item, displaying the associated listing details,
+   * the request date, and the status. For sent pending requests, it also includes a "Cancel" button.
+   * For received pending requests, it includes "Accept" and "Decline" buttons.
+   * All requests include a "Remove" button to remove the request from the user's view.
    */
   const renderRequestItem = ({ item }: { item: PurchaseRequest }) => {
     const formattedDate = new Date(item.created_at).toLocaleDateString();
@@ -307,6 +351,11 @@ const PurchaseRequests = () => {
               )}
             </View>
           )}
+          <View style={styles.removeButtonContainer}>
+            <TouchableOpacity onPress={() => removeRequest(item.id)}>
+              <Text style={styles.removeButtonText}>Remove</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -488,7 +537,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   cancelButtonText: {
-    color: "white",
+    color: "black",
     fontWeight: "500",
   },
   acceptButton: {
@@ -509,6 +558,14 @@ const styles = StyleSheet.create({
   },
   declineButtonText: {
     color: "white",
+    fontWeight: "500",
+  },
+  removeButtonContainer: {
+    alignItems: "flex-end", // aligns child to the right
+    marginTop: 10,
+  },
+  removeButtonText: {
+    color: "black",
     fontWeight: "500",
   },
   emptyContainer: {

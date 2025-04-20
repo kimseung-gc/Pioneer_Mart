@@ -102,6 +102,12 @@ const SingleItem = ({ item, source }: Props) => {
         {currentItem.seller === userData?.id && (
           <View style={styles.myItemTag} />
         )}
+        {/* sold tag */}
+        {currentItem.is_sold && (
+          <View style={styles.soldTagContainer}>
+            <Text style={styles.soldTagText}>Sold</Text>
+          </View>
+        )}
         <View style={styles.buttonsContainer}>
           {showFavoritesIcon &&
           currentItem.seller !== userData?.id &&
@@ -214,5 +220,18 @@ const styles = StyleSheet.create({
     borderRadius: 100 / 2,
     top: 20,
     left: 10,
+  },
+  soldTagContainer: {
+    position: "absolute",
+    right: 10,
+    top: "10%",
+    paddingVertical: 8,
+    transform: [{ translateY: -15 }],
+  },
+  soldTagText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 16,
   },
 });

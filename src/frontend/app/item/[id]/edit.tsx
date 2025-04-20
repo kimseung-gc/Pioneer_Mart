@@ -19,8 +19,6 @@ import React from "react";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import CameraModal from "@/components/CameraModal";
-import { UserInfo } from "@/types/types";
-import { PaginatedResponse } from "@/types/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
