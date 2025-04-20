@@ -2,7 +2,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import React from "react";
 import { useRef, useState } from "react";
-import { Modal, TouchableOpacity, View, StyleSheet } from "react-native";
+import {
+  Modal,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
 
 type CameraModalProps = {
   visible: boolean;
@@ -44,13 +50,14 @@ const CameraModal = ({ visible, onClose, onCapture }: CameraModalProps) => {
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent={false}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.cameraContainer}>
+    <SafeAreaView style={styles.cameraContainer}>
+      <Modal
+        visible={visible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        {/* <View style={styles.cameraContainer}> */}
         <CameraView style={styles.camera} facing={facing} ref={camera}>
           <View style={styles.cameraControlsContainer}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
@@ -74,8 +81,9 @@ const CameraModal = ({ visible, onClose, onCapture }: CameraModalProps) => {
             </View>
           </View>
         </CameraView>
-      </View>
-    </Modal>
+        {/* </View> */}
+      </Modal>
+    </SafeAreaView>
   );
 };
 
