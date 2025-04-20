@@ -57,6 +57,31 @@ def room_list(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def unread_count(request):
+    """
+    Get the total count of unread messages across all chat rooms for the current user
+    """
+    user = request.user
+    rooms = ChatRoom.objects.filter(
+        Q(user1=user) | Q(user2=user)
+    )  # get the rooms the user is part of
+    # Count all the unread messages not setn by the current user
+    total_unread = 0
+    for room in rooms:
+        unread_count = (
+            Message.objects.filter(
+                room=room,
+                is_read=False,
+            )
+            .exclude(user=user)
+            .count()
+        )
+        total_unread += unread_count
+    return Response({"unread_count": total_unread})
+
+
+@api_view(["GET"])
 def chat_history(request, room_id):
     try:
         # get room

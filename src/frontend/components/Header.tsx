@@ -3,9 +3,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchBar from "./SearchBar";
 import { useRoute } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { router } from "expo-router";
-import React from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useEffect } from "react";
 import { ScreenId } from "@/types/types";
+import { useChatStore } from "@/stores/chatStore";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { Badge } from "react-native-elements";
 
 type HeaderProps = {
   screenId: ScreenId;
@@ -14,7 +17,34 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ screenId }) => {
   const insets = useSafeAreaInsets();
   const route = useRoute();
+  const { unreadCount, fetchUnreadCount } = useChatStore();
+  const { authToken } = useAuth();
 
+  useEffect(() => {
+    if (authToken) {
+      fetchUnreadCount(authToken);
+    }
+    const intervalId = setInterval(() => {
+      fetchUnreadCount(authToken);
+    }, 60000); // check unread count every minute
+
+    return () => clearInterval(intervalId);
+  }, [authToken]); //runs when authToken changes
+
+  // Refresh unread count when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      if (authToken) {
+        fetchUnreadCount(authToken);
+      }
+      return () => {};
+    }, [authToken])
+  );
+
+  const handleChatPress = () => {
+    router.push("/ChatRoomScreen");
+  };
+  console.log("HERE", unreadCount);
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {route.name === "additionalinfo/MyItems" ||
@@ -32,7 +62,23 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
               <SearchBar screenId={screenId} />
             </View>
             <View style={styles.iconContainer}>
-              <Entypo name="chat" size={24} color="black" />
+              <TouchableOpacity
+                onPress={handleChatPress}
+                style={{ position: "relative" }}
+              >
+                <Entypo name="chat" size={24} color="black" />
+                {unreadCount > 0 && (
+                  <Badge
+                    value={unreadCount > 99 ? "99+" : unreadCount}
+                    status="error"
+                    containerStyle={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -42,12 +88,19 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
             <SearchBar screenId={screenId} />
           </View>
           <View style={styles.iconContainer}>
-            <Entypo
-              name="chat"
-              size={24}
-              color="black"
-              onPress={() => router.push("/ChatRoomScreen")}
-            />
+            <TouchableOpacity
+              onPress={handleChatPress}
+              style={{ position: "relative" }}
+            >
+              <Entypo name="chat" size={24} color="black" />
+              {unreadCount > 0 && (
+                <Badge
+                  value={unreadCount > 99 ? "99+" : unreadCount}
+                  status="error"
+                  containerStyle={{ position: "absolute", top: -8, right: -8 }}
+                />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -74,6 +127,14 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 1,
+  },
+  chatWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  chatIcon: {
+    zIndex: 2, //so that icon stays on the top
   },
   iconContainer: {
     justifyContent: "center",

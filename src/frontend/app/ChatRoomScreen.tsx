@@ -19,6 +19,7 @@ import {
 import React from "react";
 import { Entypo, EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
+import { useChatStore } from "@/stores/chatStore";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
@@ -44,6 +45,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const { userData } = useUserStore();
   const authToken = useAuth();
+  const { fetchUnreadCount } = useChatStore(); //for unread messages
 
   useFocusEffect(
     useCallback(() => {
@@ -73,6 +75,9 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
         );
       });
       setRooms(sortedRooms);
+      if (authToken.authToken) {
+        fetchUnreadCount(authToken.authToken); // get the unread count with the chat rooms
+      }
     } catch (error) {
       console.error("Error fetching rooms:", error);
     }
@@ -103,6 +108,10 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
           room.id === roomId.toString() ? { ...room, unread_count: 0 } : room
         )
       );
+
+      if (authToken.authToken) {
+        fetchUnreadCount(authToken.authToken); // update unread count once we make the room as read
+      }
     } catch (error) {
       console.error("Error marking room as read:", error);
     }

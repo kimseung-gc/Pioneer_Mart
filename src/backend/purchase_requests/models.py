@@ -7,7 +7,8 @@ from django.db import models
 from items.models import Listing
 from django.contrib.auth.models import User
 
-class PurchaseRequest ( models.Model ):
+
+class PurchaseRequest(models.Model):
     """
     PurchaseRequest model represents a user's intent to purchase a specific listing.
 
@@ -16,20 +17,16 @@ class PurchaseRequest ( models.Model ):
     - requester: ForeignKey to the User model. Represents the user making the request.
     - created_at: Timestamp when the request was created.
     - is_active: Boolean flag to indicate if the request is still active.
-    
+
     Meta:
     - unique_together: Ensures a user cannot send multiple requests for the same listing.
     """
 
     listing = models.ForeignKey(
-        Listing,
-        related_name="purchase_requests",
-        on_delete=models.CASCADE
+        Listing, related_name="purchase_requests", on_delete=models.CASCADE
     )
     requester = models.ForeignKey(
-        User,
-        related_name="sent_purchase_requests",
-        on_delete=models.CASCADE
+        User, related_name="sent_purchase_requests", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
@@ -38,12 +35,13 @@ class PurchaseRequest ( models.Model ):
         """
         Local class to prevent duplicate requests for the same "listing" and "requester"
         """
+
         unique_together = (
             "listing",
             "requester",
         )  # this will prevent duplicate requests
 
-    def __str__ ( self ):
+    def __str__(self):
         """
         Returns a readable string representation of the purchase request.
         """
