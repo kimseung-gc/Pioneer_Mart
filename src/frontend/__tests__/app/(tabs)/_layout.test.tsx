@@ -2,19 +2,31 @@ import TabLayout from "@/app/(tabs)/_layout"; // Adjust the import path as neede
 import { render } from "@testing-library/react-native";
 import React from "react";
 
-// mock the expo-router for testing purposes
 jest.mock("expo-router", () => {
-  const React = require("react"); //import react within mock's scope
+  const React = require("react");
+  // Add proper type annotation for the children parameter
+  const Tabs = ({
+    children,
+    screenOptions,
+  }: {
+    children: React.ReactNode;
+    screenOptions?: any;
+  }) => <>{children}</>;
+  const Screen = jest.fn(() => null);
 
-  const Tabs = ({ children, screenOptions }: any) => <>{children}</>; // takes children & screenoptions and just renders children
-  const Screen = jest.fn(() => null); //screen thingy which is just kinda sitting there chilling
+  // add Stack mock separately cause tabs testing is being weird
+  const Stack = { Screen: jest.fn(() => null) };
 
   return {
-    __esModule: true, // just good practice
+    __esModule: true,
     router: {
-      push: jest.fn(), //mock pushing
+      push: jest.fn(),
+      replace: jest.fn(),
+      back: jest.fn(),
+      setParams: jest.fn(),
     },
-    Tabs: Object.assign(Tabs, { Screen }), // combines Tabs & Screen mocks making Tabs.Screen available as mock
+    Tabs: Object.assign(Tabs, { Screen }),
+    Stack: Stack,
   };
 });
 

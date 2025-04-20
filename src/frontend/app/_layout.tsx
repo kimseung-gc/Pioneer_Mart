@@ -31,7 +31,7 @@ export default function RootLayout() {
       }
     };
     checkAuth();
-  }, [pathname]); // added this as a dependency to check on route changess
+  }, [pathname, loaded]); // added this as a dependency to check on route changess
 
   useEffect(() => {
     if (loaded) {

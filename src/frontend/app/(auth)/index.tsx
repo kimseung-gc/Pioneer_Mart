@@ -32,7 +32,10 @@ const WelcomeScreen = (props: Props) => {
         }
       );
       console.log("requested OTP....");
-      router.push({ pathname: "/OtpScreen", params: { email: fullEmail } });
+      router.push({
+        pathname: "/(auth)/OtpScreen",
+        params: { email: fullEmail },
+      });
     } catch (error) {
       console.log(email);
       console.log("Error:", error);

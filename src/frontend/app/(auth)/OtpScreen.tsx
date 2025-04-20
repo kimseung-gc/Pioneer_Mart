@@ -13,12 +13,12 @@ import {
   ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useLocalSearchParams } from "expo-router";
-import { useAuth } from "./contexts/AuthContext";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { BASE_URL } from "@/config";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { OtpInput } from "react-native-otp-entry";
 import React from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 const width = Dimensions.get("window").width;
 const OtpScreen = () => {
@@ -35,10 +35,13 @@ const OtpScreen = () => {
       const { access, refresh } = response.data;
       if (access && refresh) {
         await AsyncStorage.setItem("authToken", access);
-        // await AsyncStorage.setItem("refreshToken", refresh); //added this for testing
         setAuthToken(access); //update the context
         Alert.alert("Success", "Login successful!");
         router.replace("/(tabs)");
+        setTimeout(() => {
+          //adding this to REALLYY prevent back navigation
+          router.setParams({});
+        }, 100);
       } else {
         Alert.alert("Error", "Token not received from server.");
       }
@@ -51,6 +54,7 @@ const OtpScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}

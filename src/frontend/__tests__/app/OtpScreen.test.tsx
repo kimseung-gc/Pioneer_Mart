@@ -1,4 +1,4 @@
-import OtpScreen from "@/app/OtpScreen";
+import OtpScreen from "@/app/(auth)/OtpScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import axios from "axios";

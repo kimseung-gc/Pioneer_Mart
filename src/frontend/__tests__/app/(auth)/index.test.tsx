@@ -150,7 +150,7 @@ describe("WelcomeScreen Component", () => {
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalled();
       expect(router.push).toHaveBeenCalledWith({
-        pathname: "/OtpScreen",
+        pathname: "/(auth)/OtpScreen",
         params: { email: "khalidmu@grinnell.edu" },
       });
     });

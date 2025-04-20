@@ -3,7 +3,6 @@ import { ChatRoom, ChatRoomsScreenRouteParams } from "@/types/chat";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 // import { StackNavigationProp } from "@react-navigation/stack";
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "./contexts/AuthContext";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import {
@@ -20,6 +19,7 @@ import React from "react";
 import { Entypo, EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { useChatStore } from "@/stores/chatStore";
+import { useAuth } from "./contexts/AuthContext";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
