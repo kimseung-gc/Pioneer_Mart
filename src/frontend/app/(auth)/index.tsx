@@ -5,11 +5,14 @@ import axios from "axios";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { BASE_URL } from "@/config";
 import InputField from "@/components/InputField";
+import TCModal from "@/components/TCModal";
 
 type Props = {};
 
 const WelcomeScreen = (props: Props) => {
   const [email, setEmail] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true); // this needs to show the modal on first load
 
   const requestOTP = async () => {
     try {
@@ -36,6 +39,15 @@ const WelcomeScreen = (props: Props) => {
       alert("Failed to do OTP stuff");
     }
   };
+
+  const handleAcceptTerms = () => {
+    setTermsAccepted(true);
+    setModalVisible(false);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
   return (
     <>
       <Stack.Screen
@@ -48,6 +60,13 @@ const WelcomeScreen = (props: Props) => {
           gestureEnabled: false, //remove gesture
         }}
       />
+
+      <TCModal
+        isVisible={modalVisible}
+        termsAccepted={termsAccepted}
+        onAccept={handleAcceptTerms}
+        onClose={handleCloseModal}
+      />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Create an Account</Text>
@@ -55,19 +74,40 @@ const WelcomeScreen = (props: Props) => {
             We'll send a code to your Grinnell email account!
           </Text>
         </View>
-        <View style={styles.inputContainer}>
-          <InputField
-            placeholder="Username"
-            placeholderTextColor={Colors.gray}
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <Text style={styles.emailDomain}>@grinnell.edu</Text>
-        </View>
-        <TouchableOpacity style={styles.btn} onPress={requestOTP}>
-          <Text style={styles.btnTxt}>Send Code</Text>
-        </TouchableOpacity>
+        {termsAccepted ? (
+          <>
+            <View style={styles.inputContainer}>
+              <InputField
+                placeholder="Username"
+                placeholderTextColor={Colors.gray}
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+              <Text style={styles.emailDomain}>@grinnell.edu</Text>
+            </View>
+            <TouchableOpacity style={styles.btn} onPress={requestOTP}>
+              <Text style={styles.btnTxt}>Send Code</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Text style={styles.termsLink}>View Terms and Conditions</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <View style={styles.acceptTermsContainer}>
+            <Text style={styles.acceptTermsText}>
+              Please accept the terms and conditions to continue
+            </Text>
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.btnTxt}>View Terms</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View style={styles.divider} />
       </View>
     </>
@@ -127,6 +167,20 @@ const styles = StyleSheet.create({
   loginTxtSpan: {
     fontWeight: "600",
     color: Colors.primary,
+  },
+  termsLink: {
+    marginTop: 15,
+    color: "#4b0082",
+    textDecorationLine: "underline",
+  },
+  acceptTermsContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  acceptTermsText: {
+    textAlign: "center",
+    marginBottom: 10,
+    color: "gray",
   },
   divider: {
     borderTopColor: Colors.gray,
