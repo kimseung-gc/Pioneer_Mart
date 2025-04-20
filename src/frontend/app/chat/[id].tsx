@@ -180,7 +180,13 @@ const ChatScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerTitle: `${roomName} - ${item}`,
+          headerTitle: () => (
+            <TouchableOpacity onPress={() => console.log("header pressed")}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                {roomName} - {item}
+              </Text>
+            </TouchableOpacity>
+          ),
           headerTitleAlign: "center",
           headerShown: true,
           headerLeft: () => (
