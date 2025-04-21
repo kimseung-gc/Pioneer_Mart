@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./contexts/AuthContext";
 import React from "react";
 import { AppInitialier } from "@/components/AppInitializer";
+import { StatusBar } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -46,6 +47,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AppInitialier />
+      <StatusBar barStyle="dark-content" backgroundColor={"#fff"} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="(tabs)"

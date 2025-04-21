@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import {
   Alert,
@@ -11,16 +11,22 @@ import {
   View,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 // import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
+import DropDownPicker from "react-native-dropdown-picker";
+// import { Picker } from "@react-native-picker/picker";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -51,6 +57,10 @@ const AddItemScreen = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserInfo>();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownItems, setDropdownItems] = useState(CATEGORIES);
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const { authToken } = useAuth();
   const insets = useSafeAreaInsets();
 
@@ -58,6 +68,14 @@ const AddItemScreen = () => {
   const updateFormField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  // Effect for handling dropdown open state
+  useEffect(() => {
+    if (dropdownOpen && scrollViewRef.current) {
+      // Scroll to make the dropdown visible when it opens
+      scrollViewRef.current.scrollTo({ y: 300, animated: true });
+    }
+  }, [dropdownOpen]);
 
   // we need this for the purchaser's user info
   useEffect(() => {
@@ -309,99 +327,162 @@ const AddItemScreen = () => {
     }
   };
 
+  const handleCategorySelect = (value: string) => {
+    updateFormField("category", value);
+    setDropdownOpen(false);
+  };
+
+  const renderCategoryDropdown = () => {
+    if (dropdownOpen) {
+      return (
+        <TouchableWithoutFeedback onPress={() => setDropdownOpen(false)}>
+          <View style={styles.dropdownOverlay}>
+            <View style={styles.dropdownContainer}>
+              <ScrollView nestedScrollEnabled={true}>
+                {CATEGORIES.map((category) => (
+                  <TouchableOpacity
+                    key={category.value}
+                    style={[
+                      styles.dropdownItem,
+                      formData.category === category.value &&
+                        styles.dropdownItemSelected,
+                    ]}
+                    onPress={() => handleCategorySelect(category.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        formData.category === category.value &&
+                          styles.dropdownItemTextSelected,
+                      ]}
+                    >
+                      {category.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      );
+    }
+    return null;
+  };
+
   return (
-    <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
-      <Text style={styles.title}>Add New Item</Text>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Name *</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.name}
-          onChangeText={(text) => updateFormField("name", text)}
-          placeholder="Item name"
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          value={formData.description}
-          onChangeText={(text) => updateFormField("description", text)}
-          placeholder="Item Description"
-          multiline
-          numberOfLines={4}
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Price *</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.price}
-          onChangeText={(text) => updateFormField("price", text)}
-          placeholder="0.00"
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Category</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={formData.category}
-            onValueChange={(value) => updateFormField("category", value)}
-          >
-            {CATEGORIES.map((cat) => (
-              <Picker.Item
-                key={cat.value}
-                label={cat.label}
-                value={cat.value}
-              />
-            ))}
-          </Picker>
-        </View>
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Image *</Text>
-        <View style={styles.imagePicker}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.image} />
-          ) : (
-            <Text style={styles.imagePickerText}>No Image Selected</Text>
-          )}
-        </View>
-        <View style={styles.imageActions}>
-          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-            <MaterialIcons name="photo-library" size={24} color="#007BFF" />
-            <Text style={styles.imageButtonText}>Gallery</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.imageButton} onPress={openCamera}>
-            <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
-            <Text style={styles.imageButtonText}>Camera</Text>
-          </TouchableOpacity>
-        </View>
-        <CameraModal
-          visible={showCamera}
-          onClose={() => setShowCamera(false)}
-          onCapture={handleCapturedImage}
-        />
-      </View>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSubmit}
-        disabled={loading}
+    // flex: 1 makes the SafeAreaView fill the whole screen...without it the screen goes blank
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Save Item</Text>
-        )}
-      </TouchableOpacity>
-    </ScrollView>
+        <ScrollView
+          ref={scrollViewRef}
+          style={{ paddingTop: insets.top }}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+        >
+          <Text style={styles.title}>Add New Item</Text>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Name *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.name}
+              onChangeText={(text) => updateFormField("name", text)}
+              placeholder="Item name"
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={[styles.input, styles.textarea]}
+              value={formData.description}
+              onChangeText={(text) => updateFormField("description", text)}
+              placeholder="Item Description"
+              multiline
+              numberOfLines={4}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Price *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.price}
+              onChangeText={(text) => updateFormField("price", text)}
+              placeholder="0.00"
+              keyboardType="numeric"
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Category</Text>
+            <TouchableOpacity
+              style={styles.dropdownTrigger}
+              onPress={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <Text style={styles.dropdownTriggerText}>
+                {formData.category
+                  ? CATEGORIES.find((cat) => cat.value === formData.category)
+                      ?.label
+                  : "Select a category"}
+              </Text>
+              <MaterialIcons
+                name={dropdownOpen ? "arrow-drop-up" : "arrow-drop-down"}
+                size={24}
+                color="#007BFF"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={[styles.formGroup, { marginTop: dropdownOpen ? 120 : 0 }]}
+          >
+            <Text style={styles.label}>Image *</Text>
+            <View style={styles.imagePicker}>
+              {image ? (
+                <Image source={{ uri: image }} style={styles.image} />
+              ) : (
+                <Text style={styles.imagePickerText}>No Image Selected</Text>
+              )}
+            </View>
+            <View style={styles.imageActions}>
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <MaterialIcons name="photo-library" size={24} color="#007BFF" />
+                <Text style={styles.imageButtonText}>Gallery</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageButton} onPress={openCamera}>
+                <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
+                <Text style={styles.imageButtonText}>Camera</Text>
+              </TouchableOpacity>
+            </View>
+            <CameraModal
+              visible={showCamera}
+              onClose={() => setShowCamera(false)}
+              onCapture={handleCapturedImage}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Save Item</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* Render the dropdown outside the ScrollView */}
+        {renderCategoryDropdown()}
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -416,6 +497,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
   },
   formGroup: {
     marginBottom: 20,
@@ -488,6 +573,67 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
+    fontWeight: "bold",
+  },
+  dropdownStyle: {
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  dropdownContainerStyle: {
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+  },
+  dropdownItemStyle: {
+    justifyContent: "flex-start",
+  },
+  dropdownTrigger: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: "#fff",
+  },
+  dropdownTriggerText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  dropdownOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  dropdownContainer: {
+    width: "80%",
+    maxHeight: 300,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    zIndex: 1001,
+  },
+  dropdownItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  dropdownItemSelected: {
+    backgroundColor: "#f0f8ff",
+  },
+  dropdownItemTextSelected: {
+    color: "#007BFF",
     fontWeight: "bold",
   },
 });
