@@ -75,6 +75,11 @@ const AddItemScreen = () => {
     setImage("");
   };
 
+  // function to remove the image
+  const removeImage = () => {
+    setImage("");
+  };
+
   // Effect for handling dropdown open state
   useEffect(() => {
     if (dropdownOpen && scrollViewRef.current) {
@@ -453,6 +458,17 @@ const AddItemScreen = () => {
               ) : (
                 <Text style={styles.imagePickerText}>No Image Selected</Text>
               )}
+              {image && (
+                <TouchableOpacity
+                  style={styles.removeIcon}
+                  onPress={removeImage}
+                >
+                  <MaterialIcons name="close" size={24} color="#fff" />
+                  {/* <Text style={[styles.imageButtonText, { color: "#FF3B30" }]}>
+                    Remove
+                  </Text> */}
+                </TouchableOpacity>
+              )}
             </View>
             <View style={styles.imageActions}>
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
@@ -533,7 +549,9 @@ const styles = StyleSheet.create({
   },
   imageActions: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 10,
     marginTop: 10,
   },
   imageButton: {
@@ -559,6 +577,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f9f9f9",
     overflow: "hidden",
+    position: "relative",
   },
   image: {
     width: "100%",
@@ -640,6 +659,15 @@ const styles = StyleSheet.create({
   dropdownItemTextSelected: {
     color: "#007BFF",
     fontWeight: "bold",
+  },
+  removeIcon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    // backgroundColor: "rgba(0,0,0,0.6)",
+    // borderRadius: 12,
+    padding: 4,
+    zIndex: 10,
   },
 });
 
