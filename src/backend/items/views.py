@@ -70,9 +70,6 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]  # order by creation date in descending order
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
 
-    def get_queryset(self):
-        return Listing.objects.filter(is_sold=False)
-
     def perform_create(self, serializer):
         """
         Set seller to current user when creating listing.
