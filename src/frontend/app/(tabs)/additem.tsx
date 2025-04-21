@@ -18,8 +18,6 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 // import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
-import DropDownPicker from "react-native-dropdown-picker";
-// import { Picker } from "@react-native-picker/picker";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
@@ -47,18 +45,20 @@ const CATEGORIES = [
 ];
 
 const AddItemScreen = () => {
-  const [formData, setFormData] = useState({
+  // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
+  const initialFormState = {
     name: "",
     description: "",
     price: "",
     category: "", //default category
-  });
+  };
+  const [formData, setFormData] = useState(initialFormState);
+
   const [image, setImage] = useState<string>("");
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserInfo>();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownItems, setDropdownItems] = useState(CATEGORIES);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { authToken } = useAuth();
@@ -67,6 +67,12 @@ const AddItemScreen = () => {
   // helper function to fill in whatever form field we need
   const updateFormField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // function to reset form data
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setImage("");
   };
 
   // Effect for handling dropdown open state
@@ -293,8 +299,7 @@ const AddItemScreen = () => {
           return data;
         },
       });
-      console.log("yeyyy");
-
+      resetForm(); //reset the form after submitting
       Alert.alert("Success", "Item added successfully");
       router.back();
     } catch (error) {
