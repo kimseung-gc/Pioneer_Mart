@@ -13,11 +13,13 @@ import { useRoute } from "@react-navigation/native";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { useAuth } from "@/app/contexts/AuthContext";
 import useSingleItemStore from "@/stores/singleItemStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useUserStore } from "@/stores/userStore";
 import ZoomModal from "./ZoomModal";
 import React from "react";
+import ReportModal from "./ReportModal";
+import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   item: ItemType;
@@ -28,7 +30,7 @@ const width = Dimensions.get("window").width - 40;
 
 const SingleItem = ({ item, source }: Props) => {
   const route = useRoute();
-  const { toggleFavorite } = useItemsStore();
+  const { toggleFavorite, toggleReport } = useItemsStore();
   const { authToken } = useAuth();
   const { showFavoritesIcon, setShowFavoritesIcon } = useSingleItemStore();
   const { userData } = useUserStore();
@@ -41,21 +43,17 @@ const SingleItem = ({ item, source }: Props) => {
   const currentItem = items.find((i) => i.id === item.id) || item;
 
   const [isZoomVisible, setIsZoomVisible] = useState(false);
-
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const handleItemPress = () => {
     if (source === "myItems") {
       setShowFavoritesIcon(false);
-      router.push({
-        pathname: "/ItemDetails",
-        params: { item: JSON.stringify(item), source: source },
-      });
     } else {
       setShowFavoritesIcon(true);
-      router.push({
-        pathname: "/ItemDetails",
-        params: { item: JSON.stringify(item) },
-      });
     }
+    router.push({
+      pathname: `/item/[id]`,
+      params: { id: item.id.toString(), source },
+    });
   };
 
   // Get all items from all screens to find the most up-to-date version
@@ -75,14 +73,11 @@ const SingleItem = ({ item, source }: Props) => {
   const handleFavoriteToggle = async () => {
     await toggleFavorite(item.id, authToken || "");
   };
-
+  // Check if we're already on the item details page
+  const isDetailsPage = route.name === "item/[id]";
   return (
     <TouchableOpacity
-      onPress={
-        route.name === "ItemDetails"
-          ? () => setIsZoomVisible(true)
-          : handleItemPress
-      }
+      onPress={isDetailsPage ? () => setIsZoomVisible(true) : handleItemPress}
     >
       <View
         style={[
@@ -97,30 +92,81 @@ const SingleItem = ({ item, source }: Props) => {
             item={currentItem} // Use the updated item
           />
         )}
+
+        <ReportModal
+          isVisible={isReportModalVisible}
+          onClose={() => setIsReportModalVisible(false)}
+          itemId={currentItem.id}
+        />
         <Image source={{ uri: currentItem.image }} style={styles.itemImage} />
         {currentItem.seller === userData?.id && (
           <View style={styles.myItemTag} />
         )}
-        {showFavoritesIcon &&
-        currentItem.seller !== userData?.id &&
-        route.name !== "additionalinfo/MyItems" ? (
-          <TouchableOpacity
-            style={styles.favBtn}
-            onPress={handleFavoriteToggle}
-          >
-        <AntDesign
-          testID={latestItem.is_favorited ? "heart-icon" : "hearto-icon"}
-          name={latestItem.is_favorited ? "heart" : "hearto"}
-          size={22}
-          color="black"
-        />
-          </TouchableOpacity>
-        ) : null}
-        {route.name === "ItemDetails" ? null : (
-          <Text style={styles.title}>${currentItem.price}</Text>
+        {/* sold tag */}
+        {currentItem.is_sold && (
+          <View style={styles.soldTagContainer}>
+            <Text style={styles.soldTagText}>Sold</Text>
+          </View>
         )}
-        {route.name === "ItemDetails" ? null : (
-          <Text style={styles.title}>{currentItem.title}</Text>
+        <View style={styles.buttonsContainer}>
+          {showFavoritesIcon &&
+          currentItem.seller !== userData?.id &&
+          route.name !== "additionalinfo/MyItems" ? (
+            <>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={async (e) => {
+                  e.stopPropagation();
+                  if (latestItem.is_reported) {
+                    await toggleReport(latestItem.id, authToken || "", "");
+                  } else {
+                    setIsReportModalVisible(true);
+                  }
+                }}
+              >
+                <MaterialIcons
+                  testID={
+                    latestItem.is_reported ? "flag-icon" : "outlined-flag-icon"
+                  }
+                  name={latestItem.is_reported ? "flag" : "outlined-flag"}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.favBtn}
+                onPress={handleFavoriteToggle}
+              >
+                <AntDesign
+                  testID={
+                    latestItem.is_favorited ? "heart-icon" : "hearto-icon"
+                  }
+                  name={latestItem.is_favorited ? "heart" : "hearto"}
+                  size={22}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </>
+          ) : null}
+
+          {/* Show the report button if user is not the owner
+          {!isOwner && (
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={(e) => {
+                e.stopPropagation();
+                setIsReportModalVisible(true);
+              }}
+            >
+              <Entypo name="flag" size={20} color="black" />
+            </TouchableOpacity>
+          )} */}
+        </View>
+        {!isDetailsPage && (
+          <>
+            <Text style={styles.title}>${currentItem.price}</Text>
+            <Text style={styles.title}>{currentItem.title}</Text>
+          </>
         )}
       </View>
     </TouchableOpacity>
@@ -129,12 +175,10 @@ const SingleItem = ({ item, source }: Props) => {
 
 export default SingleItem;
 
-// Styles remain unchanged
-
 const styles = StyleSheet.create({
   container: {
-    width: (width - 10) / 2, // Ensure spacing works correctly
-    marginHorizontal: 5, // Add margin for spacing
+    width: (width - 10) / 2,
+    marginHorizontal: 5,
   },
   itemImage: {
     width: "100%",
@@ -143,10 +187,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
-  favBtn: {
+  buttonsContainer: {
     position: "absolute",
-    right: 20,
+    right: 10,
     top: 20,
+    flexDirection: "row",
+    gap: 10,
+  },
+  iconBtn: {
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    padding: 5,
+    borderRadius: 30,
+  },
+  favBtn: {
+    // position: "absolute",
+    // right: 20,
+    // top: 20,
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     padding: 5,
     borderRadius: 30,
@@ -164,5 +220,18 @@ const styles = StyleSheet.create({
     borderRadius: 100 / 2,
     top: 20,
     left: 10,
+  },
+  soldTagContainer: {
+    position: "absolute",
+    right: 10,
+    top: "10%",
+    paddingVertical: 8,
+    transform: [{ translateY: -15 }],
+  },
+  soldTagText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 16,
   },
 });

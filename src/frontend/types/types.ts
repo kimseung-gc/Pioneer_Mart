@@ -10,18 +10,17 @@ export interface ItemType {
   category_name: string;
   seller: number;
   is_favorited: boolean; // this is a separate field on the frontend for each user
+  is_reported: boolean; // this is a separate field on the frontend for each user
   purchase_request_count: number;
   purchase_requesters?: Array<{ id: number; username: string }>;
 }
 
-//adding this for now... we'll connect to backend purchase requests later
 export interface PurchaseRequest {
   id: number;
   listing: ItemType;
   requester: number;
-  // seller: number;
   requester_name: string;
-  // status: "pending" | "accepted" | "rejected" | "cancelled";
+  status: "pending" | "accepted" | "declined" | "cancelled";
   created_at: string;
   is_active: boolean;
 }
@@ -54,4 +53,4 @@ export interface SingleItemProps {
   showFavoritesIcon?: boolean;
 }
 
-export type ScreenId = "home" | "myItems" | "favorites";
+export type ScreenId = "home" | "myItems" | "favorites" | "reported";

@@ -6,6 +6,7 @@
 from rest_framework import serializers
 from .models import PurchaseRequest, Listing
 
+
 # ListingDetailSerializer extends the default listing with request-related metadata.
 class ListingDetailSerializer(serializers.ModelSerializer):
     """
@@ -14,6 +15,7 @@ class ListingDetailSerializer(serializers.ModelSerializer):
     - purchase_request_count: total number of active requests for the listing
     - purchase_requesters: a list of users who requested to buy the item (visible only to seller)
     """
+
     purchase_request_count = serializers.SerializerMethodField()
     purchase_requesters = serializers.SerializerMethodField()
 
@@ -31,8 +33,8 @@ class ListingDetailSerializer(serializers.ModelSerializer):
             "seller",
             "seller_name",
             "created_at",
-            "purchase_request_count",   # Custom field
-            "purchase_requesters",      # Custom field, conditionally shown
+            "purchase_request_count",  # Custom field
+            "purchase_requesters",  # Custom field, conditionally shown
         ]
 
     def get_purchase_request_count(self, obj):
@@ -63,12 +65,14 @@ class ListingDetailSerializer(serializers.ModelSerializer):
             return [{"id": user.id, "username": user.username} for user in users]
         return []
 
+
 # PurchaseRequestSerializer handles serialization of purchase request records.
 class PurchaseRequestSerializer(serializers.ModelSerializer):
     """
     PurchaseRequestSerializer
     Serializes PurchaseRequest instances including nested listing and requester's name.
     """
+
     requester_name = serializers.SerializerMethodField()
     listing = ListingDetailSerializer(read_only=True)
 
@@ -81,6 +85,7 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
             "requester_name",
             "created_at",
             "is_active",
+            "status",
         ]
         read_only_fields = ["requester", "created_at"]
 

@@ -1,17 +1,14 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import AddItemScreen from "../../../app/(tabs)/additem";
-
-// Mocks
-
-jest.mock("expo-font", () => ({
-  useFonts: () => [true, null],
-  loadAsync: jest.fn(() => Promise.resolve()),
-  isLoaded: jest.fn(() => true), // <-- Add this line
+import { render, fireEvent } from "@testing-library/react-native";
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock("axios");
 import axios from "axios";
+import AddItemScreen from "@/app/(tabs)/additem";
+import { KeyboardAvoidingView } from "react-native";
+jest.mock("react-native-dropdown-picker", () => () => null);
+jest.mock("@/components/CameraModal", () => () => null);
 
 // Mock an api call to get data
 (axios.get as jest.Mock).mockResolvedValue({
@@ -34,14 +31,15 @@ jest.mock("expo-image-picker", () => ({
     })
   ),
 }));
-jest.mock("expo-router", () => ({
-  router: {
-    back: jest.fn(),
-  },
-}));
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
+jest.mock("react-native-safe-area-context", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  return {
+    SafeAreaView: (props: any) => <View {...props} />,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
 
 jest.mock("@/app/contexts/AuthContext", () => ({
   useAuth: () => ({ authToken: "test-token" }),

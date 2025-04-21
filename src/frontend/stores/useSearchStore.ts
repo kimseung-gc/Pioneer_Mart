@@ -5,8 +5,6 @@ import { CategoryType, ItemType, ScreenId } from "@/types/types";
 import axios from "axios";
 import { create } from "zustand";
 
-// type ScreenId = "home" | "myItems" | "favorites";
-
 // interface for the state and actions of each screen
 interface ScreenState {
   items: ItemType[]; //all the items that could appear on the screen
@@ -27,6 +25,7 @@ interface ItemsStoreState {
   activeScreen: ScreenId;
   categories: Array<{ id: number; name: string }>;
   refreshItems: (screenId: ScreenId, authToken: string) => Promise<void>; // New function to force refresh
+  updateItem: (updatedItem: ItemType) => void;
 
   //actions
   setIsReturningFromDetails: (value: boolean) => void;
@@ -49,6 +48,11 @@ interface ItemsStoreState {
 
   //toggling favorites function
   toggleFavorite: (itemId: number, authToken: string) => Promise<void>;
+  toggleReport: (
+    itemId: number,
+    authToken: string,
+    reason: string | ""
+  ) => Promise<void>;
 }
 
 //initial state for a screen
@@ -69,6 +73,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   screens: {
     home: { ...initialScreenState },
     favorites: { ...initialScreenState },
+    reported: { ...initialScreenState },
     myItems: { ...initialScreenState },
   },
   activeScreen: "home",
@@ -78,6 +83,27 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
 
   //set active screen
   setActiveScreen: (screenId) => set({ activeScreen: screenId }),
+
+  updateItem: (updatedItem: ItemType) => {
+    set((state) => {
+      const updatedScreens = { ...state.screens };
+      for (const screenId in updatedScreens) {
+        const screen = updatedScreens[screenId as ScreenId];
+        const updatedItems = screen.items.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+        const updatedFilteredItems = screen.filteredItems.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+        updatedScreens[screenId as ScreenId] = {
+          ...screen,
+          items: updatedItems,
+          filteredItems: updatedFilteredItems,
+        };
+      }
+      return { screens: updatedScreens };
+    });
+  },
 
   /**
    * Function to refresh items on screen.
@@ -116,6 +142,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = "api/items/";
       } else if (screenId === "favorites") {
         endpoint = "api/items/favorites/";
+      } else if (screenId === "reported") {
+        endpoint = "api/report/reported-items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -133,7 +161,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           params: { _t: Date.now() },
         }
       );
-      console.log("here");
       set((state) => ({
         //take state of screens
         screens: {
@@ -206,6 +233,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = "api/items/";
       } else if (screenId == "favorites") {
         endpoint = "api/items/favorites/";
+      } else if (screenId === "reported") {
+        endpoint = "api/report/reported-items/";
       } else {
         endpoint = "api/items/my_items/";
       }
@@ -233,7 +262,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         },
       }));
-      // console.log(response.data);
     } catch (error) {
       console.error(`Error loading items for ${screenId}:`, error);
 
@@ -342,7 +370,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         }
       );
-      console.log("Categories in loadCategories:", response.data.results);
       set({ categories: response.data["results"] });
     } catch (error) {
       set({ categories: [] });
@@ -385,6 +412,8 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         endpoint = `api/items/search_favorites/?q=${query}`;
       } else if (screenId === "myItems") {
         endpoint = `api/items/search_my_items/?q${query}`;
+      } else if (screenId === "reported") {
+        endpoint = `api/items/search_reported_items/?${query}`; // TODO
       }
       console.log("This is the endpoint:", endpoint);
       const response = await axios.get<PaginatedResponse<ItemType>>(
@@ -532,7 +561,12 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       const state = get();
 
       // Check if item exists in any screen to get its current status and details
-      for (const screenKey of ["home", "favorites", "myItems"] as ScreenId[]) {
+      for (const screenKey of [
+        "home",
+        "favorites",
+        "myItems",
+        "reported",
+      ] as ScreenId[]) {
         const item = state.screens[screenKey].items.find(
           (item) => item.id === itemId
         );
@@ -569,7 +603,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems"] as ScreenId[]).forEach(
+        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
           (screenKey) => {
             const screen = updatedScreens[screenKey];
 
@@ -638,6 +672,143 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       });
     } catch (error) {
       console.log("Error toggling favorite:", error);
+    }
+  },
+  /**
+   * Function to report an item
+   * @param {number} itemId - The item that needs to be reported
+   * @param {string} authToken - User's authentication token
+   * @example
+   *  await toggleReport(item.id, authToken || "");
+   */
+  toggleReport: async (
+    itemId: number,
+    authToken: string,
+    reason: string | ""
+  ) => {
+    try {
+      const cleanToken = authToken?.trim();
+      const URL = `${BASE_URL}/api/report/${itemId}/toggle_report/`;
+
+      // First determine the current reported status from the item in any screen
+      let currentReportedStatus = false;
+      let currentItem: ItemType | undefined;
+      const state = get();
+
+      // Check if item exists in any screen to get its current status and details
+      for (const screenKey of [
+        "home",
+        "favorites",
+        "myItems",
+        "reported",
+      ] as ScreenId[]) {
+        const item = state.screens[screenKey].items.find(
+          (item) => item.id === itemId
+        );
+        if (item) {
+          currentReportedStatus = item.is_reported;
+          currentItem = item;
+          break;
+        }
+      }
+
+      if (!currentItem) {
+        console.error("Item not found in any screen");
+        return;
+      }
+      const payload = currentReportedStatus ? {} : { reason: reason };
+      // Toggle the status - calculate new status ahead of time
+      const newReportedStatus = !currentReportedStatus;
+      // Make the API call
+      await axios.post(URL, payload, {
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      console.log(
+        `Item ${itemId} reported from toggleReport with ${reason} reason`
+      );
+
+      // Now update all screens with the known new status
+      set((state) => {
+        const updatedScreens = { ...state.screens };
+
+        // Update existing items in each screen
+        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
+          (screenKey) => {
+            const screen = updatedScreens[screenKey];
+
+            // Update items array with the new status
+            const updatedItems = screen.items.map((item) =>
+              item.id === itemId
+                ? { ...item, is_reported: newReportedStatus }
+                : item
+            );
+
+            // Update filtered items array with the new status
+            const updatedFilteredItems = screen.filteredItems.map((item) =>
+              item.id === itemId
+                ? { ...item, is_reported: newReportedStatus }
+                : item
+            );
+
+            // Handle special cases for the favorites screen
+            if (screenKey === "reported") {
+              if (!newReportedStatus) {
+                // If unreporting, remove from reported screen
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: updatedItems.filter((item) => item.id !== itemId),
+                  filteredItems: updatedFilteredItems.filter(
+                    (item) => item.id !== itemId
+                  ),
+                };
+              } else if (
+                newReportedStatus &&
+                !screen.items.some((item) => item.id === itemId)
+              ) {
+                // If reporting AND the item isn't already in reported screen, add it
+                const itemToAdd = { ...currentItem!, is_reported: true };
+
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: [itemToAdd, ...screen.items],
+                  filteredItems:
+                    screen.selectedCategory === null ||
+                    Number(itemToAdd.category) === screen.selectedCategory
+                      ? [itemToAdd, ...screen.filteredItems]
+                      : screen.filteredItems,
+                };
+              } else {
+                // Just update status
+                updatedScreens[screenKey] = {
+                  ...screen,
+                  items: updatedItems,
+                  filteredItems: updatedFilteredItems,
+                };
+              }
+            } else {
+              // For non-favorites screens, just update the items
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems,
+                filteredItems: updatedFilteredItems,
+              };
+            }
+          }
+        );
+
+        return { screens: updatedScreens };
+      });
+      console.log("\n\nreported:", itemId, "\n\n");
+    } catch (error: any) {
+      if (error.response) {
+        console.log("Error reporting item:", error.response.data);
+      } else {
+        console.log("Error reporting item:", error.message);
+      }
     }
   },
 }));

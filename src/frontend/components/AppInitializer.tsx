@@ -11,7 +11,6 @@ export const AppInitialier = () => {
       if (isAuthenticated && authToken) {
         try {
           await fetchUserData(authToken);
-          console.log("User data fetched successfully");
         } catch (error) {
           console.log("Failed to fetch user data");
         }

@@ -1,10 +1,13 @@
 from rest_framework import serializers
+
+from report.models import ItemReport
 from .models import Listing
 
 
 class ItemSerializer(serializers.ModelSerializer):
     # This is a read only field
     is_favorited = serializers.SerializerMethodField()
+    is_reported = serializers.SerializerMethodField()
 
     class Meta:
         model = Listing
@@ -21,6 +24,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "seller_name",
             "created_at",
             "is_favorited",
+            "is_reported",
         ]  # get all fields
         read_only_fields = ["id", "seller_name", "category_name", "created_at"]
 
@@ -36,3 +40,18 @@ class ItemSerializer(serializers.ModelSerializer):
         """
         user = self.context.get("request").user
         return obj in user.profile.favorites.all()
+
+    def get_is_reported(self, obj):
+        """
+        Checks if the listing is reported by the current user.
+
+        Args:
+            obj (Listing): The Listing object being serialized.
+
+        Returns:
+            bool: True if the listing is reported, False otherwise.
+        """
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return ItemReport.objects.filter(item=obj, reporter=request.user).exists()
+        return False

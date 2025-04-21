@@ -91,13 +91,20 @@ const ProductList = ({
         ListHeaderComponent={() => (
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
-              {route.name === "index" ? "Latest" : "Your"}{" "}
+              {route.name === "index"
+                ? "Latest"
+                : route.name === "additionalinfo/ReportedItems"
+                ? "Reported"
+                : "Your"}{" "}
               {route.name === "favorites" ? "Favorites" : "Items"}
             </Text>
-            <View style={styles.myTimeTagContainer}>
-              <View style={styles.myItemTag} />
-              <Text>My Items</Text>
-            </View>
+            {route.name !== "favorites" &&
+              route.name !== "additionalinfo/ReportedItems" && (
+                <View style={styles.myTimeTagContainer}>
+                  <View style={styles.myItemTag} />
+                  <Text>My Items</Text>
+                </View>
+              )}
           </View>
         )}
       />

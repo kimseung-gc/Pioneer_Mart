@@ -1,22 +1,10 @@
-import OtpScreen from "@/app/OtpScreen";
+import OtpScreen from "@/app/(auth)/OtpScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
-
-jest.mock("expo-font");
-jest.mock("axios");
-jest.mock("expo-router", () => ({
-  router: {
-    push: jest.fn(),
-    back: jest.fn(),
-  },
-  useLocalSearchParams: jest
-    .fn()
-    .mockReturnValue({ email: "test@example.com" }),
-}));
 
 jest.mock("frontend/app/contexts/AuthContext.tsx", () => ({
   useAuth: jest.fn().mockReturnValue({
@@ -101,7 +89,7 @@ describe("OtpScreen Component", () => {
         mockAuthToken
       );
       expect(Alert.alert).toHaveBeenCalledWith("Success", "Login successful!");
-      expect(router.push).toHaveBeenCalledWith("/(tabs)");
+      expect(router.replace).toHaveBeenCalledWith("/(tabs)");
     });
   });
 

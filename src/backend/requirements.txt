@@ -12,3 +12,5 @@ requests==2.32.3
 sqlparse==0.5.3
 urllib3==2.2.3
 django-filter==24.3
+daphne==4.1.2
+channels==4.2.2

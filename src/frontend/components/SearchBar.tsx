@@ -3,9 +3,10 @@ import { TextInput, View, StyleSheet, TouchableOpacity } from "react-native";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
+import { ScreenId } from "@/types/types";
 
 type SearchBarProps = {
-  screenId: "home" | "favorites" | "myItems";
+  screenId: ScreenId;
 };
 
 const SearchBar: React.FC<SearchBarProps> = ({ screenId }) => {

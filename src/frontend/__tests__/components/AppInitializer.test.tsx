@@ -14,7 +14,7 @@ describe("AppInitialier", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useUserStore as jest.Mock).mockReturnValue({
+    (useUserStore as unknown as jest.Mock).mockReturnValue({
       fetchUserData: mockFetchUserData,
     });
   });
@@ -29,7 +29,6 @@ describe("AppInitialier", () => {
 
     await waitFor(() => {
       expect(mockFetchUserData).toHaveBeenCalledWith("valid-token");
-      expect(consoleLogSpy).toHaveBeenCalledWith("User data fetched successfully");
     });
   });
 

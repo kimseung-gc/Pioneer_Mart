@@ -10,12 +10,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from items.models import Listing
 
+
 class UserProfile(models.Model):
     """
     Extends the default User model with additional attributes:
     - favorites: Listings the user has favorited
     - is_verified: Indicates whether the user's account has been verified
     """
+
     user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
     favorites = models.ManyToManyField(
         Listing, blank=True, related_name="favorited_by"
@@ -27,8 +29,7 @@ class UserProfile(models.Model):
         Returns all listings the user has made active purchase requests for.
         """
         return Listing.objects.filter(
-            purchase_requests__requester=self.user,
-            purchase_requests__is_active=True
+            purchase_requests__requester=self.user, purchase_requests__is_active=True
         )
 
     def __str__(self):
@@ -36,6 +37,7 @@ class UserProfile(models.Model):
         String representation of the profile using the user's email.
         """
         return f"{self.user.email}'s profile"
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -45,6 +47,7 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         print(f"Creating profile for {instance.username}")
         UserProfile.objects.create(user=instance)
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):

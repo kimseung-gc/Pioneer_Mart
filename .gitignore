@@ -5,3 +5,4 @@
 backend/env/
 backend/config.py
 src/backend/backend/__pycache__/
+src/backend/db.sqlite3

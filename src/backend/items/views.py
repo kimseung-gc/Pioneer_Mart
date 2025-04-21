@@ -70,6 +70,9 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]  # order by creation date in descending order
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
 
+    def get_queryset(self):
+        return Listing.objects.filter(is_sold=False)
+
     def perform_create(self, serializer):
         """
         Set seller to current user when creating listing.
@@ -87,13 +90,12 @@ class ItemViewSet(viewsets.ModelViewSet):
             # When the user is not the seller
             return Response(
                 # Print error message
-                {"error": "You do not have permission to edit this listing"}, 
+                {"error": "You do not have permission to edit this listing"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        print("\n\n", serializer.data)
         # Otherwise, response with the data without error
         return Response(serializer.data)
 
@@ -297,7 +299,6 @@ class ItemViewSet(viewsets.ModelViewSet):
                 {"detail": "This item has already been sold."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         # Check if the user is trying to buy their own listing
         if listing.seller == user:
             return Response(

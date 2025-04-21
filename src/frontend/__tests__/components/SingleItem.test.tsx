@@ -15,8 +15,6 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }));
 
-jest.mock("@expo/vector-icons/AntDesign", () => "AntDesign");
-
 jest.mock("@/stores/useSearchStore", () => {
   const mockItems = [
     {
@@ -84,6 +82,7 @@ const mockItem: ItemType = {
   category_name: "Electronics",
   seller: 2,
   is_favorited: false,
+  is_reported: false,
   purchase_request_count: 0,
 };
 
