@@ -31,14 +31,12 @@ const WelcomeScreen = (props: Props) => {
           },
         }
       );
-      console.log("requested OTP....");
       router.push({
         pathname: "/(auth)/OtpScreen",
         params: { email: fullEmail },
       });
     } catch (error) {
-      console.log(email);
-      console.log("Error:", error);
+      console.error("Error:", error);
       alert("Failed to do OTP stuff");
     }
   };

@@ -1,6 +1,8 @@
-jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
-);
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
 
 jest.mock("@expo/vector-icons/AntDesign", () => {
   return {
@@ -10,6 +12,18 @@ jest.mock("@expo/vector-icons/AntDesign", () => {
 });
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => {
+  return {
+    __esModule: true,
+    default: () => <></>,
+  };
+});
+jest.mock("@expo/vector-icons/Foundation", () => {
+  return {
+    __esModule: true,
+    default: () => <></>,
+  };
+});
+jest.mock("@expo/vector-icons/FontAwesome", () => {
   return {
     __esModule: true,
     default: () => <></>,
@@ -40,7 +54,14 @@ jest.mock("expo-router", () => ({
   Tabs: {
     Screen: () => null,
   },
+  useRouter: jest.fn(),
   useLocalSearchParams: jest
     .fn()
     .mockReturnValue({ email: "test@example.com" }),
+}));
+
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: jest
+    .fn()
+    .mockReturnValue({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));

@@ -23,13 +23,6 @@ jest.mock("@react-navigation/native", () => ({
   useFocusEffect: jest.fn((fn) => fn()), // just calls the effect immediately
 }));
 
-// Mock router
-jest.mock("expo-router", () => ({
-  router: {
-    back: jest.fn(),
-  },
-}));
-
 // Mock SafeAreaInsets
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: jest.fn(),

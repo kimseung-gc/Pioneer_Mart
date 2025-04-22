@@ -44,7 +44,6 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
   const handleChatPress = () => {
     router.push("/ChatRoomScreen");
   };
-  console.log("HERE", unreadCount);
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {route.name === "additionalinfo/MyItems" ||

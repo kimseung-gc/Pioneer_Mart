@@ -46,9 +46,7 @@ const OtpScreen = () => {
         Alert.alert("Error", "Token not received from server.");
       }
     } catch (error) {
-      console.log(error);
-      // alert("Invalid OTP");
-      console.log("Invalid OTP");
+      console.log("Error", error);
     }
   };
 

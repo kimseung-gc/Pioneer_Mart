@@ -94,6 +94,7 @@ describe("OtpScreen Component", () => {
   });
 
   it("handles failed OTP verification", async () => {
+    const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     (axios.post as jest.Mock).mockRejectedValueOnce(new Error("Invalid OTP"));
     const { getByText, getByTestId } = render(<OtpScreen />);
     const otpInput = getByTestId("otp-input");
@@ -119,6 +120,7 @@ describe("OtpScreen Component", () => {
         expect.anything()
       );
     });
+    consoleSpy.mockRestore();
   });
 
   //test for pressing Resend and going back to the request code screen

@@ -4,17 +4,6 @@ import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 
-// all the mock stuff for font etc.
-// jest.mock("expo-font");
-jest.mock("axios");
-jest.mock("expo-router", () => ({
-  router: {
-    push: jest.fn(),
-  },
-  Stack: {
-    Screen: () => null,
-  },
-}));
 // jest.mock("@/components/TCModal", () => {
 //   const { Modal, View, Text, TouchableOpacity } = require("react-native");
 
@@ -157,6 +146,9 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("handles error during OTP request", async () => {
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     const component = render(<WelcomeScreen />);
 
     const acceptButton = await component.findByTestId("accept-button");
@@ -182,5 +174,6 @@ describe("WelcomeScreen Component", () => {
       // Make sure we didn't navigate
       expect(router.push).not.toHaveBeenCalled();
     });
+    consoleSpy.mockRestore(); // Clean up
   });
 });

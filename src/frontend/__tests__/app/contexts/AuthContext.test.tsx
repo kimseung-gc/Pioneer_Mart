@@ -6,19 +6,6 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import React from "react";
 
-// mocking dependencies
-jest.mock("@react-native-async-storage/async-storage", () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-}));
-
-jest.mock("expo-router", () => ({
-  router: {
-    replace: jest.fn(),
-  },
-}));
-
 describe("AuthContext", () => {
   //ensure all mock functions are cleared before testing...prevent state from leading bw tests
   beforeEach(() => {
