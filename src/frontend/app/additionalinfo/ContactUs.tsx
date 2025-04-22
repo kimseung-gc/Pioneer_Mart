@@ -11,15 +11,8 @@ const ContactUs = () => {
         options={{
           headerTitle: "Contact Us",
           headerTitleAlign: "center",
+          headerBackTitle: "Back",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => router.back()}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
         }}
       />
       <View style={styles.contentContainer}>

@@ -196,16 +196,7 @@ const ChatScreen = () => {
           ),
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => {
-                router.back();
-              }}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerBackTitle: "Back",
         }}
       />
       <SafeAreaView style={styles.container}>

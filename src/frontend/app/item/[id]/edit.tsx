@@ -336,154 +336,171 @@ const EditItem = () => {
   };
 
   return (
-    // flex: 1 makes the SafeAreaView fill the whole screen...without it the screen goes blank
-    <SafeAreaView style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView
-          ref={scrollViewRef}
-          style={{ paddingTop: insets.top }}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled={true}
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: "Edit Item",
+          headerTitleAlign: "center",
+          headerShown: true,
+          headerBackTitle: "Back",
+        }}
+      />
+      <SafeAreaView style={{ flex: 1 }} edges={["left", "right", "bottom"]}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <Text style={styles.title}>Edit Item</Text>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Name *</Text>
-            <TextInput
-              style={styles.input}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Item name"
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Description</Text>
-            <TextInput
-              style={[styles.input, styles.textarea]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Item Description"
-              multiline
-              numberOfLines={4}
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Price *</Text>
-            <TextInput
-              style={styles.input}
-              value={price}
-              onChangeText={setPrice}
-              placeholder="0.00"
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Category</Text>
-            <TouchableOpacity
-              testID="category-selector"
-              style={styles.dropdownTrigger}
-              onPress={() => setDropdownOpen(!dropdownOpen)}
-            >
-              <Text style={styles.dropdownTriggerText}>
-                {selectedCategory
-                  ? CATEGORIES.find((cat) => cat.value === selectedCategory)
-                      ?.label
-                  : "Select a category"}
-              </Text>
-              <MaterialIcons
-                name={dropdownOpen ? "arrow-drop-up" : "arrow-drop-down"}
-                size={24}
-                color="#007BFF"
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={[styles.formGroup, { marginTop: dropdownOpen ? 120 : 0 }]}
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled={true}
           >
-            <Text style={styles.label}>
-              Images * ({images.length} selected)
-            </Text>
-            {images.length > 0 ? (
-              <View style={styles.imageGallery}>
-                <FlatList
-                  data={images}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(_, index) => index.toString()}
-                  renderItem={({ item, index }) => (
-                    <View style={styles.imageContainer}>
-                      <Image
-                        source={{ uri: item }}
-                        style={styles.thumbnailImage}
-                      />
-                      <TouchableOpacity
-                        style={styles.removeIcon}
-                        onPress={() => removeImage(index)}
-                      >
-                        <MaterialIcons name="close" size={24} color="#fff" />
-                      </TouchableOpacity>
-                      {index === 0 && (
-                        <View style={styles.primaryBadge}>
-                          <Text style={styles.primaryBadgeText}>Primary</Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Name *</Text>
+              <TextInput
+                style={styles.input}
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Item name"
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Description</Text>
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Item Description"
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Price *</Text>
+              <TextInput
+                style={styles.input}
+                value={price}
+                onChangeText={setPrice}
+                placeholder="0.00"
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Category</Text>
+              <TouchableOpacity
+                testID="category-selector"
+                style={styles.dropdownTrigger}
+                onPress={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <Text style={styles.dropdownTriggerText}>
+                  {selectedCategory
+                    ? CATEGORIES.find((cat) => cat.value === selectedCategory)
+                        ?.label
+                    : "Select a category"}
+                </Text>
+                <MaterialIcons
+                  name={dropdownOpen ? "arrow-drop-up" : "arrow-drop-down"}
+                  size={24}
+                  color="#007BFF"
                 />
-              </View>
-            ) : (
-              <View style={styles.imagePicker}>
-                <Text style={styles.imagePickerText}>No Image Selected</Text>
-              </View>
-            )}
-            <View style={styles.imageActions}>
-              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <MaterialIcons name="photo-library" size={24} color="#007BFF" />
-                <Text style={styles.imageButtonText}>Gallery</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.imageButton} onPress={openCamera}>
-                <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
-                <Text style={styles.imageButtonText}>Camera</Text>
               </TouchableOpacity>
             </View>
-            <CameraModal
-              visible={showCamera}
-              onClose={() => setShowCamera(false)}
-              onCapture={handleCapturedImage}
-            />
-          </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Save Item</Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-        {/* Render the dropdown outside the ScrollView */}
-        {renderCategoryDropdown()}
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            <View
+              style={[styles.formGroup, { marginTop: dropdownOpen ? 120 : 0 }]}
+            >
+              <Text style={styles.label}>
+                Images * ({images.length} selected)
+              </Text>
+              {images.length > 0 ? (
+                <View style={styles.imageGallery}>
+                  <FlatList
+                    data={images}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(_, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                      <View style={styles.imageContainer}>
+                        <Image
+                          source={{ uri: item }}
+                          style={styles.thumbnailImage}
+                        />
+                        <TouchableOpacity
+                          style={styles.removeIcon}
+                          onPress={() => removeImage(index)}
+                        >
+                          <MaterialIcons name="close" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        {index === 0 && (
+                          <View style={styles.primaryBadge}>
+                            <Text style={styles.primaryBadgeText}>Primary</Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  />
+                </View>
+              ) : (
+                <View style={styles.imagePicker}>
+                  <Text style={styles.imagePickerText}>No Image Selected</Text>
+                </View>
+              )}
+              <View style={styles.imageActions}>
+                <TouchableOpacity
+                  style={styles.imageButton}
+                  onPress={pickImage}
+                >
+                  <MaterialIcons
+                    name="photo-library"
+                    size={24}
+                    color="#007BFF"
+                  />
+                  <Text style={styles.imageButtonText}>Gallery</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.imageButton}
+                  onPress={openCamera}
+                >
+                  <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
+                  <Text style={styles.imageButtonText}>Camera</Text>
+                </TouchableOpacity>
+              </View>
+              <CameraModal
+                visible={showCamera}
+                onClose={() => setShowCamera(false)}
+                onCapture={handleCapturedImage}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Save Item</Text>
+              )}
+            </TouchableOpacity>
+          </ScrollView>
+          {/* Render the dropdown outside the ScrollView */}
+          {renderCategoryDropdown()}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
+    paddingTop: 20,
     backgroundColor: "#fff",
   },
   title: {

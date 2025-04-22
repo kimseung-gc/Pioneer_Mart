@@ -56,7 +56,6 @@ const WelcomeScreen = (props: Props) => {
           headerTitle: "Sign Up",
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => null, // This removes the back button
           headerBackVisible: false,
           gestureEnabled: false, //remove gesture
         }}

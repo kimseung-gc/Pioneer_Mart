@@ -179,24 +179,9 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
       <Stack.Screen
         options={{
           headerTitle: "Your Chats",
+          headerBackTitle: "Back",
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => {
-                router.back();
-                console.log("navigating back...");
-              }}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-          headerRight: () => (
-            <TouchableOpacity style={{ padding: 8 }} onPress={handleRefresh}>
-              <EvilIcons name="refresh" size={24} color="black" />
-            </TouchableOpacity>
-          ),
         }}
       />
       <View style={styles.container}>

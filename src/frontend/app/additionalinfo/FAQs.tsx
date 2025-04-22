@@ -75,14 +75,7 @@ const FAQs = () => {
           headerTitle: "Frequently Asked Questions",
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => router.back()}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerBackTitle: "Back",
         }}
       />
 

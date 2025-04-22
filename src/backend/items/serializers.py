@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from report.models import ItemReport
+from django.contrib.auth.models import User
 from .models import ItemImage, Listing
 
 
@@ -11,6 +12,12 @@ class ItemImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image"]
 
 
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username")
+
+
 class ItemSerializer(serializers.ModelSerializer):
     # This is a read only field
     is_favorited = serializers.SerializerMethodField()
@@ -18,6 +25,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
     # new field for additional images
     additional_images = ItemImageSerializer(many=True, read_only=True)
+    purchase_requesters = serializers.SerializerMethodField()
+    purchase_request_count = serializers.SerializerMethodField()
 
     # # this will be used to handle the uploaded additional images
     # uploaded_images = serializers.ListField(
@@ -37,13 +46,14 @@ class ItemSerializer(serializers.ModelSerializer):
             "price",
             "image",
             "additional_images",
-            # "uploaded_images",
             "is_sold",
             "seller",
             "seller_name",
             "created_at",
             "is_favorited",
             "is_reported",
+            "purchase_request_count",
+            "purchase_requesters",
         ]  # get all fields
         read_only_fields = [
             "id",
@@ -80,3 +90,10 @@ class ItemSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return ItemReport.objects.filter(item=obj, reporter=request.user).exists()
         return False
+
+    def get_purchase_requesters(self, obj):
+        requesters = obj.get_purchase_requesters()
+        return UserMiniSerializer(requesters, many=True).data
+
+    def get_purchase_request_count(self, obj):
+        return obj.get_purchase_request_count()
