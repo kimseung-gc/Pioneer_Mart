@@ -77,13 +77,13 @@ const ItemDetails = () => {
   const getItemImages = () => {
     if (!item) return [];
 
-    // if the item has multiple images, then use them
-    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
-      return item.images;
-    }
+    const primary = item.image ? [item.image] : [];
 
-    // otherwise use the single image as an array
-    return item.image ? [item.image] : [];
+    const additional =
+      item.additional_images && Array.isArray(item.additional_images)
+        ? item.additional_images.map((img: any) => img.image)
+        : [];
+    return [...primary, ...additional];
   };
 
   const images = getItemImages(); // get the images of the item

@@ -1,13 +1,30 @@
 from rest_framework import serializers
 
 from report.models import ItemReport
-from .models import Listing
+from .models import ItemImage, Listing
+
+
+# new serializer for the ItemImage model
+class ItemImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemImage
+        fields = ["id", "image"]
 
 
 class ItemSerializer(serializers.ModelSerializer):
     # This is a read only field
     is_favorited = serializers.SerializerMethodField()
     is_reported = serializers.SerializerMethodField()
+
+    # new field for additional images
+    additional_images = ItemImageSerializer(many=True, read_only=True)
+
+    # # this will be used to handle the uploaded additional images
+    # uploaded_images = serializers.ListField(
+    #     child=serializers.ImageField(allow_empty_file=False, use_url=False),
+    #     write_only=True,
+    #     required=False,
+    # )
 
     class Meta:
         model = Listing
@@ -19,6 +36,8 @@ class ItemSerializer(serializers.ModelSerializer):
             "description",
             "price",
             "image",
+            "additional_images",
+            # "uploaded_images",
             "is_sold",
             "seller",
             "seller_name",
