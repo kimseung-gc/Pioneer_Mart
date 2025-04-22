@@ -161,3 +161,30 @@ class PurchaseRequestViewSet(viewsets.ModelViewSet):
         purchase_request.save()
 
         return Response({"detail": "Purchase request declined"})
+
+    @action(detail=True, methods=["delete"])
+    def remove(self, request, pk=None):
+        """
+        Deletes a purchase request from the database.
+
+        Only the requester can delete their own request.
+
+        Args:
+            request (Request): The request object.
+            pk (int, optional): The primary key of the purchase request.
+
+        Returns:
+            Response: A response indicating the delete status.
+        """
+        purchase_request = self.get_object()
+        if purchase_request.requester != request.user:
+            return Response(
+                {"detail": "You cannot delete someone else's purchase request"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        purchase_request.delete()
+        return Response(
+            {"detail": "Purchase request permanently deleted."},
+            status=status.HTTP_200_OK,
+        )
