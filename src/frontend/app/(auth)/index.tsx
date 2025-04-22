@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useState } from "react";
 import axios from "axios";
@@ -37,7 +37,7 @@ const WelcomeScreen = (props: Props) => {
       });
     } catch (error) {
       console.error("Error:", error);
-      alert("Failed to do OTP stuff");
+      Alert.alert("Failed to do OTP stuff");
     }
   };
 
