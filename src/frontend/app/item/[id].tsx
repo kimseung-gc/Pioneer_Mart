@@ -34,11 +34,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  ListRenderItemInfo,
+  Image,
+  FlatList,
 } from "react-native";
+import { TapGestureHandler } from "react-native-gesture-handler";
+
 import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
 import SingleItem from "@/components/SingleItem";
 import axios from "axios";
@@ -48,9 +51,10 @@ import { useUserStore } from "@/stores/userStore";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
-import { ChatRoom } from "@/types/chat";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ZoomModal from "@/components/ZoomModal";
 
-const width = Dimensions.get("window").width;
+const { width, height } = Dimensions.get("window");
 
 const ItemDetails = () => {
   const router = useRouter();
@@ -62,8 +66,27 @@ const ItemDetails = () => {
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
+  const [isZoomVisible, setIsZoomVisible] = useState(false);
   const authToken = useAuth();
   const { userData } = useUserStore();
+
+  // image carousel stuff
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+
+  const getItemImages = () => {
+    if (!item) return [];
+
+    // if the item has multiple images, then use them
+    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+      return item.images;
+    }
+
+    // otherwise use the single image as an array
+    return item.image ? [item.image] : [];
+  };
+
+  const images = getItemImages(); // get the images of the item
 
   // Fetch the latest item data from the API
   const fetchItemDetails = async () => {
@@ -167,6 +190,25 @@ const ItemDetails = () => {
   // Find out if the user is the owner of the item
   const isOwner = userData && item && item.seller === userData.id;
 
+  // function to handle image scroll
+  const handleScroll = (event: any) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = Math.floor(event.nativeEvent.contentOffset.x / slideSize);
+    if (index !== currentImageIndex) {
+      setCurrentImageIndex(index);
+    }
+  };
+
+  // render each image in the carousel
+  const renderImageItem = ({ item: imageUrl }: { item: string }) => {
+    return (
+      <Image
+        source={{ uri: imageUrl }}
+        style={styles.itemImage}
+        resizeMode="cover"
+      />
+    );
+  };
   if (isLoading || !item) {
     return (
       <View style={styles.container}>
@@ -239,84 +281,117 @@ const ItemDetails = () => {
           ),
         }}
       />
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ItemPurchaseModal
           isVisible={isVisible}
           onClose={closeModal}
           email={item.seller_name}
         />
-        <SingleItem item={item} />
-        <Text style={styles.title}>Price: ${item.price}</Text>
-        <Text style={styles.title}>Name: {item.title}</Text>
-        <Text style={styles.title}>Description: {item.description}</Text>
-        <Text style={styles.title}>Seller: {item.seller_name}</Text>
-        <Text style={styles.title}>Date Posted: {item.created_at}</Text>
-        <Text style={styles.title}>Category: {item.category_name}</Text>
-        {isOwner && (
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#4CAF50",
-              padding: 15,
-              borderRadius: 5,
-              marginTop: 20,
-              width: "100%",
-              alignItems: "center",
-            }}
-            onPress={() => {
-              router.push({
-                pathname: "/item/[id]/edit",
-                params: { id: item.id.toString(), item: JSON.stringify(item) },
-              });
-            }}
-          >
-            <Text style={{ color: "white", fontSize: 16 }}>Edit Listing</Text>
-          </TouchableOpacity>
-        )}
-
-        {isLoading ? (
-          <ActivityIndicator
-            style={{ marginTop: 20 }}
-            size="small"
-            color="blue"
+        {isZoomVisible && (
+          <ZoomModal
+            isVisible={isZoomVisible}
+            onClose={() => setIsZoomVisible(false)}
+            item={item} // Use the updated item
           />
-        ) : (
-          source !== "myItems" &&
-          !isOwner && (
-            <>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: hasRequestedItem ? "gray" : "blue",
-                  padding: 15,
-                  borderRadius: 5,
-                  marginTop: 20,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-                onPress={() => handlePurchaseRequest(authToken.authToken)}
-                disabled={hasRequestedItem}
-              >
-                <Text style={{ color: "white", fontSize: 16 }}>
-                  {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.chatButton}
-                onPress={startChat}
-                disabled={chatLoading}
-              >
-                {chatLoading ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <>
-                    <Entypo name="chat" size={20} color="white" />
-                    <Text style={styles.chatButtonText}>Message Seller</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </>
-          )
         )}
-      </View>
+        <TapGestureHandler
+          numberOfTaps={1}
+          onActivated={() => setIsZoomVisible(true)}
+        >
+          <View style={styles.carouselContainer}>
+            <FlatList
+              ref={flatListRef}
+              data={
+                images.length > 0
+                  ? images
+                  : ["src/frontend/assets/images/defaultpic.png"]
+              }
+              renderItem={renderImageItem}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+            />
+
+            {/* image counter overlay */}
+            <View style={styles.imageCounterContainer}>
+              <Text style={styles.imageCounter}>
+                {currentImageIndex + 1} of {images.length || 1}
+              </Text>
+            </View>
+          </View>
+        </TapGestureHandler>
+        {/* <SingleItem item={item} /> */}
+        {/* all the item details */}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.title}>Price: ${item.price}</Text>
+          <Text style={styles.title}>Name: {item.title}</Text>
+          <Text style={styles.title}>Description: {item.description}</Text>
+          <Text style={styles.title}>Seller: {item.seller_name}</Text>
+          <Text style={styles.title}>Date Posted: {item.created_at}</Text>
+          <Text style={styles.title}>Category: {item.category_name}</Text>
+          {isOwner && (
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => {
+                router.push({
+                  pathname: "/item/[id]/edit",
+                  params: {
+                    id: item.id.toString(),
+                    item: JSON.stringify(item),
+                  },
+                });
+              }}
+            >
+              <Text style={styles.buttonText}>Edit Listing</Text>
+            </TouchableOpacity>
+          )}
+
+          {isLoading ? (
+            <ActivityIndicator
+              style={{ marginTop: 20 }}
+              size="small"
+              color="blue"
+            />
+          ) : (
+            source !== "myItems" &&
+            !isOwner && (
+              <>
+                <TouchableOpacity
+                  style={[
+                    styles.purchaseRequestButton,
+                    hasRequestedItem && styles.disabledButton,
+                  ]}
+                  onPress={() => handlePurchaseRequest(authToken.authToken)}
+                  disabled={hasRequestedItem}
+                >
+                  <Text style={styles.buttonText}>
+                    {hasRequestedItem
+                      ? "Purchase Requested"
+                      : "Request Purchase"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.chatButton}
+                  onPress={startChat}
+                  disabled={chatLoading}
+                >
+                  {chatLoading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <>
+                      <Entypo name="chat" size={20} color="white" />
+                      <Text style={styles.chatButtonText}>Message Seller</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </>
+            )
+          )}
+        </View>
+      </SafeAreaView>
     </>
   );
 };
@@ -327,15 +402,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 20,
+    // padding: 20,
     justifyContent: "center",
   },
+  carouselContainer: {
+    width: width,
+    height: height * 0.35,
+    position: "relative",
+  },
   itemImage: {
-    width: "100%",
-    height: 200,
+    width: width,
+    height: "100%",
+    // borderRadius: 15,
+    // marginTop: 10,
+    // marginBottom: 10,
+  },
+  imageCounterContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 15,
-    marginTop: 10,
-    marginBottom: 10,
+  },
+  imageCounter: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  detailsContainer: {
+    padding: 20,
+    flex: 1,
   },
   favBtn: {
     position: "absolute",
@@ -350,20 +448,28 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "black",
   },
-  roomItem: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+  editButton: {
+    backgroundColor: "#4CAF50",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
   },
-  roomName: {
-    fontSize: 18,
-    fontWeight: "bold",
+  purchaseRequestButton: {
+    backgroundColor: "blue",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
   },
-  roomDetails: {
-    fontSize: 14,
-    color: "#888",
-    marginTop: 4,
+  disabledButton: {
+    backgroundColor: "gray",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
   },
   chatButton: {
     backgroundColor: "#22a45d",

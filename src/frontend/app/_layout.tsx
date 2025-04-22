@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import React from "react";
 import { AppInitialier } from "@/components/AppInitializer";
 import { StatusBar } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -47,17 +48,19 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AppInitialier />
-      <StatusBar barStyle="dark-content" backgroundColor={"#fff"} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen
-          name="(tabs)"
-          options={{ gestureEnabled: false, headerBackVisible: false }} //prevent user from going back to (auth) tabs
-        />
-        <Stack.Screen
-          name="(auth)"
-          options={{ gestureEnabled: false, headerShown: false }} // user can't go back from here either but just putting this in case
-        />
-      </Stack>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar barStyle="dark-content" backgroundColor={"#fff"} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="(tabs)"
+            options={{ gestureEnabled: false, headerBackVisible: false }} //prevent user from going back to (auth) tabs
+          />
+          <Stack.Screen
+            name="(auth)"
+            options={{ gestureEnabled: false, headerShown: false }} // user can't go back from here either but just putting this in case
+          />
+        </Stack>
+      </GestureHandlerRootView>
     </AuthProvider>
   );
 }

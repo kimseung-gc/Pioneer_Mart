@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   zoomContainer: {
-    width: width * 0.9, // Make the zoom container responsive
+    width: width, // Make the zoom container responsive
     height: height,
     justifyContent: "center",
     alignItems: "center",
