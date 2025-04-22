@@ -115,7 +115,19 @@ const ItemDetails = () => {
           Accept: "application/json",
         },
       });
-      setItem(response.data);
+      const fetchedItem = response.data;
+      setItem(fetchedItem);
+      if (
+        fetchedItem.purchase_requesters &&
+        userData &&
+        fetchedItem.purchase_requesters.some(
+          (requester: { id: number }) => requester.id === userData.id
+        )
+      ) {
+        setHasRequestedItem(true);
+      } else {
+        setHasRequestedItem(false);
+      }
     } catch (error) {
       console.error("Error fetching item details:", error);
       Alert.alert(
@@ -142,8 +154,6 @@ const ItemDetails = () => {
   );
   const openModal = () => {
     setIsVisible(true);
-    console.log("Requested purchase...");
-    console.log("Seller: ", item?.seller_name);
   };
 
   const closeModal = () => {
@@ -262,20 +272,13 @@ const ItemDetails = () => {
           headerTitle: item.title,
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => {
-                router.back();
-                console.log("navigating back...");
-              }}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerBackTitle: "Back",
         }}
       />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "bottom"]}
+      >
         <ItemPurchaseModal
           isVisible={isVisible}
           onClose={closeModal}
@@ -400,10 +403,10 @@ export default ItemDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    // padding: 20,
-    justifyContent: "center",
+    paddingTop: 20,
+    backgroundColor: "#fff",
   },
+
   carouselContainer: {
     width: width,
     height: height * 0.35,
@@ -412,9 +415,6 @@ const styles = StyleSheet.create({
   itemImage: {
     width: width,
     height: "100%",
-    // borderRadius: 15,
-    // marginTop: 10,
-    // marginBottom: 10,
   },
   imageCounterContainer: {
     position: "absolute",
