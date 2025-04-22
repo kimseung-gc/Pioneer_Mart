@@ -121,6 +121,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         # data = request.data.copy()  # mutable copy of request.data
 
         # check if there are any additional images
+        instance.additional_images.clear()
         additional_images = request.FILES.getlist("additional_images")
         if additional_images:
             for img in additional_images:

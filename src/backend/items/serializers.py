@@ -45,7 +45,13 @@ class ItemSerializer(serializers.ModelSerializer):
             "is_favorited",
             "is_reported",
         ]  # get all fields
-        read_only_fields = ["id", "seller_name", "category_name", "created_at"]
+        read_only_fields = [
+            "id",
+            "seller",
+            "seller_name",
+            "category_name",
+            "created_at",
+        ]
 
     def get_is_favorited(self, obj):
         """

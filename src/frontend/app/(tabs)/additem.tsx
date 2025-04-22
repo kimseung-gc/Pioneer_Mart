@@ -89,11 +89,6 @@ const AddItemScreen = () => {
     }
   }, [dropdownOpen]);
 
-  // we need this for the purchaser's user info
-  useEffect(() => {
-    getProfile();
-  }, []);
-
   const getProfile = async () => {
     if (!authToken) {
       // check if authenticated
@@ -163,6 +158,7 @@ const AddItemScreen = () => {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.8,
+      // TODO: THIS DOESNT WORK ON ANDROID
       allowsMultipleSelection: true, // to allow selecting multiple images
     });
 
@@ -195,7 +191,7 @@ const AddItemScreen = () => {
     const selectedCategory = CATEGORIES.find((cat) => cat.value === category);
     formDataObj.append(
       "category",
-      selectedCategory ? selectedCategory.id.toString() : "8"
+      selectedCategory ? selectedCategory.id.toString() : "7"
     ); // Default to "Other" (8) if not found
     if (userData !== undefined) {
       formDataObj.append("seller", userData.id.toString());
@@ -223,8 +219,7 @@ const AddItemScreen = () => {
         type: imageType,
       } as unknown as Blob);
     }
-    // TODO: add array of images in backend image field.
-    // TODO: additional_images???
+
     if (images.length > 1) {
       // skip the first image since it's already added as the primary image
       for (let i = 1; i < images.length; i++) {
@@ -251,9 +246,8 @@ const AddItemScreen = () => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
+      setLoading(true);
       if (!userData) {
         await getProfile();
       }
@@ -336,29 +330,7 @@ const AddItemScreen = () => {
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error("Response status:", error.response.status);
-        console.error("Response data:", JSON.stringify(error.response.data));
-
-        // Display specific validation errors
-        let errorMessage = "Could not add item. Please try again later.";
-        if (error.response.data) {
-          if (typeof error.response.data === "object") {
-            const errorDetails = Object.entries(error.response.data)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join("\n");
-            if (errorDetails) {
-              errorMessage = `Validation errors:\n${errorDetails}`;
-            }
-          }
-        }
-        Alert.alert("Error", errorMessage);
-      } else {
-        Alert.alert(
-          "Connection Error",
-          "Could not connect to the server. Please check your network and try again."
-        );
-      }
+      Alert.alert("Error", "Could not edit item. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -458,6 +430,7 @@ const AddItemScreen = () => {
           <View style={styles.formGroup}>
             <Text style={styles.label}>Category</Text>
             <TouchableOpacity
+              testID="category-selector"
               style={styles.dropdownTrigger}
               onPress={() => setDropdownOpen(!dropdownOpen)}
             >
@@ -487,7 +460,7 @@ const AddItemScreen = () => {
                   data={images}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  keyExtractor={(index) => index.toString()}
+                  keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item, index }) => (
                     <View style={styles.imageContainer}>
                       <Image
@@ -739,8 +712,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 8,
-    // backgroundColor: "rgba(0,0,0,0.6)",
-    // borderRadius: 12,
     padding: 4,
     zIndex: 10,
   },
