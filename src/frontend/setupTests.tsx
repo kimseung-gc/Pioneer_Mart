@@ -41,9 +41,12 @@ jest.mock("expo-font", () => ({
 
 jest.mock("axios");
 
+const mockPush = jest.fn();
+
 jest.mock("expo-router", () => ({
+  __esModule: true,
   router: {
-    push: jest.fn(),
+    push: mockPush,
     back: jest.fn(),
     replace: jest.fn(),
     setParams: jest.fn(),
@@ -54,7 +57,9 @@ jest.mock("expo-router", () => ({
   Tabs: {
     Screen: () => null,
   },
-  useRouter: jest.fn(),
+  useRouter: () => ({
+    push: mockPush,
+  }),
   useLocalSearchParams: jest
     .fn()
     .mockReturnValue({ email: "test@example.com" }),
