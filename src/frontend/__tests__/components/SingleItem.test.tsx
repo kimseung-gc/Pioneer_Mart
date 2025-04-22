@@ -76,6 +76,7 @@ const mockItem: ItemType = {
   description: "A test item",
   price: 100,
   image: "https://example.com/image.jpg",
+  additional_images: ["https://example.com/image.jpg"],
   is_sold: false,
   created_at: "2025-04-01T00:00:00Z",
   category: 1,

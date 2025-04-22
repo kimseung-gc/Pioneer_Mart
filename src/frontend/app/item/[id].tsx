@@ -62,17 +62,26 @@ const ItemDetails = () => {
   const [item, setItem] = useState(
     itemString ? JSON.parse(itemString as string) : null
   );
+  const hasFetched = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
   const [isZoomVisible, setIsZoomVisible] = useState(false);
-  const authToken = useAuth();
+  const { authToken } = useAuth();
   const { userData } = useUserStore();
 
   // image carousel stuff
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    return () => {
+      setIsLoading(false);
+      setItem(null);
+      setIsVisible(false);
+    };
+  }, []);
 
   const getItemImages = () => {
     if (!item) return [];
@@ -86,9 +95,10 @@ const ItemDetails = () => {
     return [...primary, ...additional];
   };
 
-  const images = getItemImages(); // get the images of the item
+  const images = React.useMemo(() => getItemImages(), [item]);
+  // const images = getItemImages(); // get the images of the item
 
-  // Fetch the latest item data from the API
+  // tetch the latest item data from the API
   const fetchItemDetails = async () => {
     if (!id) {
       console.log("No item Id provided");
@@ -97,7 +107,7 @@ const ItemDetails = () => {
     }
     try {
       setIsLoading(true);
-      const cleanToken = authToken.authToken?.trim();
+      const cleanToken = authToken?.trim();
       const response = await axios.get(`${BASE_URL}/api/items/${id}/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
@@ -108,51 +118,28 @@ const ItemDetails = () => {
       setItem(response.data);
     } catch (error) {
       console.error("Error fetching item details:", error);
+      Alert.alert(
+        "Error",
+        "Unable to load item details. Please try again later."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Refresh data when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      fetchItemDetails();
+      if (!hasFetched.current) {
+        fetchItemDetails();
+        hasFetched.current = true;
+      }
+
       return () => {
-        // Optional cleanup
+        // reset the ref when the screen loses focus
+        hasFetched.current = false;
       };
     }, [id, authToken])
   );
-
-  // Check if user has requested this item
-  useEffect(() => {
-    const checkPurchaseRequest = async (authToken: string | null) => {
-      if (!item || !authToken) return;
-
-      try {
-        const cleanToken = authToken?.trim();
-        const response = await axios.get(`${BASE_URL}/api/requests/sent/`, {
-          headers: {
-            Authorization: `Bearer ${cleanToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        });
-
-        // Check if any of the sent requests match this item
-        const hasRequested = response.data.some(
-          (request: any) => request.listing.id === item.id && request.is_active
-        );
-        setHasRequestedItem(hasRequested);
-        //   setIsLoading(false);
-      } catch (error) {
-        console.error("Error checking purchase request:", error);
-        setIsLoading(false);
-      }
-    };
-
-    checkPurchaseRequest(authToken.authToken);
-  }, [item, authToken.authToken]);
-
   const openModal = () => {
     setIsVisible(true);
     console.log("Requested purchase...");
@@ -163,29 +150,32 @@ const ItemDetails = () => {
     setIsVisible(false);
   };
 
-  const handlePurchaseRequest = async (authToken: string | null) => {
-    if (!item) return;
+  const handlePurchaseRequest = React.useCallback(
+    async (authToken: string | null) => {
+      if (!item) return;
 
-    try {
-      const cleanToken = authToken?.trim();
-      const response = await axios.post(
-        `${BASE_URL}/api/items/${item.id}/request_purchase/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${cleanToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-      setHasRequestedItem(true); //update state of item for user
-      openModal(); // show the user that the request was sent.
-    } catch (error) {
-      console.error("Error requesting purchase:", error);
-      alert("Failed to send purchase request. Please try again.");
-    }
-  };
+      try {
+        const cleanToken = authToken?.trim();
+        const response = await axios.post(
+          `${BASE_URL}/api/items/${item.id}/request_purchase/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${cleanToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+        setHasRequestedItem(true); //update state of item for user
+        openModal(); // show the user that the request was sent.
+      } catch (error) {
+        console.error("Error requesting purchase:", error);
+        alert("Failed to send purchase request. Please try again.");
+      }
+    },
+    [item, authToken]
+  );
 
   // Find out if the user is the owner of the item
   const isOwner = userData && item && item.seller === userData.id;
@@ -212,7 +202,11 @@ const ItemDetails = () => {
   if (isLoading || !item) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator
+          testID="activity-indicator"
+          size="large"
+          color="blue"
+        />
       </View>
     );
   }
@@ -223,7 +217,7 @@ const ItemDetails = () => {
     setChatLoading(true);
 
     try {
-      const cleanToken = authToken.authToken?.trim();
+      const cleanToken = authToken?.trim();
       console.log(
         "Starting chat about item:",
         item.id,
@@ -351,6 +345,7 @@ const ItemDetails = () => {
 
           {isLoading ? (
             <ActivityIndicator
+              testID="activity-indicator"
               style={{ marginTop: 20 }}
               size="small"
               color="blue"
@@ -364,7 +359,7 @@ const ItemDetails = () => {
                     styles.purchaseRequestButton,
                     hasRequestedItem && styles.disabledButton,
                   ]}
-                  onPress={() => handlePurchaseRequest(authToken.authToken)}
+                  onPress={() => handlePurchaseRequest(authToken)}
                   disabled={hasRequestedItem}
                 >
                   <Text style={styles.buttonText}>
@@ -379,7 +374,11 @@ const ItemDetails = () => {
                   disabled={chatLoading}
                 >
                   {chatLoading ? (
-                    <ActivityIndicator size="small" color="white" />
+                    <ActivityIndicator
+                      testID="activity-indicator"
+                      size="small"
+                      color="white"
+                    />
                   ) : (
                     <>
                       <Entypo name="chat" size={20} color="white" />
