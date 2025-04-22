@@ -6,6 +6,20 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import React from "react";
 
+// This is to temporarily suppress the act warning
+const originalConsoleError = console.error;
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((msg, ...args) => {
+    if (typeof msg === "string" && msg.includes("not wrapped in act")) {
+      return;
+    }
+    originalConsoleError(msg, ...args);
+  });
+});
+afterAll(() => {
+  (console.error as jest.Mock).mockRestore();
+});
+
 describe("AuthContext", () => {
   //ensure all mock functions are cleared before testing...prevent state from leading bw tests
   beforeEach(() => {
