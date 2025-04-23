@@ -267,7 +267,6 @@ const EditItem = () => {
           Accept: "application/json",
         },
       };
-      console.log("hello");
       const response = await axios.put(
         `${BASE_URL}/api/items/${originalItem.id}/`,
         formData,
@@ -431,6 +430,7 @@ const EditItem = () => {
                         />
                         <TouchableOpacity
                           style={styles.removeIcon}
+                          testID="remove-image-button"
                           onPress={() => removeImage(index)}
                         >
                           <MaterialIcons name="close" size={24} color="#fff" />
@@ -482,7 +482,7 @@ const EditItem = () => {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator testID="activity-indicator" color="#fff" />
               ) : (
                 <Text style={styles.buttonText}>Save Item</Text>
               )}

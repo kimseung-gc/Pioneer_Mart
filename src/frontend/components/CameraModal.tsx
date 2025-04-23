@@ -10,7 +10,7 @@ import {
   SafeAreaView,
 } from "react-native";
 
-type CameraModalProps = {
+export type CameraModalProps = {
   visible: boolean;
   onClose: () => void;
   onCapture: (imageUri: string) => void;
@@ -53,6 +53,7 @@ const CameraModal = ({ visible, onClose, onCapture }: CameraModalProps) => {
     <SafeAreaView style={styles.cameraContainer}>
       <Modal
         visible={visible}
+        testID="CameraModal"
         transparent={false}
         animationType="slide"
         onRequestClose={onClose}
