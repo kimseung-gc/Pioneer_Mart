@@ -135,7 +135,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
       pathname: "/chat/[id]",
       params: {
         id: room.id.toString(),
-        name: otherUser.username,
+        username: otherUser.username,
         itemTitle: room.item_title || "No item",
       },
     });

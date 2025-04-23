@@ -21,9 +21,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 
 const ChatScreen = () => {
-  const { id, name, itemTitle } = useLocalSearchParams();
+  const { id, username, itemTitle } = useLocalSearchParams();
   const roomId = typeof id === "string" ? id : "";
-  const roomName = typeof name === "string" ? name : "Chat Room";
+  const roomName = typeof username === "string" ? username : "Chat Room";
   const item = typeof itemTitle === "string" ? itemTitle : "Item";
   const [messages, setMessages] = useState<Message[]>([]); // state for all messagees in the chat
   const [messageText, setMessageText] = useState<string>(""); // state for the actual content of a message
@@ -35,6 +35,7 @@ const ChatScreen = () => {
 
   useEffect(() => {
     // connect to websocket
+    console.log(username);
     setMessages([]);
     let socketUrl = "";
     const baseUrlObj = new URL(BASE_URL);

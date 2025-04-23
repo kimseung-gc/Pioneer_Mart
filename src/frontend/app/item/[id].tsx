@@ -253,7 +253,7 @@ const ItemDetails = () => {
         pathname: `/chat/[id]`,
         params: {
           id: chatRoom.id.toString(),
-          name: item.seller_name,
+          username: item.seller_name,
           itemTitle: item.title || "No item",
         }, // Assuming item.seller_name is the seller's name
       });
