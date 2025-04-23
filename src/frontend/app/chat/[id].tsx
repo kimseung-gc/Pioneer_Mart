@@ -194,6 +194,7 @@ const ChatScreen = () => {
               </Text>
             </TouchableOpacity>
           ),
+          headerShown: true,
           headerTitleAlign: "center",
           headerBackTitle: "Back",
         }}
