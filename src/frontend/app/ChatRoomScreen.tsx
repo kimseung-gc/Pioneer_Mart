@@ -144,7 +144,6 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
     // figure out who's sending the messages for UI stuff
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
-    console.log("Unread count:", item.unread_count); //debug line
     return (
       <TouchableOpacity
         style={[

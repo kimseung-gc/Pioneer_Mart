@@ -35,7 +35,6 @@ const ChatScreen = () => {
 
   useEffect(() => {
     // connect to websocket
-    console.log(username);
     setMessages([]);
     let socketUrl = "";
     const baseUrlObj = new URL(BASE_URL);
