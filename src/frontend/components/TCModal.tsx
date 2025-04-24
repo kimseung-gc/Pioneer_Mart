@@ -28,7 +28,7 @@ const TCModal: React.FC<TCModalProps> = ({
 }) => {
   const handleClose = () => {
     if (!termsAccepted) {
-      alert("You must accept the terms to continue");
+      Alert.alert("You must accept the terms to continue");
     } else {
       onClose();
     }
@@ -36,12 +36,11 @@ const TCModal: React.FC<TCModalProps> = ({
 
   return (
     <Modal
+      testID="tc-modal"
       animationType="slide"
       transparent={true}
       visible={isVisible}
-      onRequestClose={() => {
-        handleClose;
-      }}
+      onRequestClose={handleClose}
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>

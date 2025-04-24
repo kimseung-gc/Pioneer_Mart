@@ -42,6 +42,7 @@ const StartChatButton = ({ otherUserId }: { otherUserId: string }) => {
   return (
     <View>
       <TouchableOpacity
+        testID="start-chat-button"
         onPress={handleStartChat}
         disabled={loading}
         style={{
