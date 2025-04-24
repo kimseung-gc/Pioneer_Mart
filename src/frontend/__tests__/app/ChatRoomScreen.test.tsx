@@ -30,6 +30,18 @@ jest.mock("@/stores/userStore", () => ({
   useUserStore: jest.fn(),
 }));
 
+const originalConsoleError = console.error;
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((msg, ...args) => {
+    if (typeof msg === "string" && msg.includes("not wrapped in act")) {
+      return;
+    }
+    originalConsoleError(msg, ...args);
+  });
+});
+afterAll(() => {
+  (console.error as jest.Mock).mockRestore();
+});
 describe("ChatRoomsScreen", () => {
   const mockUserData = {
     id: 456,
