@@ -13,13 +13,12 @@ import {
   Platform,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
+  FlatList,
 } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 // import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
-import DropDownPicker from "react-native-dropdown-picker";
-// import { Picker } from "@react-native-picker/picker";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
@@ -47,18 +46,20 @@ const CATEGORIES = [
 ];
 
 const AddItemScreen = () => {
-  const [formData, setFormData] = useState({
+  // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
+  const initialFormState = {
     name: "",
     description: "",
     price: "",
     category: "", //default category
-  });
-  const [image, setImage] = useState<string>("");
+  };
+  const [formData, setFormData] = useState(initialFormState);
+
+  const [images, setImages] = useState<string[]>([]);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserInfo>();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownItems, setDropdownItems] = useState(CATEGORIES);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { authToken } = useAuth();
@@ -69,6 +70,17 @@ const AddItemScreen = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // function to reset form data
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setImages([]);
+  };
+
+  // function to remove the image
+  const removeImage = (indexToRemove: number) => {
+    setImages(images.filter((_, index) => index !== indexToRemove));
+  };
+
   // Effect for handling dropdown open state
   useEffect(() => {
     if (dropdownOpen && scrollViewRef.current) {
@@ -76,11 +88,6 @@ const AddItemScreen = () => {
       scrollViewRef.current.scrollTo({ y: 300, animated: true });
     }
   }, [dropdownOpen]);
-
-  // we need this for the purchaser's user info
-  useEffect(() => {
-    getProfile();
-  }, []);
 
   const getProfile = async () => {
     if (!authToken) {
@@ -119,9 +126,9 @@ const AddItemScreen = () => {
     setShowCamera(true);
   };
 
-  // Function to handle this image
+  // function to add selected images to the images array
   const handleCapturedImage = (imageUri: string) => {
-    setImage(imageUri);
+    setImages((prevImages) => [...prevImages, imageUri]);
     setShowCamera(false);
   };
 
@@ -147,20 +154,23 @@ const AddItemScreen = () => {
 
     // The thing for picking images, we can crop and stuff like that
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ["images"], //might have to change this???
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.8,
+      // TODO: THIS DOESNT WORK ON ANDROID
+      allowsMultipleSelection: true, // to allow selecting multiple images
     });
 
-    if (!result.canceled && result.assets[0]) {
-      setImage(result.assets[0].uri);
+    if (!result.canceled && result.assets.length > 0) {
+      const newImages = result.assets.map((asset) => asset.uri);
+      setImages((prevImages) => [...prevImages, ...newImages]);
     }
   };
 
   const validateForm = () => {
     const { name, price } = formData;
-    if (!name || !price || !image) {
+    if (!name || !price || images.length === 0) {
       Alert.alert(
         "Missing information",
         "Please fill out all required fields and add an image"
@@ -181,29 +191,53 @@ const AddItemScreen = () => {
     const selectedCategory = CATEGORIES.find((cat) => cat.value === category);
     formDataObj.append(
       "category",
-      selectedCategory ? selectedCategory.id.toString() : "8"
+      selectedCategory ? selectedCategory.id.toString() : "7"
     ); // Default to "Other" (8) if not found
     if (userData !== undefined) {
       formDataObj.append("seller", userData.id.toString());
     }
 
-    if (image) {
-      const imageFileName = image.split("/").pop() || "image.jpg";
+    if (images.length > 0) {
+      const primaryImage = images[0];
+      const imageFileName = primaryImage.split("/").pop() || "image.jpg";
       const imageType = imageFileName.endsWith("png")
         ? "image/png"
         : "image/jpeg";
-      const fileUri =
-        Platform.OS === "android"
-          ? image
-          : image.startsWith("file://")
-          ? image
-          : `file://${image}`;
+      // const fileUri =
+      //   Platform.OS === "android"
+      //     ? image
+      //     : image.startsWith("file://")
+      //     ? image
+      //     : `file://${image}`;
 
       formDataObj.append("image", {
-        uri: Platform.OS === "android" ? image : image.replace("file://", ""),
+        uri:
+          Platform.OS === "android"
+            ? primaryImage
+            : primaryImage.replace("file://", ""),
         name: imageFileName,
         type: imageType,
       } as unknown as Blob);
+    }
+
+    if (images.length > 1) {
+      // skip the first image since it's already added as the primary image
+      for (let i = 1; i < images.length; i++) {
+        const additionalImage = images[i];
+        const imageFileName =
+          additionalImage.split("/").pop() || `image_${i}.jpg`;
+        const imageType = imageFileName.endsWith("png")
+          ? "image/png"
+          : "image/jpeg";
+        formDataObj.append("additional_images", {
+          uri:
+            Platform.OS === "android"
+              ? additionalImage
+              : additionalImage.replace("file://", ""),
+          name: imageFileName,
+          type: imageType,
+        } as unknown as Blob);
+      }
     }
 
     return formDataObj;
@@ -212,9 +246,8 @@ const AddItemScreen = () => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
+      setLoading(true);
       if (!userData) {
         await getProfile();
       }
@@ -282,7 +315,6 @@ const AddItemScreen = () => {
 
       const formDataObj = createFormData();
       const cleanToken = authToken?.trim();
-      console.log("Making request to:", `${BASE_URL}/api/items/`);
       const response = await axios.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -293,35 +325,12 @@ const AddItemScreen = () => {
           return data;
         },
       });
-      console.log("yeyyy");
-
+      resetForm(); //reset the form after submitting
       Alert.alert("Success", "Item added successfully");
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error("Response status:", error.response.status);
-        console.error("Response data:", JSON.stringify(error.response.data));
-
-        // Display specific validation errors
-        let errorMessage = "Could not add item. Please try again later.";
-        if (error.response.data) {
-          if (typeof error.response.data === "object") {
-            const errorDetails = Object.entries(error.response.data)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join("\n");
-            if (errorDetails) {
-              errorMessage = `Validation errors:\n${errorDetails}`;
-            }
-          }
-        }
-        Alert.alert("Error", errorMessage);
-      } else {
-        Alert.alert(
-          "Connection Error",
-          "Could not connect to the server. Please check your network and try again."
-        );
-      }
+      Alert.alert("Error", "Could not edit item. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -378,7 +387,7 @@ const AddItemScreen = () => {
       >
         <ScrollView
           ref={scrollViewRef}
-          style={{ paddingTop: insets.top }}
+          // style={{ paddingTop: insets.top }}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled={true}
@@ -421,6 +430,7 @@ const AddItemScreen = () => {
           <View style={styles.formGroup}>
             <Text style={styles.label}>Category</Text>
             <TouchableOpacity
+              testID="category-selector"
               style={styles.dropdownTrigger}
               onPress={() => setDropdownOpen(!dropdownOpen)}
             >
@@ -441,14 +451,42 @@ const AddItemScreen = () => {
           <View
             style={[styles.formGroup, { marginTop: dropdownOpen ? 120 : 0 }]}
           >
-            <Text style={styles.label}>Image *</Text>
-            <View style={styles.imagePicker}>
-              {image ? (
-                <Image source={{ uri: image }} style={styles.image} />
-              ) : (
+            <Text style={styles.label}>
+              Images * ({images.length} selected)
+            </Text>
+            {images.length > 0 ? (
+              <View style={styles.imageGallery}>
+                <FlatList
+                  data={images}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item, index }) => (
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={{ uri: item }}
+                        style={styles.thumbnailImage}
+                      />
+                      <TouchableOpacity
+                        style={styles.removeIcon}
+                        onPress={() => removeImage(index)}
+                      >
+                        <MaterialIcons name="close" size={24} color="#fff" />
+                      </TouchableOpacity>
+                      {index === 0 && (
+                        <View style={styles.primaryBadge}>
+                          <Text style={styles.primaryBadgeText}>Primary</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                />
+              </View>
+            ) : (
+              <View style={styles.imagePicker}>
                 <Text style={styles.imagePickerText}>No Image Selected</Text>
-              )}
-            </View>
+              </View>
+            )}
             <View style={styles.imageActions}>
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
                 <MaterialIcons name="photo-library" size={24} color="#007BFF" />
@@ -489,7 +527,7 @@ const AddItemScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
     backgroundColor: "#fff",
   },
   title: {
@@ -528,7 +566,9 @@ const styles = StyleSheet.create({
   },
   imageActions: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 10,
     marginTop: 10,
   },
   imageButton: {
@@ -554,6 +594,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f9f9f9",
     overflow: "hidden",
+    position: "relative",
+  },
+  imageGallery: {
+    height: 150,
+    marginBottom: 10,
+  },
+  imageContainer: {
+    width: 120,
+    height: 120,
+    margin: 5,
+    borderRadius: 8,
+    overflow: "hidden",
+    position: "relative",
+  },
+  thumbnailImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  primaryBadge: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 123, 255, 0.8)",
+    padding: 4,
+    alignItems: "center",
+  },
+  primaryBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   image: {
     width: "100%",
@@ -635,6 +707,13 @@ const styles = StyleSheet.create({
   dropdownItemTextSelected: {
     color: "#007BFF",
     fontWeight: "bold",
+  },
+  removeIcon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    padding: 4,
+    zIndex: 10,
   },
 });
 

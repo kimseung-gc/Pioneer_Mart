@@ -1,7 +1,7 @@
 # Import Modules
 from rest_framework import viewsets
 from categories.serializers import CategorySerializer
-from .models import Listing
+from .models import Listing, ItemImage
 from purchase_requests.models import PurchaseRequest
 from purchase_requests.serializers import PurchaseRequestSerializer
 from .serializers import ItemSerializer
@@ -70,22 +70,44 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]  # order by creation date in descending order
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
 
-    def get_queryset(self):
-        return Listing.objects.filter(is_sold=False)
+    def create(self, request, *args, **kwargs):
+        """
+        Handle multiple images from form data
+        The primary image is already handled by the default serializer
+        Additional images need to be extracted from request.FILES
+        """
+        # # first create a mutable copy of request.data
+        # data = request.data.copy()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = self.perform_create(serializer)
+        # then check if there are any additional images
+        additional_images = request.FILES.getlist("additional_images")
+        if additional_images:
+            for img in additional_images:
+                item_image = ItemImage.objects.create(image=img)
+                instance.additional_images.add(item_image)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def perform_create(self, serializer):
         """
         Set seller to current user when creating listing.
         """
-        serializer.save(seller=self.request.user)
+        return serializer.save(seller=self.request.user)
 
     def update(self, request, *args, **kwargs):
         """
         Overrides default update behavior to enforce ownership:
         Only the original seller can update the listing.
         """
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        # get the instance object
+
         if instance.seller != request.user:
             # When the user is not the seller
             return Response(
@@ -93,9 +115,24 @@ class ItemViewSet(viewsets.ModelViewSet):
                 {"error": "You do not have permission to edit this listing"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+        # data = request.data.copy()  # mutable copy of request.data
+
+        # check if there are any additional images
+        instance.additional_images.clear()
+        additional_images = request.FILES.getlist("additional_images")
+        if additional_images:
+            for img in additional_images:
+                item_image = ItemImage.objects.create(image=img)
+                instance.additional_images.add(item_image)
+        # data["uploaded_images"] = additional_images
+
+        if getattr(instance, "_prefetched_objects_cache", None):
+            # if 'prefetch_related has been applied to a queryset,
+            # we need to forcibly invalidate the prefetch cache on the instance
+            instance._prefetched_objects_cache = {}
         # Otherwise, response with the data without error
         return Response(serializer.data)
 

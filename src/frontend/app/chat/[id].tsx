@@ -21,9 +21,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 
 const ChatScreen = () => {
-  const { id, name, itemTitle } = useLocalSearchParams();
+  const { id, username, itemTitle } = useLocalSearchParams();
   const roomId = typeof id === "string" ? id : "";
-  const roomName = typeof name === "string" ? name : "Chat Room";
+  const roomName = typeof username === "string" ? username : "Chat Room";
   const item = typeof itemTitle === "string" ? itemTitle : "Item";
   const [messages, setMessages] = useState<Message[]>([]); // state for all messagees in the chat
   const [messageText, setMessageText] = useState<string>(""); // state for the actual content of a message
@@ -194,23 +194,14 @@ const ChatScreen = () => {
               </Text>
             </TouchableOpacity>
           ),
-          headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => {
-                router.back();
-              }}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerTitleAlign: "center",
+          headerBackTitle: "Back",
         }}
       />
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : "padding"}
           style={styles.keyboardAvoid}
           keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
         >

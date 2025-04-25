@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAuthToken(null);
       setIsAuthenticated(false);
       router.replace("/(auth)");
-      console.log("User logged out");
     } catch (error) {
       console.error("Failed to log out", error);
     }

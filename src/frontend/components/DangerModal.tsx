@@ -20,7 +20,9 @@ const DangerModal: React.FC<DangerModalProps> = ({
     <Modal animationType="slide" transparent={true} visible={isVisible}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>{dangerMessage}</Text>
+          <Text testID="danger-message" style={styles.modalText}>
+            {dangerMessage}
+          </Text>
           <View style={styles.divider} />
           <TouchableOpacity
             style={styles.logoutButton}
@@ -31,7 +33,9 @@ const DangerModal: React.FC<DangerModalProps> = ({
               console.log("this guys crazy..");
             }}
           >
-            <Text style={styles.logoutText}>{dangerOption1}</Text>
+            <Text testID="danger-option" style={styles.logoutText}>
+              {dangerOption1}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
             <Text style={styles.cancelButtonText}>Cancel</Text>

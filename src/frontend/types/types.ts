@@ -4,6 +4,7 @@ export interface ItemType {
   description: string;
   price: number;
   image: string;
+  additional_images: string[];
   is_sold: boolean;
   created_at: string;
   category: number;

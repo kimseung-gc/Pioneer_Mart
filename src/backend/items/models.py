@@ -23,6 +23,9 @@ class Listing(models.Model):
     image = models.ImageField(
         upload_to="item_images", blank=True, null=True
     )  # django will create item_images if folder doesn't exist
+    additional_images = models.ManyToManyField(
+        "ItemImage", related_name="listings", blank=True
+    )
     is_sold = models.BooleanField(default=False)
     seller = models.ForeignKey(
         User, related_name="items", on_delete=models.CASCADE
@@ -76,3 +79,12 @@ class Listing(models.Model):
         Returns the title of the listing as its string representation.
         """
         return self.title
+
+
+# new model for additional images
+class ItemImage(models.Model):
+    image = models.ImageField(upload_to="item_additional_images")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image {self.id}"

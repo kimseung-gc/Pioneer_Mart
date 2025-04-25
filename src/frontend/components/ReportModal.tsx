@@ -39,9 +39,9 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
       Alert.alert("Error", "Please select a reason for reporting");
       return;
     }
-    toggleReport(itemId, authToken || "", selectedReason);
     setIsSubmitting(true);
     try {
+      await toggleReport(itemId, authToken || "", selectedReason);
       setSelectedReason(null);
       onClose();
     } catch (error) {
@@ -90,6 +90,7 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              testID="submit-report-button"
               style={[
                 styles.button,
                 styles.submitButton,
@@ -99,7 +100,11 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
               disabled={!selectedReason || isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="white" />
+                <ActivityIndicator
+                  testID="activity-indicator"
+                  size="small"
+                  color="white"
+                />
               ) : (
                 <Text style={styles.buttonText}>Submit</Text>
               )}

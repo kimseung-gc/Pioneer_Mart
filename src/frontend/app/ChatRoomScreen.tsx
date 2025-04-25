@@ -135,7 +135,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
       pathname: "/chat/[id]",
       params: {
         id: room.id.toString(),
-        name: otherUser.username,
+        username: otherUser.username,
         itemTitle: room.item_title || "No item",
       },
     });
@@ -144,7 +144,6 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
     // figure out who's sending the messages for UI stuff
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
-    console.log("Unread count:", item.unread_count); //debug line
     return (
       <TouchableOpacity
         style={[
@@ -179,24 +178,9 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
       <Stack.Screen
         options={{
           headerTitle: "Your Chats",
+          headerBackTitle: "Back",
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 8 }}
-              onPress={() => {
-                router.back();
-                console.log("navigating back...");
-              }}
-            >
-              <Entypo name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-          headerRight: () => (
-            <TouchableOpacity style={{ padding: 8 }} onPress={handleRefresh}>
-              <EvilIcons name="refresh" size={24} color="black" />
-            </TouchableOpacity>
-          ),
         }}
       />
       <View style={styles.container}>

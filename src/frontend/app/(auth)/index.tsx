@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useState } from "react";
 import axios from "axios";
@@ -31,15 +31,13 @@ const WelcomeScreen = (props: Props) => {
           },
         }
       );
-      console.log("requested OTP....");
       router.push({
         pathname: "/(auth)/OtpScreen",
         params: { email: fullEmail },
       });
     } catch (error) {
-      console.log(email);
-      console.log("Error:", error);
-      alert("Failed to do OTP stuff");
+      console.error("Error:", error);
+      Alert.alert("Failed to do OTP stuff");
     }
   };
 
@@ -58,7 +56,6 @@ const WelcomeScreen = (props: Props) => {
           headerTitle: "Sign Up",
           headerTitleAlign: "center",
           headerShown: true,
-          headerLeft: () => null, // This removes the back button
           headerBackVisible: false,
           gestureEnabled: false, //remove gesture
         }}

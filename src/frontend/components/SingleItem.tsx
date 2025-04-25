@@ -16,10 +16,10 @@ import useSingleItemStore from "@/stores/singleItemStore";
 import { useState } from "react";
 
 import { useUserStore } from "@/stores/userStore";
-import ZoomModal from "./ZoomModal";
+// import ZoomModal from "./ZoomModal";
 import React from "react";
 import ReportModal from "./ReportModal";
-import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   item: ItemType;
@@ -42,7 +42,6 @@ const SingleItem = ({ item, source }: Props) => {
   // Get the latest version of this item from the store
   const currentItem = items.find((i) => i.id === item.id) || item;
 
-  const [isZoomVisible, setIsZoomVisible] = useState(false);
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const handleItemPress = () => {
     if (source === "myItems") {
@@ -76,23 +75,13 @@ const SingleItem = ({ item, source }: Props) => {
   // Check if we're already on the item details page
   const isDetailsPage = route.name === "item/[id]";
   return (
-    <TouchableOpacity
-      onPress={isDetailsPage ? () => setIsZoomVisible(true) : handleItemPress}
-    >
+    <TouchableOpacity onPress={handleItemPress}>
       <View
         style={[
           styles.container,
           route.name === "ItemDetails" && { width: width },
         ]}
       >
-        {isZoomVisible && (
-          <ZoomModal
-            isVisible={isZoomVisible}
-            onClose={() => setIsZoomVisible(false)}
-            item={currentItem} // Use the updated item
-          />
-        )}
-
         <ReportModal
           isVisible={isReportModalVisible}
           onClose={() => setIsReportModalVisible(false)}

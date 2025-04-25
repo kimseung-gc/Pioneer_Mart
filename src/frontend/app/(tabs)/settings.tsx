@@ -40,22 +40,18 @@ const ProfileScreen = () => {
 
   const openClearHistoryModal = () => {
     setIsClearHistoryVisible(true);
-    console.log("Wants to clear history...");
   };
 
   const closeClearHistoryModal = () => {
     setIsClearHistoryVisible(false);
-    console.log("Doesn't want to clear history...");
   };
 
   const openLogoutModal = () => {
     setIsLogoutVisible(true);
-    console.log("Wants to log out...");
   };
 
   const closeLogoutModal = () => {
     setIsLogoutVisible(false);
-    console.log("Doesn't want to log out...");
   };
 
   if (isLoading && !userData) {
