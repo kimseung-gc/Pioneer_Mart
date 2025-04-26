@@ -20,13 +20,9 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import { MaterialIcons } from "@expo/vector-icons";
 import CameraModal from "@/components/CameraModal";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 
@@ -40,18 +36,15 @@ const EditItem = () => {
     originalItem.description || ""
   );
   const [price, setPrice] = useState(originalItem.price.toString());
-  const [selectedCategory, setSelectedCategory] = useState(
-    originalItem.category
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    originalItem.category_name
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [images, setImages] = useState<string[]>([]);
   const [modifiedImages, setModifiedImages] = useState(false);
-  // const [isNewImage, setIsNewImage] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
-  const insets = useSafeAreaInsets();
   const { categories } = useItemsStore();
 
   useEffect(() => {
@@ -103,7 +96,7 @@ const EditItem = () => {
       setModifiedImages(true);
     }
   };
-
+  console.log(originalItem.category_name);
   // Function to handle this image
   const handleCapturedImage = (imageUri: string) => {
     setImages((prevImages) => [...prevImages, imageUri]);

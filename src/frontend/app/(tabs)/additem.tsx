@@ -22,10 +22,7 @@ import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
@@ -48,8 +45,6 @@ const AddItemScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { authToken } = useAuth();
-  const insets = useSafeAreaInsets();
-
   const { categories } = useItemsStore();
 
   // helper function to fill in whatever form field we need
