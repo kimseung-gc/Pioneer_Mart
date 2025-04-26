@@ -48,19 +48,17 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       # Setting up python
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
       # Run a test file with django test
       - name: Install django requirements
         working-directory: ./src/backend
         run: |
-          add-apt-repository universe
-          apt-get update
-          apt-get -y install python3-pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
       # - name: Generate Random Key
       #   working-directory: ./src/backend
