@@ -58,7 +58,7 @@ jobs:
       - name: Install django requirements
         working-directory: ./src/backend
         run: |
-          pip install -r requirements.txt
+          python3 -m pip install -r requirements.txt
       # - name: Generate Random Key
       #   working-directory: ./src/backend
       #   run: |
