@@ -36,11 +36,11 @@ class RequestOTPView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
 
-            # Create or get user
-            # TODO: This gets the entire user's grinnell email...I need to only get their username
-            user, created = User.objects.get_or_create(
-                email=email, defaults={"username": email}
-            )
+            # # Create or get user
+            # # TODO: This gets the entire user's grinnell email...I need to only get their username
+            # user, created = User.objects.get_or_create(
+            #     email=email, defaults={"username": email}
+            # )
             # Create new OTP
             # TODO: we'll likely need to interact with this otp code or something of the sort to let users login
             # TODO: because users aren't gonna keep asking for a code lmao
@@ -74,9 +74,12 @@ class VerifyOTPView(APIView):
 
                 if otp.otp == otp_code and otp.is_valid():
                     # retrieve the User object associated with the email
-                    user = User.objects.get(email=email)
-                    profile, created = UserProfile.objects.get_or_create(user=user)
-                    # profile = user.profile
+                    # user = User.objects.get(email=email)
+                    user, created = User.objects.get_or_create(
+                        email=email, defaults={"username": email}
+                    )
+                    # create the UserProfile if not already created
+                    profile, _ = UserProfile.objects.get_or_create(user=user)
                     profile.is_verified = True
                     # TODO: probably don't need this...will need to find a workaround cause what if the user's OTP code expired cause sem's over
                     profile.save()  # this just saves the user's profile
