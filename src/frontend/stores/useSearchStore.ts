@@ -361,7 +361,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   loadCategories: async (authToken: string) => {
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get<PaginatedResponse<CategoryType>>(
+      const response = await axios.get<CategoryType[]>(
         `${BASE_URL}/api/categories/`,
         {
           headers: {
@@ -370,7 +370,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         }
       );
-      set({ categories: response.data["results"] });
+      set({ categories: response.data });
     } catch (error) {
       set({ categories: [] });
     }
