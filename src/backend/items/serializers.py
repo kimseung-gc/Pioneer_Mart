@@ -37,8 +37,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
     # new field for additional images
     additional_images = ItemImageSerializer(many=True, read_only=True)
-    # purchase_requesters = serializers.SerializerMethodField()
-    # purchase_request_count = serializers.SerializerMethodField()
+    purchase_requesters = serializers.SerializerMethodField()
+    purchase_request_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Listing
@@ -58,8 +58,8 @@ class ItemSerializer(serializers.ModelSerializer):
             "created_at",
             "is_favorited",
             "is_reported",
-            # "purchase_request_count",
-            # "purchase_requesters",
+            "purchase_request_count",
+            "purchase_requesters",
         ]  # get all fields
         read_only_fields = [
             "id",
@@ -104,9 +104,9 @@ class ItemSerializer(serializers.ModelSerializer):
             return ItemReport.objects.filter(item=obj, reporter=request.user).exists()
         return False
 
-    # def get_purchase_requesters(self, obj):
-    #     requesters = obj.get_purchase_requesters()
-    #     return UserMiniSerializer(requesters, many=True).data
+    def get_purchase_requesters(self, obj):
+        requesters = obj.get_purchase_requesters()
+        return UserMiniSerializer(requesters, many=True).data
 
-    # def get_purchase_request_count(self, obj):
-    #     return obj.get_purchase_request_count()
+    def get_purchase_request_count(self, obj):
+        return obj.get_purchase_request_count()

@@ -12,8 +12,9 @@ export interface ItemType {
   seller: number;
   is_favorited: boolean; // this is a separate field on the frontend for each user
   is_reported: boolean; // this is a separate field on the frontend for each user
+  purchase_requests: number;
   purchase_request_count: number;
-  purchase_requesters?: Array<{ id: number; username: string }>;
+  // purchase_requesters?: Array<{ id: number; username: string }>;
 }
 
 export interface PurchaseRequest {

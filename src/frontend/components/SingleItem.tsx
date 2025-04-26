@@ -132,10 +132,17 @@ const SingleItem = ({ item, source }: Props) => {
           ) : null}
         </View>
         {!isDetailsPage && (
-          <>
-            <Text style={styles.title}>${currentItem.price}</Text>
-            <Text style={styles.title}>{currentItem.title}</Text>
-          </>
+          <View style={styles.infoRow}>
+            <Text style={styles.price}>${currentItem.price}</Text>
+            {currentItem.purchase_request_count !== undefined && (
+              <Text style={styles.requestersCount}>
+                ({currentItem.purchase_request_count} interested)
+              </Text>
+            )}
+          </View>
+        )}
+        {!isDetailsPage && (
+          <Text style={styles.title}>{currentItem.title}</Text>
         )}
       </View>
     </TouchableOpacity>
@@ -183,6 +190,20 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     padding: 5,
     borderRadius: 30,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "black",
+  },
+  requestersCount: {
+    fontSize: 12,
+    color: "black",
   },
   title: {
     fontSize: 14,
