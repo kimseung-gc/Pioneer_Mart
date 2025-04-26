@@ -28,22 +28,7 @@ import {
 } from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
-
-// TODO: make Camera feature better
-
-// I also have a categories endpoint which I'm considering removing cause
-// we could honestly just hardcode all the categories. Getting these from
-// the backend seems like extra work esp cause the categories are so few
-// We would however have to figure out this id stuff lol
-const CATEGORIES = [
-  { label: "Electronics", value: "electronics", id: 2 },
-  { label: "Clothing", value: "clothing", id: 6 },
-  { label: "Books", value: "books", id: 3 },
-  { label: "Furniture", value: "furniture", id: 1 },
-  { label: "Fitness", value: "fitness", id: 4 },
-  { label: "Health", value: "health", id: 5 },
-  { label: "Other", value: "other", id: 7 },
-];
+import { useItemsStore } from "@/stores/useSearchStore";
 
 const AddItemScreen = () => {
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
@@ -64,6 +49,8 @@ const AddItemScreen = () => {
 
   const { authToken } = useAuth();
   const insets = useSafeAreaInsets();
+
+  const { categories } = useItemsStore();
 
   // helper function to fill in whatever form field we need
   const updateFormField = (field: string, value: string) => {
@@ -188,11 +175,11 @@ const AddItemScreen = () => {
     formDataObj.append("description", description);
     formDataObj.append("price", price);
     // Find the matching category object and send its ID instead of string value
-    const selectedCategory = CATEGORIES.find((cat) => cat.value === category);
+    const selectedCategory = categories.find((cat) => cat.name === category);
     formDataObj.append(
       "category",
       selectedCategory ? selectedCategory.id.toString() : "7"
-    ); // Default to "Other" (8) if not found
+    ); // Default to "Other" (7) if not found
     if (userData !== undefined) {
       formDataObj.append("seller", userData.id.toString());
     }
@@ -336,8 +323,8 @@ const AddItemScreen = () => {
     }
   };
 
-  const handleCategorySelect = (value: string) => {
-    updateFormField("category", value);
+  const handleCategorySelect = (name: string) => {
+    updateFormField("category", name);
     setDropdownOpen(false);
   };
 
@@ -348,24 +335,24 @@ const AddItemScreen = () => {
           <View style={styles.dropdownOverlay}>
             <View style={styles.dropdownContainer}>
               <ScrollView nestedScrollEnabled={true}>
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
-                    key={category.value}
+                    key={category.name}
                     style={[
                       styles.dropdownItem,
-                      formData.category === category.value &&
+                      formData.category === category.name &&
                         styles.dropdownItemSelected,
                     ]}
-                    onPress={() => handleCategorySelect(category.value)}
+                    onPress={() => handleCategorySelect(category.name)}
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        formData.category === category.value &&
+                        formData.category === category.name &&
                           styles.dropdownItemTextSelected,
                       ]}
                     >
-                      {category.label}
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -436,8 +423,8 @@ const AddItemScreen = () => {
             >
               <Text style={styles.dropdownTriggerText}>
                 {formData.category
-                  ? CATEGORIES.find((cat) => cat.value === formData.category)
-                      ?.label
+                  ? categories.find((cat) => cat.name === formData.category)
+                      ?.name
                   : "Select a category"}
               </Text>
               <MaterialIcons

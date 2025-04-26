@@ -30,16 +30,6 @@ import {
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 
-const CATEGORIES = [
-  { label: "Electronics", value: "electronics", id: 2 },
-  { label: "Clothing", value: "clothing", id: 6 },
-  { label: "Books", value: "books", id: 3 },
-  { label: "Furniture", value: "furniture", id: 1 },
-  { label: "Fitness", value: "fitness", id: 4 },
-  { label: "Health", value: "health", id: 5 },
-  { label: "Other", value: "other", id: 7 },
-];
-
 const EditItem = () => {
   const { item: itemString } = useLocalSearchParams();
   const originalItem = JSON.parse(itemString as string);
@@ -62,6 +52,7 @@ const EditItem = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
+  const { categories } = useItemsStore();
 
   useEffect(() => {
     const imageArray = [];
@@ -130,7 +121,7 @@ const EditItem = () => {
     formData.append("title", title);
     formData.append("description", description);
     formData.append("price", price);
-    const category = CATEGORIES.find((cat) => cat.value === selectedCategory);
+    const category = categories.find((cat) => cat.name === selectedCategory);
     formData.append("category", category ? category.id.toString() : "7"); // Default to "Other" (8) if not found
 
     // only process images if they've been modified
@@ -176,8 +167,8 @@ const EditItem = () => {
     setShowCamera(true);
   };
 
-  const handleCategorySelect = (value: string) => {
-    setSelectedCategory(value);
+  const handleCategorySelect = (name: string) => {
+    setSelectedCategory(name);
     setDropdownOpen(false);
   };
 
@@ -304,24 +295,24 @@ const EditItem = () => {
           <View style={styles.dropdownOverlay}>
             <View style={styles.dropdownContainer}>
               <ScrollView nestedScrollEnabled={true}>
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
-                    key={category.value}
+                    key={category.name}
                     style={[
                       styles.dropdownItem,
-                      selectedCategory === category.value &&
+                      selectedCategory === category.name &&
                         styles.dropdownItemSelected,
                     ]}
-                    onPress={() => handleCategorySelect(category.value)}
+                    onPress={() => handleCategorySelect(category.name)}
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        selectedCategory === category.value &&
+                        selectedCategory === category.name &&
                           styles.dropdownItemTextSelected,
                       ]}
                     >
-                      {category.label}
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -397,8 +388,8 @@ const EditItem = () => {
               >
                 <Text style={styles.dropdownTriggerText}>
                   {selectedCategory
-                    ? CATEGORIES.find((cat) => cat.value === selectedCategory)
-                        ?.label
+                    ? categories.find((cat) => cat.name === selectedCategory)
+                        ?.name
                     : "Select a category"}
                 </Text>
                 <MaterialIcons
