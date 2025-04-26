@@ -19,7 +19,7 @@ import { useUserStore } from "@/stores/userStore";
 // import ZoomModal from "./ZoomModal";
 import React from "react";
 import ReportModal from "./ReportModal";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   item: ItemType;
@@ -41,6 +41,9 @@ const SingleItem = ({ item, source }: Props) => {
 
   // Get the latest version of this item from the store
   const currentItem = items.find((i) => i.id === item.id) || item;
+
+  // check if the current user is the owner of this item
+  const isOwner = currentItem.seller === userData?.id;
 
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const handleItemPress = () => {
@@ -80,6 +83,7 @@ const SingleItem = ({ item, source }: Props) => {
         style={[
           styles.container,
           route.name === "ItemDetails" && { width: width },
+          // isOwner && styles.myItemContainer,
         ]}
       >
         <ReportModal
@@ -87,10 +91,10 @@ const SingleItem = ({ item, source }: Props) => {
           onClose={() => setIsReportModalVisible(false)}
           itemId={currentItem.id}
         />
-        <Image source={{ uri: currentItem.image }} style={styles.itemImage} />
-        {currentItem.seller === userData?.id && (
-          <View style={styles.myItemTag} />
-        )}
+        <Image
+          source={{ uri: currentItem.image }}
+          style={[isOwner ? styles.myItemImage : styles.itemImage]}
+        />
         {/* sold tag */}
         {currentItem.is_sold && (
           <View style={styles.soldTagContainer}>
@@ -99,7 +103,7 @@ const SingleItem = ({ item, source }: Props) => {
         )}
         <View style={styles.buttonsContainer}>
           {showFavoritesIcon &&
-          currentItem.seller !== userData?.id &&
+          !isOwner &&
           route.name !== "additionalinfo/MyItems" ? (
             <>
               <TouchableOpacity
@@ -137,19 +141,6 @@ const SingleItem = ({ item, source }: Props) => {
               </TouchableOpacity>
             </>
           ) : null}
-
-          {/* Show the report button if user is not the owner
-          {!isOwner && (
-            <TouchableOpacity
-              style={styles.iconBtn}
-              onPress={(e) => {
-                e.stopPropagation();
-                setIsReportModalVisible(true);
-              }}
-            >
-              <Entypo name="flag" size={20} color="black" />
-            </TouchableOpacity>
-          )} */}
         </View>
         {!isDetailsPage && (
           <>
@@ -168,13 +159,30 @@ const styles = StyleSheet.create({
   container: {
     width: (width - 10) / 2,
     marginHorizontal: 5,
+    position: "relative",
   },
+  // myItemContainer: {
+  //   borderWidth: 2,
+  //   borderColor: "#ffd700",
+  //   borderRadius: 15,
+  //   backgroundColor: "rgba(255, 215, 0, 0.05)",
+  // },
   itemImage: {
     width: "100%",
     height: 200,
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
+  },
+  myItemImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 15,
+    marginTop: 10,
+    marginBottom: 10,
+    borderColor: "#ffd700",
+    borderWidth: 2,
+    backgroundColor: "rgba(255, 215, 0, 0.05)",
   },
   buttonsContainer: {
     position: "absolute",
@@ -189,9 +197,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   favBtn: {
-    // position: "absolute",
-    // right: 20,
-    // top: 20,
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     padding: 5,
     borderRadius: 30,
@@ -200,15 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "black",
-  },
-  myItemTag: {
-    width: 10,
-    height: 10,
-    backgroundColor: "#ffd700",
-    position: "absolute",
-    borderRadius: 100 / 2,
-    top: 20,
-    left: 10,
   },
   soldTagContainer: {
     position: "absolute",
@@ -222,5 +218,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 16,
+  },
+  detailsContainer: {
+    paddingHorizontal: 5,
+    paddingBottom: 8,
+  },
+  ownerLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#ffd700",
+    marginTop: 2,
   },
 });
