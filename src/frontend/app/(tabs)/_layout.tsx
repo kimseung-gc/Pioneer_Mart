@@ -2,6 +2,7 @@ import { Stack, Tabs } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
+import { AppInitialier } from "@/components/AppInitializer";
 
 // This defines the basic layout of the app after user's logged in
 export default function TabLayout() {
@@ -15,6 +16,7 @@ export default function TabLayout() {
           animation: "none", // Optional: removes animation which can help with navigation issues
         }}
       />
+      <AppInitialier />
       <Tabs screenOptions={{ headerShown: false }}>
         <Tabs.Screen
           name="index"
