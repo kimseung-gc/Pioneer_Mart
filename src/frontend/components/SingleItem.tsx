@@ -16,10 +16,10 @@ import useSingleItemStore from "@/stores/singleItemStore";
 import { useState } from "react";
 
 import { useUserStore } from "@/stores/userStore";
-// import ZoomModal from "./ZoomModal";
 import React from "react";
 import ReportModal from "./ReportModal";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useLatestItem } from "@/hooks/useLatestItem";
 
 type Props = {
   item: ItemType;
@@ -42,6 +42,9 @@ const SingleItem = ({ item, source }: Props) => {
   // Get the latest version of this item from the store
   const currentItem = items.find((i) => i.id === item.id) || item;
 
+  // find the latest version of this item in any screen
+  const latestItem = useLatestItem(item.id, item);
+
   // check if the current user is the owner of this item
   const isOwner = currentItem.seller === userData?.id;
 
@@ -57,20 +60,6 @@ const SingleItem = ({ item, source }: Props) => {
       params: { id: item.id.toString(), source },
     });
   };
-
-  // Get all items from all screens to find the most up-to-date version
-  const homeItems = useItemsStore((state) => state.screens.home.items);
-  const favoritesItems = useItemsStore(
-    (state) => state.screens.favorites.items
-  );
-  const myItemsItems = useItemsStore((state) => state.screens.myItems.items);
-
-  // Find the latest version of this item in any screen
-  const latestItem =
-    homeItems.find((i) => i.id === item.id) ||
-    favoritesItems.find((i) => i.id === item.id) ||
-    myItemsItems.find((i) => i.id === item.id) ||
-    item;
 
   const handleFavoriteToggle = async () => {
     await toggleFavorite(item.id, authToken || "");
@@ -153,7 +142,7 @@ const SingleItem = ({ item, source }: Props) => {
   );
 };
 
-export default SingleItem;
+export default React.memo(SingleItem);
 
 const styles = StyleSheet.create({
   container: {
@@ -161,12 +150,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     position: "relative",
   },
-  // myItemContainer: {
-  //   borderWidth: 2,
-  //   borderColor: "#ffd700",
-  //   borderRadius: 15,
-  //   backgroundColor: "rgba(255, 215, 0, 0.05)",
-  // },
   itemImage: {
     width: "100%",
     height: 200,
