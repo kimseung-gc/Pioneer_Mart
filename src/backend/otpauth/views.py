@@ -1,3 +1,4 @@
+from userprofile.models import UserProfile
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -60,17 +61,6 @@ class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # if settings.DEVELOPMENT_MODE:
-        #     try:
-        #         user = User.objects.get(id=settings.DEVELOPMENT_USER_ID)
-        #     except User.DoesNotExist:
-        #         return Response({'error': 'Development user not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        #     refresh = RefreshToken.for_user(user)
-        #     return Response({
-        #         'refresh': str(refresh),
-        #         'access': str(refresh.access_token),
-        #     })
         serializer = OTPVerificationSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
@@ -85,7 +75,8 @@ class VerifyOTPView(APIView):
                 if otp.otp == otp_code and otp.is_valid():
                     # retrieve the User object associated with the email
                     user = User.objects.get(email=email)
-                    profile = user.profile
+                    profile, created = UserProfile.objects.get_or_create(user=user)
+                    # profile = user.profile
                     profile.is_verified = True
                     # TODO: probably don't need this...will need to find a workaround cause what if the user's OTP code expired cause sem's over
                     profile.save()  # this just saves the user's profile
