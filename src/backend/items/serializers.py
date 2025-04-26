@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from report.models import ItemReport
@@ -7,9 +8,17 @@ from .models import ItemImage, Listing
 
 # new serializer for the ItemImage model
 class ItemImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ItemImage
-        fields = ["id", "image"]
+        fields = ["id", "image", "image_url"]
+
+    # to fix the weird url error wtih s3
+    def get_image_url(self, obj):
+        if obj.image:
+            return f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{obj.image.name}"
+        return None
 
 
 class UserMiniSerializer(serializers.ModelSerializer):
@@ -23,17 +32,13 @@ class ItemSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_reported = serializers.SerializerMethodField()
 
+    # override the image field
+    image_url = serializers.SerializerMethodField()
+
     # new field for additional images
     additional_images = ItemImageSerializer(many=True, read_only=True)
-    purchase_requesters = serializers.SerializerMethodField()
-    purchase_request_count = serializers.SerializerMethodField()
-
-    # # this will be used to handle the uploaded additional images
-    # uploaded_images = serializers.ListField(
-    #     child=serializers.ImageField(allow_empty_file=False, use_url=False),
-    #     write_only=True,
-    #     required=False,
-    # )
+    # purchase_requesters = serializers.SerializerMethodField()
+    # purchase_request_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Listing
@@ -45,6 +50,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "description",
             "price",
             "image",
+            "image_url",  # to fix the weird url error wtih s3
             "additional_images",
             "is_sold",
             "seller",
@@ -52,8 +58,8 @@ class ItemSerializer(serializers.ModelSerializer):
             "created_at",
             "is_favorited",
             "is_reported",
-            "purchase_request_count",
-            "purchase_requesters",
+            # "purchase_request_count",
+            # "purchase_requesters",
         ]  # get all fields
         read_only_fields = [
             "id",
@@ -61,7 +67,14 @@ class ItemSerializer(serializers.ModelSerializer):
             "seller_name",
             "category_name",
             "created_at",
+            "image_url",
         ]
+
+    # to fix the weird url error wtih s3
+    def get_image_url(self, obj):
+        if obj.image:
+            return f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{obj.image.name}"
+        return None
 
     def get_is_favorited(self, obj):
         """
@@ -91,9 +104,9 @@ class ItemSerializer(serializers.ModelSerializer):
             return ItemReport.objects.filter(item=obj, reporter=request.user).exists()
         return False
 
-    def get_purchase_requesters(self, obj):
-        requesters = obj.get_purchase_requesters()
-        return UserMiniSerializer(requesters, many=True).data
+    # def get_purchase_requesters(self, obj):
+    #     requesters = obj.get_purchase_requesters()
+    #     return UserMiniSerializer(requesters, many=True).data
 
-    def get_purchase_request_count(self, obj):
-        return obj.get_purchase_request_count()
+    # def get_purchase_request_count(self, obj):
+    #     return obj.get_purchase_request_count()
