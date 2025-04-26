@@ -41,7 +41,7 @@ import { TapGestureHandler } from "react-native-gesture-handler";
 
 import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
 import SingleItem from "@/components/SingleItem";
 import axios from "axios";
@@ -83,7 +83,8 @@ const ItemDetails = () => {
     };
   }, []);
 
-  const getItemImages = () => {
+  // useCallback will memoize the function and return the same instance across renders unless item has changed
+  const getItemImages = useCallback(() => {
     if (!item) return [];
 
     const primary = item.image ? [item.image] : [];
@@ -93,10 +94,10 @@ const ItemDetails = () => {
         ? item.additional_images.map((img: any) => img.image)
         : [];
     return [...primary, ...additional];
-  };
+  }, [item]);
 
-  const images = React.useMemo(() => getItemImages(), [item]);
-  // const images = getItemImages(); // get the images of the item
+  // ensure that the images array is only recalculated if the getItemImages function changes(which only happens when item changes)
+  const images = React.useMemo(() => getItemImages(), [getItemImages]);
 
   // tetch the latest item data from the API
   const fetchItemDetails = async () => {
@@ -209,17 +210,6 @@ const ItemDetails = () => {
       />
     );
   };
-  if (isLoading || !item) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator
-          testID="activity-indicator"
-          size="large"
-          color="blue"
-        />
-      </View>
-    );
-  }
 
   const startChat = async () => {
     if (!item || !userData) return;
@@ -228,12 +218,6 @@ const ItemDetails = () => {
 
     try {
       const cleanToken = authToken?.trim();
-      console.log(
-        "Starting chat about item:",
-        item.id,
-        "with seller ID:",
-        item.seller
-      );
       const response = await axios.get(
         `${BASE_URL}/api/chat/get-or-create-room/`,
         {
@@ -244,7 +228,6 @@ const ItemDetails = () => {
         }
       );
       const chatRoom = response.data.room;
-      console.log("Chat room created/retrieved:", chatRoom);
       if (!chatRoom || !chatRoom.id) {
         throw new Error("Invalid room data received");
       }
@@ -264,6 +247,14 @@ const ItemDetails = () => {
       setChatLoading(false);
     }
   };
+
+  if (isLoading || !item) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -320,7 +311,6 @@ const ItemDetails = () => {
             </View>
           </View>
         </TapGestureHandler>
-        {/* <SingleItem item={item} /> */}
         {/* all the item details */}
         <View style={styles.detailsContainer}>
           <Text style={styles.title}>Price: ${item.price}</Text>
@@ -346,51 +336,39 @@ const ItemDetails = () => {
             </TouchableOpacity>
           )}
 
-          {isLoading ? (
-            <ActivityIndicator
-              testID="activity-indicator"
-              style={{ marginTop: 20 }}
-              size="small"
-              color="blue"
-            />
-          ) : (
-            source !== "myItems" &&
-            !isOwner && (
-              <>
-                <TouchableOpacity
-                  style={[
-                    styles.purchaseRequestButton,
-                    hasRequestedItem && styles.disabledButton,
-                  ]}
-                  onPress={() => handlePurchaseRequest(authToken)}
-                  disabled={hasRequestedItem}
-                >
-                  <Text style={styles.buttonText}>
-                    {hasRequestedItem
-                      ? "Purchase Requested"
-                      : "Request Purchase"}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.chatButton}
-                  onPress={startChat}
-                  disabled={chatLoading}
-                >
-                  {chatLoading ? (
-                    <ActivityIndicator
-                      testID="activity-indicator"
-                      size="small"
-                      color="white"
-                    />
-                  ) : (
-                    <>
-                      <Entypo name="chat" size={20} color="white" />
-                      <Text style={styles.chatButtonText}>Message Seller</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </>
-            )
+          {source !== "myItems" && !isOwner && (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.purchaseRequestButton,
+                  hasRequestedItem && styles.disabledButton,
+                ]}
+                onPress={() => handlePurchaseRequest(authToken)}
+                disabled={hasRequestedItem}
+              >
+                <Text style={styles.buttonText}>
+                  {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.chatButton}
+                onPress={startChat}
+                disabled={chatLoading}
+              >
+                {chatLoading ? (
+                  <ActivityIndicator
+                    testID="activity-indicator"
+                    size="small"
+                    color="white"
+                  />
+                ) : (
+                  <>
+                    <Entypo name="chat" size={20} color="white" />
+                    <Text style={styles.chatButtonText}>Message Seller</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </>
           )}
         </View>
       </SafeAreaView>
