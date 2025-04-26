@@ -42,14 +42,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ['3.8', '3.9']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
