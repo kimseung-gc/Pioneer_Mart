@@ -36,6 +36,8 @@ jobs:
           POSTGRES_DB: test_db
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -45,23 +47,18 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Downloads a copy of the code in your repository before running CI tests
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      # Run a test file with django test
-      - name: Install django requirements
-        working-directory: ./src/backend
-        run: |
-          pip install -r requirements.txt
-
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       # Setting up python
       - name: Set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      # Run a test file with django test
+      - name: Install django requirements
+        working-directory: ./src/backend
+        run: |
+          pip install -r requirements.txt
       # - name: Generate Random Key
       #   working-directory: ./src/backend
       #   run: |
