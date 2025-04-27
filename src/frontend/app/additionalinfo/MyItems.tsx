@@ -42,7 +42,7 @@ const MyItems = () => {
         }}
       />
       {isLoading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#007AFF" testID="loading-indicator"/>
       ) : (
         <>
           <Categories screenId={screenId} categories={categories} />
