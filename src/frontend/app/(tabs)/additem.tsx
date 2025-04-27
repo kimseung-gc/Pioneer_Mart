@@ -27,6 +27,26 @@ import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
 
+const sightEngineTextModeration = async (text: string) => {
+  const textFormData = new URLSearchParams();
+  textFormData.append("text", text);
+  textFormData.append("lang", "en");
+  textFormData.append("api_user", SE_API_USER);
+  textFormData.append("api_secret", SE_SECRET_KEY);
+  textFormData.append("mode", "rules");
+  textFormData.append("categories", "profanity,drug,extremism,violence");
+  const response = await axios.post(
+    "https://api.sightengine.com/1.0/text/check.json",
+    textFormData,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  return response.data;
+};
+
 const AddItemScreen = () => {
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
   const initialFormState = {
@@ -233,6 +253,44 @@ const AddItemScreen = () => {
       if (!userData) {
         await getProfile();
       }
+
+      // TODO: Uncomment for sightengine stuff
+
+      // const combinedText = `${formData.name}\n${formData.description}`; //combine all the text
+      // const textModerationResult = await sightEngineTextModeration(
+      //   combinedText
+      // );
+
+      // if (textModerationResult.status === "failure") {
+      //   console.error(
+      //     "SightEngine text moderation error:",
+      //     textModerationResult.error
+      //   );
+      //   Alert.alert("Error", "Text validation failed. Please try again");
+      //   setLoading(false);
+      //   return;
+      // }
+      // if (
+      //   (textModerationResult.profanity.matches[0] &&
+      //     textModerationResult.profanity.matches[0].intensity === "high") ||
+      //   (textModerationResult.drug.matches[0] &&
+      //     textModerationResult.drug.matches[0].intensity === "high") ||
+      //   (textModerationResult.extremism.matches[0] &&
+      //     textModerationResult.extremism.matches[0].intensity === "high") ||
+      //   (textModerationResult.violence.matches[0] &&
+      //     textModerationResult.violence.matches[0].intensity === "high")
+      // ) {
+      //   console.log(
+      //     "Text rejected:",
+      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+      //   );
+      //   Alert.alert(
+      //     "NOT ALLOWED",
+      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+      //   );
+      //   setLoading(false);
+      //   return;
+      // }
       // for (const image of images) {
       //   if (image) {
       //     const sightEngineFormData = new FormData();
