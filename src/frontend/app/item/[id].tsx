@@ -5,9 +5,10 @@
  * It shows the item's image, description, price, seller info, and category.
  * Users can:
  *  - View the item's full details.
- *  - Request to purchase the item (unless they are the seller).
+ *  - Request to purchase the item & report item (unless they are the seller).
  *  - Edit their listing if they are the item owner.
  *  - See confirmation of a submitted purchase request.
+ *  - See confirmation of a submitted report
  *
  * Features:
  * - Uses React Navigation (Expo Router) for navigation stack handling.
@@ -53,6 +54,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ZoomModal from "@/components/ZoomModal";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useLatestItem } from "@/hooks/useLatestItem";
+import { useItemsStore } from "@/stores/useSearchStore";
+import ReportModal from "@/components/ReportModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,12 +69,15 @@ const ItemDetails = () => {
   );
   const hasFetched = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
+  const [hasReportedItem, setHasReportedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
   const [isZoomVisible, setIsZoomVisible] = useState(false);
   const { authToken } = useAuth();
   const { userData } = useUserStore();
+  const { toggleReport } = useItemsStore();
 
   // image carousel stuff
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -129,6 +137,8 @@ const ItemDetails = () => {
       } else {
         setHasRequestedItem(false);
       }
+
+      setHasReportedItem(fetchedItem.is_reported || false);
     } catch (error) {
       console.error("Error fetching item details:", error);
       Alert.alert(
@@ -270,6 +280,11 @@ const ItemDetails = () => {
         style={styles.container}
         edges={["left", "right", "bottom"]}
       >
+        <ReportModal
+          isVisible={isReportModalVisible}
+          onClose={() => setIsReportModalVisible(false)}
+          itemId={item.id}
+        />
         <ItemPurchaseModal
           isVisible={isVisible}
           onClose={closeModal}
@@ -368,6 +383,34 @@ const ItemDetails = () => {
                   </>
                 )}
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.reportItemButton,
+                  hasReportedItem && styles.disabledButton,
+                ]}
+                onPress={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    if (!item.is_reported) {
+                      setIsReportModalVisible(true);
+                    } else {
+                      await toggleReport(item.id, authToken || "", "");
+                      setHasReportedItem(true);
+                    }
+                  } catch (error) {
+                    console.error("Error toggling report:", error);
+                    Alert.alert(
+                      "Error",
+                      "Failed to report item. Please try again"
+                    );
+                  }
+                }}
+                disabled={hasReportedItem}
+              >
+                <Text style={styles.buttonText}>
+                  {hasReportedItem ? "Item Reported" : "Report Item"}
+                </Text>
+              </TouchableOpacity>
             </>
           )}
         </View>
@@ -435,6 +478,14 @@ const styles = StyleSheet.create({
   },
   purchaseRequestButton: {
     backgroundColor: "blue",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+  reportItemButton: {
+    backgroundColor: "red",
     padding: 15,
     borderRadius: 5,
     marginTop: 20,
