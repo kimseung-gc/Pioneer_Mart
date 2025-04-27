@@ -54,8 +54,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ZoomModal from "@/components/ZoomModal";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useLatestItem } from "@/hooks/useLatestItem";
 import { useItemsStore } from "@/stores/useSearchStore";
 import ReportModal from "@/components/ReportModal";
 
@@ -282,7 +280,10 @@ const ItemDetails = () => {
       >
         <ReportModal
           isVisible={isReportModalVisible}
-          onClose={() => setIsReportModalVisible(false)}
+          onClose={() => {
+            setIsReportModalVisible(false);
+            setHasReportedItem(true);
+          }}
           itemId={item.id}
         />
         <ItemPurchaseModal
