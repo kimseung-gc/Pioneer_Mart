@@ -17,3 +17,8 @@ class TokenSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()
     # user = UserSerializer() #TODO: same as above
+
+
+class ContactFormSerializer(serializers.Serializer):
+    description = serializers.CharField(required=True)
+    user_email = serializers.EmailField(required=True)

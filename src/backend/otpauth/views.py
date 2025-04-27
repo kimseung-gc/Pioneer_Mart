@@ -1,3 +1,4 @@
+from AUTHKEY.config import EMAIL_HOST_USER
 from userprofile.models import UserProfile
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,11 +8,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 
 # from userprofile.models import UserProfile #TODO: uncomment when we make the userprofile api
 # from userprofile.serializers import UserSerializer #TODO: same as above
 from .models import OTP
-from .serializers import EmailSerializer, OTPVerificationSerializer, TokenSerializer
+from .serializers import (
+    ContactFormSerializer,
+    EmailSerializer,
+    OTPVerificationSerializer,
+    TokenSerializer,
+)
 
 # For these 2 classes, first we create an OTP code associated with the user's email
 # then we verify the code in the 2nd class by checking if the received code
@@ -49,7 +56,9 @@ class RequestOTPView(APIView):
             # Send email with OTP
             subject = "Your OTP for authentication"
             message = f"Your OTP is {otp.otp}. It will expire in 10 minutes."
-            # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email]) # TODO: uncomment this to send email
+            send_mail(
+                subject, message, settings.DEFAULT_FROM_EMAIL, [email]
+            )  # TODO: uncomment this to send email
 
             return Response(
                 {"detail": "OTP sent to your email"}, status=status.HTTP_200_OK
@@ -105,4 +114,39 @@ class VerifyOTPView(APIView):
                     {"detail": "Invalid email or OTP"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContactFormView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ContactFormSerializer(data=request.data)
+        if serializer.is_valid():
+            description = serializer.validated_data["description"]
+            user_email = serializer.validated_data["user_email"]
+
+            subject = "New contact form from PioneerMart"
+            message = f"Message from PioneerMart contact form:\n\nUser: {user_email}\n\n{description}"
+            recipient_email = EMAIL_HOST_USER
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [EMAIL_HOST_USER],
+                    fail_silently=False,
+                )
+                print("Hello")
+                return Response(
+                    {"detail": "Your message has been sent successfully"},
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:
+                print(f"Error sending email: {str(e)}")
+                return Response(
+                    {"detail": "Failed to send message. Please try again later."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
