@@ -16,8 +16,8 @@ import {
   FlatList,
 } from "react-native";
 import axios from "axios";
-import { BASE_URL } from "@/config";
-// import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
+// import { BASE_URL } from "@/config";
+import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
@@ -233,65 +233,62 @@ const AddItemScreen = () => {
       if (!userData) {
         await getProfile();
       }
+      // for (const image of images) {
+      //   if (image) {
+      //     const sightEngineFormData = new FormData();
+      //     const imageFileName = image.split("/").pop() || "image.jpg";
+      //     const imageType = imageFileName.endsWith("png")
+      //       ? "image/png"
+      //       : "image/jpeg";
+      //     sightEngineFormData.append("media", {
+      //       uri: image,
+      //       name: imageFileName,
+      //       type: imageType,
+      //     } as unknown as Blob);
+      //     //TODO: append image to form data
+      //     type SightEngineParams = {
+      //       workflow: string;
+      //       api_user: string;
+      //       api_secret: string;
+      //     };
 
-      // if (image) {
-      //   const sightEngineFormData = new FormData();
-      //   const imageFileName = image.split("/").pop() || "image.jpg";
-      //   const imageType = imageFileName.endsWith("png")
-      //     ? "image/png"
-      //     : "image/jpeg";
-      //   sightEngineFormData.append("media", {
-      //     uri: image,
-      //     name: imageFileName,
-      //     type: imageType,
-      //   } as unknown as Blob);
-      //   //TODO: append image to form data
-      //   type SightEngineParams = {
-      //     workflow: string;
-      //     api_user: string;
-      //     api_secret: string;
-      //   };
+      //     const params: SightEngineParams = {
+      //       workflow: SE_WORKFLOW,
+      //       api_user: SE_API_USER,
+      //       api_secret: SE_SECRET_KEY,
+      //     };
 
-      //   const params: SightEngineParams = {
-      //     workflow: SE_WORKFLOW,
-      //     api_user: SE_API_USER,
-      //     api_secret: SE_SECRET_KEY,
-      //   };
-
-      //   (Object.keys(params) as (keyof SightEngineParams)[]).forEach((key) => {
-      //     sightEngineFormData.append(key, params[key]);
-      //   });
-      //   // Make API call to SightEngine
-      //   const sightEngineResponse = await axios.post(
-      //     "https://api.sightengine.com/1.0/check-workflow.json",
-      //     sightEngineFormData,
-      //     {
-      //       headers: {
-      //         "Content-Type": "multipart/form-data",
-      //       },
+      //     (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
+      //       (key) => {
+      //         sightEngineFormData.append(key, params[key]);
+      //       }
+      //     );
+      //     // Make API call to SightEngine
+      //     const sightEngineResponse = await axios.post(
+      //       "https://api.sightengine.com/1.0/check-workflow.json",
+      //       sightEngineFormData,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //         },
+      //       }
+      //     );
+      //     const output = sightEngineResponse.data;
+      //     if (output.status === "failure") {
+      //       console.error("SightEngine API error:", output.error);
+      //       Alert.alert("Error", "Image validation failed. Please try again.");
+      //       setLoading(false);
+      //       return;
       //     }
-      //   );
-      //   const output = sightEngineResponse.data;
-      //   if (output.status === "failure") {
-      //     console.error("SightEngine API error:", output.error);
-      //     Alert.alert("Error", "Image validation failed. Please try again.");
-      //     setLoading(false);
-      //     return;
-      //   }
-      //   // Check if image should be rejected
-      //   if (output.summary && output.summary.action === "reject") {
-      //     console.log(
-      //       "Image rejected with probability:",
-      //       output.summary.reject_prob
-      //     );
-      //     console.log(
-      //       "Rejection reasons:",
-      //       output.summary.reject_reason[0].text
-      //     );
-
-      //     Alert.alert("NOT ALLOWED", `${output.summary.reject_reason[0].text}`);
-      //     setLoading(false);
-      //     return;
+      //     // Check if image should be rejected
+      //     if (output.summary && output.summary.action === "reject") {
+      //       Alert.alert(
+      //         "NOT ALLOWED",
+      //         `${output.summary.reject_reason[0].text}`
+      //       );
+      //       setLoading(false);
+      //       return;
+      //     }
       //   }
       // }
 
