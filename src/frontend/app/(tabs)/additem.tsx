@@ -16,8 +16,8 @@ import {
   FlatList,
 } from "react-native";
 import axios from "axios";
-// import { BASE_URL } from "@/config";
-import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
+import { BASE_URL } from "@/config";
+// import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
@@ -27,25 +27,25 @@ import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
 
-const sightEngineTextModeration = async (text: string) => {
-  const textFormData = new URLSearchParams();
-  textFormData.append("text", text);
-  textFormData.append("lang", "en");
-  textFormData.append("api_user", SE_API_USER);
-  textFormData.append("api_secret", SE_SECRET_KEY);
-  textFormData.append("mode", "rules");
-  textFormData.append("categories", "profanity,drug,extremism,violence");
-  const response = await axios.post(
-    "https://api.sightengine.com/1.0/text/check.json",
-    textFormData,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
-  return response.data;
-};
+// const sightEngineTextModeration = async (text: string) => {
+//   const textFormData = new URLSearchParams();
+//   textFormData.append("text", text);
+//   textFormData.append("lang", "en");
+//   textFormData.append("api_user", SE_API_USER);
+//   textFormData.append("api_secret", SE_SECRET_KEY);
+//   textFormData.append("mode", "rules");
+//   textFormData.append("categories", "profanity,drug,extremism,violence");
+//   const response = await axios.post(
+//     "https://api.sightengine.com/1.0/text/check.json",
+//     textFormData,
+//     {
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//     }
+//   );
+//   return response.data;
+// };
 
 const AddItemScreen = () => {
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user

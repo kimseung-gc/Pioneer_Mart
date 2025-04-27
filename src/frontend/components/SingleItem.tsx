@@ -136,7 +136,11 @@ const SingleItem = ({ item, source }: Props) => {
             <Text style={styles.price}>${currentItem.price}</Text>
             {currentItem.purchase_request_count !== undefined && (
               <Text style={styles.requestersCount}>
-                ({currentItem.purchase_request_count} requests)
+                ({currentItem.purchase_request_count}{" "}
+                {currentItem.purchase_request_count === 1
+                  ? "request"
+                  : "requests"}
+                )
               </Text>
             )}
           </View>
