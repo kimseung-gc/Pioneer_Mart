@@ -2,10 +2,13 @@ import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 import FAQs from "@/app/additionalinfo/FAQs";
 
+// Test suite for FAQs screen
 describe("FAQs", () => {
   it("renders all FAQ questions", () => {
+    // Render the FAQs component
     const { getByText } = render(<FAQs />);
 
+    // Verify all FAQ questions are displayed
     expect(getByText("How do I edit my account?")).toBeTruthy();
     expect(getByText("Do I need to have a username or password to access the app?")).toBeTruthy();
     expect(getByText("How do I contact customer support?")).toBeTruthy();
@@ -15,6 +18,7 @@ describe("FAQs", () => {
   });
 
   it("expands and shows answer when a question is clicked", () => {
+    // Render the FAQs component
     const { getByText, queryByText } = render(<FAQs />);
 
     // Initially, the answer should not be visible
@@ -24,10 +28,10 @@ describe("FAQs", () => {
       )
     ).toBeNull();
 
-    // Press the question
+    // Simulate clicking on a question
     fireEvent.press(getByText("How do I edit my account?"));
 
-    // After pressing, the answer should appear
+    // After clicking, the answer should be displayed
     expect(
       getByText(
         "The only part of your account that you can edit is your preferred payment method, pronouns, and preferred name."
