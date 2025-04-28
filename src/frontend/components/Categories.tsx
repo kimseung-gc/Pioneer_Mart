@@ -37,7 +37,6 @@ const Categories: React.FC<CategoriesProps> = ({
   const { screens, filterByCategory } = useItemsStore();
   const { selectedCategory } = screens[screenId];
   const [modalVisible, setModalVisible] = useState(false);
-  console.log("Categories", categories);
 
   const handleCategorySelect = (categoryId: string | null) => {
     const numCatId = categoryId === null ? null : Number(categoryId);

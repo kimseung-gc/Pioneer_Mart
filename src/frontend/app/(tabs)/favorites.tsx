@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Stack } from "expo-router";
 
@@ -10,6 +10,8 @@ import Categories from "@/components/Categories";
 import { BASE_URL } from "@/config";
 import axios from "axios";
 import { Alert, StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { useUserStore } from "@/stores/userStore";
+import { useFocusEffect } from "@react-navigation/native";
 
 const FavoritesScreen = () => {
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
@@ -20,22 +22,33 @@ const FavoritesScreen = () => {
   const { filteredItems, isLoading } = screens[screenId];
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSuccess, setRequestSuccess] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+  const { userData } = useUserStore();
 
-  useEffect(() => {
-    setActiveScreen(screenId);
-    loadItems(screenId, authToken || "");
-    loadCategories(authToken || "");
-  }, [authToken]);
+  const notRequestedItems = useMemo(() => {
+    return filteredItems.filter(
+      (item) =>
+        !item.purchase_requesters?.some(
+          (requester: any) => requester.id === userData?.id
+        )
+    );
+  }, [filteredItems, userData, refreshTrigger]);
+  useFocusEffect(
+    useCallback(() => {
+      setActiveScreen(screenId);
+      loadItems(screenId, authToken || "");
+      loadCategories(authToken || "");
+    }, [authToken])
+  );
 
   const handleRequestAllItems = async () => {
     if (!authToken || filteredItems.length <= 1) return;
-
     setIsRequesting(true);
     let successCount = 0;
     let failCount = 0;
 
     try {
-      for (const item of filteredItems) {
+      for (const item of notRequestedItems) {
         try {
           await axios.post(
             `${BASE_URL}/api/items/${item.id}/request_purchase/`,
@@ -64,6 +77,8 @@ const FavoritesScreen = () => {
       console.error("Error in batch request process:", error);
     } finally {
       setIsRequesting(false);
+      await loadItems(screenId, authToken || "");
+      setRefreshTrigger((prev) => !prev);
       // send alert with the summary
       if (failCount > 0) {
         Alert.alert(
@@ -75,6 +90,7 @@ const FavoritesScreen = () => {
       }
     }
   };
+  console.log(notRequestedItems);
 
   return (
     <>
@@ -90,7 +106,7 @@ const FavoritesScreen = () => {
         isLoading={isLoading}
         source={"favorites"}
       />
-      {filteredItems.length > 1 && (
+      {notRequestedItems.length > 0 && (
         <View style={styles.floatingButtonContainer}>
           {requestSuccess && (
             <View style={styles.successMessageContainer}>
