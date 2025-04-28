@@ -143,6 +143,79 @@ class ItemViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         return context
 
+    @action(detail=True, methods=["post"])
+    def unmark_sold(self, request, pk=None):
+        """
+        Allows the seller to unmark their listing as available (not sold).
+        """
+        try:
+            listing = self.get_object()
+
+            if listing.seller != request.user:
+                return Response(
+                    {"detail": "You are not the seller of this listing."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+            if not listing.is_sold:
+                return Response(
+                    {"detail": "Listing is already marked as available."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            listing.is_sold = False
+            listing.save()
+
+            return Response(
+                {"detail": "Listing marked as available."},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["post"])
+    def mark_sold(self, request, pk=None):
+        """
+        Allows the seller to manually mark their own listing as sold.
+        """
+        try:
+            listing = self.get_object()
+
+            if listing.seller != request.user:
+                return Response(
+                    {"detail": "You are not the seller of this listing."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+            if listing.is_sold:
+                return Response(
+                    {"detail": "Listing is already marked as sold."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            listing.is_sold = True
+            listing.save()
+
+            # Optional: deactivate all related purchase requests
+            PurchaseRequest.objects.filter(listing=listing).update(
+                is_active=False, status="declined"
+            )
+
+            return Response(
+                {"detail": "Listing marked as sold."},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     @action(
         detail=True, methods=["POST"], permission_classes=[IsAuthenticated]
     )  # detail True cause we're doing smth to one single instance of the model
