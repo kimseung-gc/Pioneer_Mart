@@ -24,6 +24,10 @@ jobs:
         python-version: ['3.9']
     # Docker Hub image that `container-job` executes in
     container: node:20-bookworm-slim
+    defaults:
+      run: 
+        working-directory: ./src/backend
+
 
     # Service containers to run with `container-job`
     services:
@@ -56,12 +60,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       # Set PATH Variable
       - name: set_path
-        working-directory: ./src/backend
         run: |
           export PYTHONPATH=$PYTHONPATH:/home/dev/python-files
       # Run a test file with django test
       - name: Install django requirements
-        working-directory: ./src/backend
         run: |
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -70,7 +72,6 @@ jobs:
       #   run: |
       #     python3 generate_random_key.py
       - name: Test with django
-        working-directory: ./src/backend
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: test_user
