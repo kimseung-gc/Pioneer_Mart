@@ -7,6 +7,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
+import os
+from dotenv import load_dotenv
+
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 
