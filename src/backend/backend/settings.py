@@ -38,12 +38,15 @@ from pathlib import Path
 # )
 
 # import secret keys. This distinction is required due to different secret keys for github and project.
-try:
-    from AUTHKEY import config
-except:
-    from AUTHKEY import config_github
+# try:
+#     from AUTHKEY import config
+# except:
+#     from AUTHKEY import config_github
 
-    config = config_github
+#     config = config_github
+from AUTHKEY import config_github
+
+config = config_github
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
