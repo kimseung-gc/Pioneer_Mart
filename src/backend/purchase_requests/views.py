@@ -36,8 +36,18 @@ class PurchaseRequestViewSet(viewsets.ModelViewSet):
             # return PurchaseRequest.objects.filter(requester=user)
 
     def perform_create(self, serializer):
-        # Save the requester as the user sending the request
-        serializer.save(requester=self.request.user)
+        # # Save the requester as the user sending the request
+        # serializer.save(requester=self.request.user)
+        user = self.request.user
+        listing = serializer.validated_data.get("listing")
+        existing_request = PurchaseRequest.objects.filter(
+            requester=user,
+            listing=listing,
+            is_active=True,
+        ).first()
+        if existing_request:
+            return
+        serializer.save(requester=user)
 
     @action(detail=False, methods=["get"])
     def sent(self, request):
