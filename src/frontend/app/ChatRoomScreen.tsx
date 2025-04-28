@@ -20,6 +20,8 @@ import { Entypo, EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { useChatStore } from "@/stores/chatStore";
 import { useAuth } from "./contexts/AuthContext";
+import { ItemType } from "@/types/types";
+import Toast from "react-native-toast-message";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
@@ -44,7 +46,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const { userData } = useUserStore();
-  const authToken = useAuth();
+  const { authToken } = useAuth();
   const { fetchUnreadCount } = useChatStore(); //for unread messages
 
   useFocusEffect(
@@ -56,7 +58,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
 
   const fetchRooms = async (): Promise<void> => {
     try {
-      const cleanToken = authToken.authToken?.trim();
+      const cleanToken = authToken?.trim();
       const response = await axios.get(`${BASE_URL}/api/chat/rooms/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
@@ -75,8 +77,8 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
         );
       });
       setRooms(sortedRooms);
-      if (authToken.authToken) {
-        fetchUnreadCount(authToken.authToken); // get the unread count with the chat rooms
+      if (authToken) {
+        fetchUnreadCount(authToken); // get the unread count with the chat rooms
       }
     } catch (error) {
       console.error("Error fetching rooms:", error);
@@ -91,7 +93,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
 
   const markRoomAsRead = async (roomId: number): Promise<void> => {
     try {
-      const cleanToken = authToken.authToken?.trim();
+      const cleanToken = authToken?.trim();
       await axios.post(
         `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
         {},
@@ -109,8 +111,8 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
         )
       );
 
-      if (authToken.authToken) {
-        fetchUnreadCount(authToken.authToken); // update unread count once we make the room as read
+      if (authToken) {
+        fetchUnreadCount(authToken); // update unread count once we make the room as read
       }
     } catch (error) {
       console.error("Error marking room as read:", error);
@@ -141,18 +143,57 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
     });
   };
 
+  const handleDeleteRoom = async (roomId: number) => {
+    try {
+      const cleanToken = authToken?.trim();
+      await axios.delete(`${BASE_URL}/api/chat/rooms/${roomId}/delete/`, {
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // update UI after deletion
+      setRooms((prevRooms) =>
+        prevRooms.filter((room) => Number(room.id) !== roomId)
+      );
+      Toast.show({
+        type: "success",
+        text1: "Deleted",
+        text2: "Chat room deleted successfully",
+      });
+      if (authToken) {
+        fetchUnreadCount(authToken);
+      }
+    } catch (error) {
+      console.error("Error deleting room:", error);
+      Alert.alert("Error", "Failed to delete the chat room.");
+    }
+  };
+
   const renderRoom = ({ item }: ListRenderItemInfo<ChatRoom>) => {
     // figure out who's sending the messages for UI stuff
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
+    const confirmDelete = () => {
+      Alert.alert(
+        "Delete Chat Room",
+        "Are you sure you want to delete this chat room?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => handleDeleteRoom(Number(item.id)),
+          },
+        ]
+      );
+    };
     return (
-      <TouchableOpacity
-        style={[
-          styles.roomItem,
-          item.unread_count && item.unread_count > 0 ? styles.unreadRoom : null,
-        ]}
-        onPress={() => enterRoom(item)}
-      >
-        <View style={styles.roomContent}>
+      <View style={styles.roomItem}>
+        <TouchableOpacity
+          style={styles.roomContent}
+          onPress={() => enterRoom(item)}
+        >
           <Text style={styles.roomName}>{otherUser.username}</Text>
           <View style={styles.detailsContainer}>
             <Text style={styles.roomDetails}>
@@ -163,13 +204,17 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
               {item.message_count} messages
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
+        {/* Delete button */}
         {Number(item.unread_count) > 0 && (
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadText}>{item.unread_count}</Text>
           </View>
         )}
-      </TouchableOpacity>
+        <TouchableOpacity onPress={confirmDelete}>
+          <EvilIcons name="trash" size={28} color="red" />
+        </TouchableOpacity>
+      </View>
     );
   };
 

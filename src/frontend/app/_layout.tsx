@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./contexts/AuthContext";
 import React from "react";
 import { AppInitialier } from "@/components/AppInitializer";
+import Toast from "react-native-toast-message";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -60,6 +61,7 @@ export default function RootLayout() {
           />
         </Stack>
       </GestureHandlerRootView>
+      <Toast />
     </AuthProvider>
   );
 }
