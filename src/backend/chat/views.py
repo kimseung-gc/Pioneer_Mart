@@ -199,3 +199,22 @@ def mark_room_as_read(request, room_id):
         )
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_room(request, room_id):
+    try:
+        room = ChatRoom.objects.get(id=room_id)
+        user = request.user
+
+        # make sure the user is part of this room
+        if user != room.user1 and user != room.user2:
+            return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+
+        room.delete()
+        return Response({"success": "Chat room deleted successfully"})
+    except ChatRoom.DoesNotExist:
+        return Response(
+            {"error": "Chat room not found"}, status=status.HTTP_404_NOT_FOUND
+        )

@@ -11,7 +11,28 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from datetime import timedelta
+import os
 from pathlib import Path
+
+from AUTHKEY.config import (
+    DB_NAME,
+    DB_USER,
+    HOST,
+    PASSWORD,
+    PORT,
+    AWS_ACCESS_KEY_ID,
+    AWS_S3_CUSTOM_DOMAIN,
+    AWS_S3_REGION_NAME,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_STORAGE_BUCKET_NAME,
+    EMAIL_BACKEND,
+    EMAIL_HOST_USER,
+    EMAIL_HOST,
+    EMAIL_HOST_PASSWORD,
+    EMAIL_PORT,
+    EMAIL_USE_TLS,
+    DEFAULT_FROM_EMAIL,
+)
 
 # import secret keys. This distinction is required due to different secret keys for github and project.
 try:
@@ -25,6 +46,14 @@ except:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+EMAIL_BACKEND = EMAIL_BACKEND
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -34,7 +63,10 @@ SECRET_KEY = config.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -57,7 +89,24 @@ INSTALLED_APPS = [
     "channels",
     "chat",
     "report",
+    "storages",
 ]
+
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+AWS_S3_REGION_NAME = AWS_S3_REGION_NAME
+# AWS_S3_CUSTOM_DOMAIN = AWS_S3_CUSTOM_DOMAIN
+
+# AWS_S3_URL_PROTOCOL = 'https'
+# AWS_S3_USE_SSL = True
+# AWS_S3_VERIFY = True
+
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -132,9 +181,17 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": DB_NAME,
+        "USER": DB_USER,
+        "PASSWORD": PASSWORD,
+        "HOST": HOST,
+        "PORT": PORT,
     }
 }
 
@@ -174,7 +231,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
-MEDIA_URL = "media/"
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# MEDIA_URL = "media/"
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type

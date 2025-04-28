@@ -16,10 +16,10 @@ import useSingleItemStore from "@/stores/singleItemStore";
 import { useState } from "react";
 
 import { useUserStore } from "@/stores/userStore";
-// import ZoomModal from "./ZoomModal";
 import React from "react";
 import ReportModal from "./ReportModal";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useLatestItem } from "@/hooks/useLatestItem";
 
 type Props = {
   item: ItemType;
@@ -42,6 +42,12 @@ const SingleItem = ({ item, source }: Props) => {
   // Get the latest version of this item from the store
   const currentItem = items.find((i) => i.id === item.id) || item;
 
+  // find the latest version of this item in any screen
+  const latestItem = useLatestItem(item.id, item);
+
+  // check if the current user is the owner of this item
+  const isOwner = currentItem.seller === userData?.id;
+
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const handleItemPress = () => {
     if (source === "myItems") {
@@ -55,20 +61,6 @@ const SingleItem = ({ item, source }: Props) => {
     });
   };
 
-  // Get all items from all screens to find the most up-to-date version
-  const homeItems = useItemsStore((state) => state.screens.home.items);
-  const favoritesItems = useItemsStore(
-    (state) => state.screens.favorites.items
-  );
-  const myItemsItems = useItemsStore((state) => state.screens.myItems.items);
-
-  // Find the latest version of this item in any screen
-  const latestItem =
-    homeItems.find((i) => i.id === item.id) ||
-    favoritesItems.find((i) => i.id === item.id) ||
-    myItemsItems.find((i) => i.id === item.id) ||
-    item;
-
   const handleFavoriteToggle = async () => {
     await toggleFavorite(item.id, authToken || "");
   };
@@ -80,6 +72,7 @@ const SingleItem = ({ item, source }: Props) => {
         style={[
           styles.container,
           route.name === "ItemDetails" && { width: width },
+          // isOwner && styles.myItemContainer,
         ]}
       >
         <ReportModal
@@ -87,10 +80,10 @@ const SingleItem = ({ item, source }: Props) => {
           onClose={() => setIsReportModalVisible(false)}
           itemId={currentItem.id}
         />
-        <Image source={{ uri: currentItem.image }} style={styles.itemImage} />
-        {currentItem.seller === userData?.id && (
-          <View style={styles.myItemTag} />
-        )}
+        <Image
+          source={{ uri: currentItem.image }}
+          style={[isOwner ? styles.myItemImage : styles.itemImage]}
+        />
         {/* sold tag */}
         {currentItem.is_sold && (
           <View style={styles.soldTagContainer}>
@@ -99,7 +92,7 @@ const SingleItem = ({ item, source }: Props) => {
         )}
         <View style={styles.buttonsContainer}>
           {showFavoritesIcon &&
-          currentItem.seller !== userData?.id &&
+          !isOwner &&
           route.name !== "additionalinfo/MyItems" ? (
             <>
               <TouchableOpacity
@@ -137,37 +130,36 @@ const SingleItem = ({ item, source }: Props) => {
               </TouchableOpacity>
             </>
           ) : null}
-
-          {/* Show the report button if user is not the owner
-          {!isOwner && (
-            <TouchableOpacity
-              style={styles.iconBtn}
-              onPress={(e) => {
-                e.stopPropagation();
-                setIsReportModalVisible(true);
-              }}
-            >
-              <Entypo name="flag" size={20} color="black" />
-            </TouchableOpacity>
-          )} */}
         </View>
         {!isDetailsPage && (
-          <>
-            <Text style={styles.title}>${currentItem.price}</Text>
-            <Text style={styles.title}>{currentItem.title}</Text>
-          </>
+          <View style={styles.infoRow}>
+            <Text style={styles.price}>${currentItem.price}</Text>
+            {currentItem.purchase_request_count !== undefined && (
+              <Text style={styles.requestersCount}>
+                ({currentItem.purchase_request_count}{" "}
+                {currentItem.purchase_request_count === 1
+                  ? "request"
+                  : "requests"}
+                )
+              </Text>
+            )}
+          </View>
+        )}
+        {!isDetailsPage && (
+          <Text style={styles.title}>{currentItem.title}</Text>
         )}
       </View>
     </TouchableOpacity>
   );
 };
 
-export default SingleItem;
+export default React.memo(SingleItem);
 
 const styles = StyleSheet.create({
   container: {
     width: (width - 10) / 2,
     marginHorizontal: 5,
+    position: "relative",
   },
   itemImage: {
     width: "100%",
@@ -175,6 +167,16 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
+  },
+  myItemImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 15,
+    marginTop: 10,
+    marginBottom: 10,
+    borderColor: "#ffd700",
+    borderWidth: 4,
+    backgroundColor: "rgba(255, 215, 0, 0.05)",
   },
   buttonsContainer: {
     position: "absolute",
@@ -189,26 +191,28 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   favBtn: {
-    // position: "absolute",
-    // right: 20,
-    // top: 20,
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     padding: 5,
     borderRadius: 30,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "black",
+  },
+  requestersCount: {
+    fontSize: 12,
+    color: "black",
   },
   title: {
     fontSize: 14,
     fontWeight: "600",
     color: "black",
-  },
-  myItemTag: {
-    width: 10,
-    height: 10,
-    backgroundColor: "#ffd700",
-    position: "absolute",
-    borderRadius: 100 / 2,
-    top: 20,
-    left: 10,
   },
   soldTagContainer: {
     position: "absolute",
@@ -222,5 +226,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 16,
+  },
+  detailsContainer: {
+    paddingHorizontal: 5,
+    paddingBottom: 8,
+  },
+  ownerLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#ffd700",
+    marginTop: 2,
   },
 });

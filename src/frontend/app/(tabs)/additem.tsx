@@ -22,28 +22,31 @@ import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
 import { PaginatedResponse } from "@/types/api";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useItemsStore } from "@/stores/useSearchStore";
+import Toast from "react-native-toast-message";
 
-// TODO: make Camera feature better
-
-// I also have a categories endpoint which I'm considering removing cause
-// we could honestly just hardcode all the categories. Getting these from
-// the backend seems like extra work esp cause the categories are so few
-// We would however have to figure out this id stuff lol
-const CATEGORIES = [
-  { label: "Electronics", value: "electronics", id: 2 },
-  { label: "Clothing", value: "clothing", id: 6 },
-  { label: "Books", value: "books", id: 3 },
-  { label: "Furniture", value: "furniture", id: 1 },
-  { label: "Fitness", value: "fitness", id: 4 },
-  { label: "Health", value: "health", id: 5 },
-  { label: "Other", value: "other", id: 7 },
-];
+// const sightEngineTextModeration = async (text: string) => {
+//   const textFormData = new URLSearchParams();
+//   textFormData.append("text", text);
+//   textFormData.append("lang", "en");
+//   textFormData.append("api_user", SE_API_USER);
+//   textFormData.append("api_secret", SE_SECRET_KEY);
+//   textFormData.append("mode", "rules");
+//   textFormData.append("categories", "profanity,drug,extremism,violence");
+//   const response = await axios.post(
+//     "https://api.sightengine.com/1.0/text/check.json",
+//     textFormData,
+//     {
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//     }
+//   );
+//   return response.data;
+// };
 
 const AddItemScreen = () => {
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
@@ -63,7 +66,7 @@ const AddItemScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { authToken } = useAuth();
-  const insets = useSafeAreaInsets();
+  const { categories } = useItemsStore();
 
   // helper function to fill in whatever form field we need
   const updateFormField = (field: string, value: string) => {
@@ -188,11 +191,11 @@ const AddItemScreen = () => {
     formDataObj.append("description", description);
     formDataObj.append("price", price);
     // Find the matching category object and send its ID instead of string value
-    const selectedCategory = CATEGORIES.find((cat) => cat.value === category);
+    const selectedCategory = categories.find((cat) => cat.name === category);
     formDataObj.append(
       "category",
       selectedCategory ? selectedCategory.id.toString() : "7"
-    ); // Default to "Other" (8) if not found
+    ); // Default to "Other" (7) if not found
     if (userData !== undefined) {
       formDataObj.append("seller", userData.id.toString());
     }
@@ -252,64 +255,99 @@ const AddItemScreen = () => {
         await getProfile();
       }
 
-      // if (image) {
-      //   const sightEngineFormData = new FormData();
-      //   const imageFileName = image.split("/").pop() || "image.jpg";
-      //   const imageType = imageFileName.endsWith("png")
-      //     ? "image/png"
-      //     : "image/jpeg";
-      //   sightEngineFormData.append("media", {
-      //     uri: image,
-      //     name: imageFileName,
-      //     type: imageType,
-      //   } as unknown as Blob);
-      //   //TODO: append image to form data
-      //   type SightEngineParams = {
-      //     workflow: string;
-      //     api_user: string;
-      //     api_secret: string;
-      //   };
+      // TODO: Uncomment for sightengine stuff
 
-      //   const params: SightEngineParams = {
-      //     workflow: SE_WORKFLOW,
-      //     api_user: SE_API_USER,
-      //     api_secret: SE_SECRET_KEY,
-      //   };
+      // const combinedText = `${formData.name}\n${formData.description}`; //combine all the text
+      // const textModerationResult = await sightEngineTextModeration(
+      //   combinedText
+      // );
 
-      //   (Object.keys(params) as (keyof SightEngineParams)[]).forEach((key) => {
-      //     sightEngineFormData.append(key, params[key]);
-      //   });
-      //   // Make API call to SightEngine
-      //   const sightEngineResponse = await axios.post(
-      //     "https://api.sightengine.com/1.0/check-workflow.json",
-      //     sightEngineFormData,
-      //     {
-      //       headers: {
-      //         "Content-Type": "multipart/form-data",
-      //       },
-      //     }
+      // if (textModerationResult.status === "failure") {
+      //   console.error(
+      //     "SightEngine text moderation error:",
+      //     textModerationResult.error
       //   );
-      //   const output = sightEngineResponse.data;
-      //   if (output.status === "failure") {
-      //     console.error("SightEngine API error:", output.error);
-      //     Alert.alert("Error", "Image validation failed. Please try again.");
-      //     setLoading(false);
-      //     return;
-      //   }
-      //   // Check if image should be rejected
-      //   if (output.summary && output.summary.action === "reject") {
-      //     console.log(
-      //       "Image rejected with probability:",
-      //       output.summary.reject_prob
-      //     );
-      //     console.log(
-      //       "Rejection reasons:",
-      //       output.summary.reject_reason[0].text
-      //     );
+      //   Alert.alert("Error", "Text validation failed. Please try again");
+      //   setLoading(false);
+      //   return;
+      // }
+      // if (
+      //   (textModerationResult.profanity.matches[0] &&
+      //     textModerationResult.profanity.matches[0].intensity === "high") ||
+      //   (textModerationResult.drug.matches[0] &&
+      //     textModerationResult.drug.matches[0].intensity === "high") ||
+      //   (textModerationResult.extremism.matches[0] &&
+      //     textModerationResult.extremism.matches[0].intensity === "high") ||
+      //   (textModerationResult.violence.matches[0] &&
+      //     textModerationResult.violence.matches[0].intensity === "high")
+      // ) {
+      //   console.log(
+      //     "Text rejected:",
+      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+      //   );
+      //   Alert.alert(
+      //     "NOT ALLOWED",
+      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+      //   );
+      //   setLoading(false);
+      //   return;
+      // }
+      // for (const image of images) {
+      //   if (image) {
+      //     const sightEngineFormData = new FormData();
+      //     const imageFileName = image.split("/").pop() || "image.jpg";
+      //     const imageType = imageFileName.endsWith("png")
+      //       ? "image/png"
+      //       : "image/jpeg";
+      //     sightEngineFormData.append("media", {
+      //       uri: image,
+      //       name: imageFileName,
+      //       type: imageType,
+      //     } as unknown as Blob);
+      //     //TODO: append image to form data
+      //     type SightEngineParams = {
+      //       workflow: string;
+      //       api_user: string;
+      //       api_secret: string;
+      //     };
 
-      //     Alert.alert("NOT ALLOWED", `${output.summary.reject_reason[0].text}`);
-      //     setLoading(false);
-      //     return;
+      //     const params: SightEngineParams = {
+      //       workflow: SE_WORKFLOW,
+      //       api_user: SE_API_USER,
+      //       api_secret: SE_SECRET_KEY,
+      //     };
+
+      //     (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
+      //       (key) => {
+      //         sightEngineFormData.append(key, params[key]);
+      //       }
+      //     );
+      //     // Make API call to SightEngine
+      //     const sightEngineResponse = await axios.post(
+      //       "https://api.sightengine.com/1.0/check-workflow.json",
+      //       sightEngineFormData,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //         },
+      //       }
+      //     );
+      //     const output = sightEngineResponse.data;
+      //     if (output.status === "failure") {
+      //       console.error("SightEngine API error:", output.error);
+      //       Alert.alert("Error", "Image validation failed. Please try again.");
+      //       setLoading(false);
+      //       return;
+      //     }
+      //     // Check if image should be rejected
+      //     if (output.summary && output.summary.action === "reject") {
+      //       Alert.alert(
+      //         "NOT ALLOWED",
+      //         `${output.summary.reject_reason[0].text}`
+      //       );
+      //       setLoading(false);
+      //       return;
+      //     }
       //   }
       // }
 
@@ -326,7 +364,11 @@ const AddItemScreen = () => {
         },
       });
       resetForm(); //reset the form after submitting
-      Alert.alert("Success", "Item added successfully");
+      Toast.show({
+        type: "success",
+        text1: "Added",
+        text2: "Item uploaded successfully",
+      });
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);
@@ -336,8 +378,8 @@ const AddItemScreen = () => {
     }
   };
 
-  const handleCategorySelect = (value: string) => {
-    updateFormField("category", value);
+  const handleCategorySelect = (name: string) => {
+    updateFormField("category", name);
     setDropdownOpen(false);
   };
 
@@ -348,24 +390,24 @@ const AddItemScreen = () => {
           <View style={styles.dropdownOverlay}>
             <View style={styles.dropdownContainer}>
               <ScrollView nestedScrollEnabled={true}>
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
-                    key={category.value}
+                    key={category.name}
                     style={[
                       styles.dropdownItem,
-                      formData.category === category.value &&
+                      formData.category === category.name &&
                         styles.dropdownItemSelected,
                     ]}
-                    onPress={() => handleCategorySelect(category.value)}
+                    onPress={() => handleCategorySelect(category.name)}
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        formData.category === category.value &&
+                        formData.category === category.name &&
                           styles.dropdownItemTextSelected,
                       ]}
                     >
-                      {category.label}
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -436,8 +478,8 @@ const AddItemScreen = () => {
             >
               <Text style={styles.dropdownTriggerText}>
                 {formData.category
-                  ? CATEGORIES.find((cat) => cat.value === formData.category)
-                      ?.label
+                  ? categories.find((cat) => cat.name === formData.category)
+                      ?.name
                   : "Select a category"}
               </Text>
               <MaterialIcons

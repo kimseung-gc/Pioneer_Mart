@@ -20,25 +20,11 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import { MaterialIcons } from "@expo/vector-icons";
 import CameraModal from "@/components/CameraModal";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
-
-const CATEGORIES = [
-  { label: "Electronics", value: "electronics", id: 2 },
-  { label: "Clothing", value: "clothing", id: 6 },
-  { label: "Books", value: "books", id: 3 },
-  { label: "Furniture", value: "furniture", id: 1 },
-  { label: "Fitness", value: "fitness", id: 4 },
-  { label: "Health", value: "health", id: 5 },
-  { label: "Other", value: "other", id: 7 },
-];
 
 const EditItem = () => {
   const { item: itemString } = useLocalSearchParams();
@@ -50,18 +36,16 @@ const EditItem = () => {
     originalItem.description || ""
   );
   const [price, setPrice] = useState(originalItem.price.toString());
-  const [selectedCategory, setSelectedCategory] = useState(
-    originalItem.category
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    originalItem.category_name
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [images, setImages] = useState<string[]>([]);
   const [modifiedImages, setModifiedImages] = useState(false);
-  // const [isNewImage, setIsNewImage] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
-  const insets = useSafeAreaInsets();
+  const { categories } = useItemsStore();
 
   useEffect(() => {
     const imageArray = [];
@@ -112,7 +96,7 @@ const EditItem = () => {
       setModifiedImages(true);
     }
   };
-
+  console.log(originalItem.category_name);
   // Function to handle this image
   const handleCapturedImage = (imageUri: string) => {
     setImages((prevImages) => [...prevImages, imageUri]);
@@ -130,7 +114,7 @@ const EditItem = () => {
     formData.append("title", title);
     formData.append("description", description);
     formData.append("price", price);
-    const category = CATEGORIES.find((cat) => cat.value === selectedCategory);
+    const category = categories.find((cat) => cat.name === selectedCategory);
     formData.append("category", category ? category.id.toString() : "7"); // Default to "Other" (8) if not found
 
     // only process images if they've been modified
@@ -176,8 +160,8 @@ const EditItem = () => {
     setShowCamera(true);
   };
 
-  const handleCategorySelect = (value: string) => {
-    setSelectedCategory(value);
+  const handleCategorySelect = (name: string) => {
+    setSelectedCategory(name);
     setDropdownOpen(false);
   };
 
@@ -194,70 +178,75 @@ const EditItem = () => {
       // if (!userData) {
       //   await getProfile();
       // }
+      // for (const image of images) {
+      //   if (image) {
+      //     const sightEngineFormData = new FormData();
+      //     const imageFileName = image.split("/").pop() || "image.jpg";
+      //     const imageType = imageFileName.endsWith("png")
+      //       ? "image/png"
+      //       : "image/jpeg";
+      //     sightEngineFormData.append("media", {
+      //       uri: image,
+      //       name: imageFileName,
+      //       type: imageType,
+      //     } as unknown as Blob);
+      //     //TODO: append image to form data
+      //     type SightEngineParams = {
+      //       workflow: string;
+      //       api_user: string;
+      //       api_secret: string;
+      //     };
 
-      // if (image) {
-      //   const sightEngineFormData = new FormData();
-      //   const imageFileName = image.split("/").pop() || "image.jpg";
-      //   const imageType = imageFileName.endsWith("png")
-      //     ? "image/png"
-      //     : "image/jpeg";
-      //   sightEngineFormData.append("media", {
-      //     uri: image,
-      //     name: imageFileName,
-      //     type: imageType,
-      //   } as unknown as Blob);
-      //   //TODO: append image to form data
-      //   type SightEngineParams = {
-      //     workflow: string;
-      //     api_user: string;
-      //     api_secret: string;
-      //   };
+      //     const params: SightEngineParams = {
+      //       workflow: SE_WORKFLOW,
+      //       api_user: SE_API_USER,
+      //       api_secret: SE_SECRET_KEY,
+      //     };
 
-      //   const params: SightEngineParams = {
-      //     workflow: SE_WORKFLOW,
-      //     api_user: SE_API_USER,
-      //     api_secret: SE_SECRET_KEY,
-      //   };
-
-      //   (Object.keys(params) as (keyof SightEngineParams)[]).forEach((key) => {
-      //     sightEngineFormData.append(key, params[key]);
-      //   });
-      //   // Make API call to SightEngine
-      //   const sightEngineResponse = await axios.post(
-      //     "https://api.sightengine.com/1.0/check-workflow.json",
-      //     sightEngineFormData,
-      //     {
-      //       headers: {
-      //         "Content-Type": "multipart/form-data",
-      //       },
+      //     (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
+      //       (key) => {
+      //         sightEngineFormData.append(key, params[key]);
+      //       }
+      //     );
+      //     // Make API call to SightEngine
+      //     const sightEngineResponse = await axios.post(
+      //       "https://api.sightengine.com/1.0/check-workflow.json",
+      //       sightEngineFormData,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //         },
+      //       }
+      //     );
+      //     const output = sightEngineResponse.data;
+      //     if (output.status === "failure") {
+      //       console.error("SightEngine API error:", output.error);
+      //       Alert.alert("Error", "Image validation failed. Please try again.");
+      //       setLoading(false);
+      //       return;
       //     }
-      //   );
-      //   const output = sightEngineResponse.data;
-      //   if (output.status === "failure") {
-      //     console.error("SightEngine API error:", output.error);
-      //     Alert.alert("Error", "Image validation failed. Please try again.");
-      //     setLoading(false);
-      //     return;
-      //   }
-      //   // Check if image should be rejected
-      //   if (output.summary && output.summary.action === "reject") {
-      //     console.log(
-      //       "Image rejected with probability:",
-      //       output.summary.reject_prob
-      //     );
-      //     console.log(
-      //       "Rejection reasons:",
-      //       output.summary.reject_reason[0].text
-      //     );
+      //     // Check if image should be rejected
+      //     if (output.summary && output.summary.action === "reject") {
+      //       console.log(
+      //         "Image rejected with probability:",
+      //         output.summary.reject_prob
+      //       );
+      //       console.log(
+      //         "Rejection reasons:",
+      //         output.summary.reject_reason[0].text
+      //       );
 
-      //     Alert.alert("NOT ALLOWED", `${output.summary.reject_reason[0].text}`);
-      //     setLoading(false);
-      //     return;
+      //       Alert.alert(
+      //         "NOT ALLOWED",
+      //         `${output.summary.reject_reason[0].text}`
+      //       );
+      //       setLoading(false);
+      //       return;
+      //     }
       //   }
       // }
 
       //   const formDataObj = createFormData();
-      // console.log("hello", originalItem);
       const cleanToken = authToken?.trim();
 
       const config = {
@@ -304,24 +293,24 @@ const EditItem = () => {
           <View style={styles.dropdownOverlay}>
             <View style={styles.dropdownContainer}>
               <ScrollView nestedScrollEnabled={true}>
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
-                    key={category.value}
+                    key={category.name}
                     style={[
                       styles.dropdownItem,
-                      selectedCategory === category.value &&
+                      selectedCategory === category.name &&
                         styles.dropdownItemSelected,
                     ]}
-                    onPress={() => handleCategorySelect(category.value)}
+                    onPress={() => handleCategorySelect(category.name)}
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        selectedCategory === category.value &&
+                        selectedCategory === category.name &&
                           styles.dropdownItemTextSelected,
                       ]}
                     >
-                      {category.label}
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -397,8 +386,8 @@ const EditItem = () => {
               >
                 <Text style={styles.dropdownTriggerText}>
                   {selectedCategory
-                    ? CATEGORIES.find((cat) => cat.value === selectedCategory)
-                        ?.label
+                    ? categories.find((cat) => cat.name === selectedCategory)
+                        ?.name
                     : "Select a category"}
                 </Text>
                 <MaterialIcons

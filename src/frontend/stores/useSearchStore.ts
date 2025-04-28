@@ -5,12 +5,21 @@ import { CategoryType, ItemType, ScreenId } from "@/types/types";
 import axios from "axios";
 import { create } from "zustand";
 
+// interface for filters
+interface FilterOptions {
+  priceRange: [number, number];
+  hasActivePurchaseRequest: boolean;
+  isSold: boolean;
+  sortByPrice: "asc" | "desc" | null;
+}
+
 // interface for the state and actions of each screen
 interface ScreenState {
   items: ItemType[]; //all the items that could appear on the screen
   filteredItems: ItemType[]; //items that actually appear on the screen
   searchQuery: string; //query used to search thru items on a page
   selectedCategory: number | null; //category filter
+  filterOptions: FilterOptions;
   isLoading: boolean;
   isLoadingMore: boolean;
   lastUpdated: number; // Timestamp to track when data was last refreshed
@@ -30,6 +39,8 @@ interface ItemsStoreState {
   //actions
   setIsReturningFromDetails: (value: boolean) => void;
   setActiveScreen: (screenId: ScreenId) => void;
+  applyFilters: (screenId: ScreenId, filterOptions: FilterOptions) => void;
+  resetFilters: (screenId: ScreenId) => void;
 
   //data loading stuff
   isReturningFromDetails: boolean;
@@ -61,6 +72,12 @@ const initialScreenState: ScreenState = {
   filteredItems: [],
   searchQuery: "",
   selectedCategory: null,
+  filterOptions: {
+    priceRange: [0, 1000],
+    hasActivePurchaseRequest: false,
+    isSold: false,
+    sortByPrice: null,
+  },
   isLoading: false,
   isLoadingMore: false,
   lastUpdated: 0,
@@ -84,6 +101,64 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   //set active screen
   setActiveScreen: (screenId) => set({ activeScreen: screenId }),
 
+  // apply filter action
+  applyFilters: (screenId: ScreenId, filterOptions: FilterOptions) => {
+    set((state) => {
+      const currentScreen = state.screens[screenId];
+      const items = currentScreen.items;
+
+      // save the new filter options
+      const updatedScreen = {
+        ...currentScreen,
+        filterOptions: filterOptions,
+      };
+
+      // apply all filters (category + new filters)
+      const filteredItems = applyAllFilters(items, updatedScreen);
+
+      return {
+        screens: {
+          ...state.screens,
+          [screenId]: {
+            ...updatedScreen,
+            filteredItems: filteredItems,
+          },
+        },
+      };
+    });
+  },
+
+  // reset filter action
+  resetFilters: (screenId: ScreenId) => {
+    set((state) => {
+      const currentScreen = state.screens[screenId];
+      const defaultFilters = initialScreenState.filterOptions;
+
+      // Reset to default filters but keep the selected category
+      const updatedScreen = {
+        ...currentScreen,
+        filterOptions: defaultFilters,
+      };
+
+      // Re-apply only category filter (since other filters are reset)
+      const filteredByCategory =
+        currentScreen.selectedCategory === null
+          ? currentScreen.items
+          : currentScreen.items.filter(
+              (item) => Number(item.category) === currentScreen.selectedCategory
+            );
+
+      return {
+        screens: {
+          ...state.screens,
+          [screenId]: {
+            ...updatedScreen,
+            filteredItems: filteredByCategory,
+          },
+        },
+      };
+    });
+  },
   updateItem: (updatedItem: ItemType) => {
     set((state) => {
       const updatedScreens = { ...state.screens };
@@ -361,7 +436,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   loadCategories: async (authToken: string) => {
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get<PaginatedResponse<CategoryType>>(
+      const response = await axios.get<CategoryType[]>(
         `${BASE_URL}/api/categories/`,
         {
           headers: {
@@ -370,7 +445,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           },
         }
       );
-      set({ categories: response.data["results"] });
+      set({ categories: response.data });
     } catch (error) {
       set({ categories: [] });
     }
@@ -477,48 +552,70 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
    *  filterByCategory(screenId, category.id)
    */
   filterByCategory: (screenId: ScreenId, categoryId: number | null) => {
-    const state = get(); //get the current state
-    const screenState = state.screens[screenId];
+    set((state) => {
+      // First get the current screen state
+      const currentScreen = state.screens[screenId];
 
-    // Update selected category
-    set((state) => ({
-      screens: {
-        ...state.screens,
-        [screenId]: {
-          ...state.screens[screenId],
-          selectedCategory: categoryId, //
-        },
-      },
-    }));
+      // Create updated screen with new category selection
+      const updatedScreen = {
+        ...currentScreen,
+        selectedCategory: categoryId,
+      };
 
-    //apply category filter
-    if (categoryId === null) {
-      // Show all items if no category selected
-      set((state) => ({
-        screens: {
-          ...state.screens,
-          [screenId]: {
-            ...state.screens[screenId],
-            filteredItems: screenState.items,
-          },
-        },
-      }));
-    } else {
-      //filter items by category
-      const filtered = screenState.items.filter(
-        (item) => Number(item.category) === categoryId
+      // Filter items based on the category
+      const filteredItems =
+        categoryId === null
+          ? currentScreen.items
+          : currentScreen.items.filter(
+              (item) => Number(item.category) === categoryId
+            );
+
+      // Apply any other active filters from filterOptions
+      const fullyFilteredItems = applyAllFilters(
+        currentScreen.items,
+        updatedScreen
       );
 
-      set((state) => ({
+      // Return the updated state
+      return {
         screens: {
           ...state.screens,
           [screenId]: {
-            ...state.screens[screenId],
-            filteredItems: filtered,
+            ...updatedScreen,
+            filteredItems: fullyFilteredItems,
           },
         },
-      }));
-    }
+      };
+    });
+
+    // //apply category filter
+    // if (categoryId === null) {
+    //   // Show all items if no category selected
+    //   set((state) => ({
+    //     screens: {
+    //       ...state.screens,
+    //       [screenId]: {
+    //         ...state.screens[screenId],
+    //         filteredItems: screenState.items,
+    //       },
+    //     },
+    //   }));
+    // } else {
+    //   //filter items by category
+    //   const filtered = screenState.items.filter(
+    //     (item) => Number(item.category) === categoryId
+    //   );
+
+    //   set((state) => ({
+    //     screens: {
+    //       ...state.screens,
+    //       [screenId]: {
+    //         ...state.screens[screenId],
+    //         filteredItems: filtered,
+    //       },
+    //     },
+    //   }));
+    // }
   },
 
   /**
@@ -812,3 +909,48 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
     }
   },
 }));
+
+// helper function to apply all filters to items
+function applyAllFilters(
+  items: ItemType[],
+  screenState: ScreenState
+): ItemType[] {
+  const { selectedCategory, filterOptions } = screenState;
+  let result = [...items];
+
+  // Apply category filter
+  if (selectedCategory !== null) {
+    result = result.filter(
+      (item) => Number(item.category) === selectedCategory
+    );
+  }
+
+  // Apply price range filter
+  result = result.filter((item) => {
+    const price = Number(item.price);
+    return (
+      price >= filterOptions.priceRange[0] &&
+      price <= filterOptions.priceRange[1]
+    );
+  });
+
+  // Apply active purchase request filter
+  if (filterOptions.hasActivePurchaseRequest) {
+    result = result.filter((item) => item.purchase_request_count > 0);
+  }
+
+  // Apply sold filter
+  if (!filterOptions.isSold) {
+    // Only show unsold items
+    result = result.filter((item) => !item.is_sold);
+  }
+
+  // Apply price sorting
+  if (filterOptions.sortByPrice === "asc") {
+    result.sort((a, b) => Number(a.price) - Number(b.price));
+  } else if (filterOptions.sortByPrice === "desc") {
+    result.sort((a, b) => Number(b.price) - Number(a.price));
+  }
+
+  return result;
+}

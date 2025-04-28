@@ -11,4 +11,5 @@ urlpatterns = [
         name="mark-room-as-read",
     ),
     path("chat/unread-count/", views.unread_count, name="unread_count"),
+    path("chat/rooms/<int:room_id>/delete/", views.delete_room, name="delete_room"),
 ]

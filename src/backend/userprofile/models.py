@@ -37,26 +37,3 @@ class UserProfile(models.Model):
         String representation of the profile using the user's email.
         """
         return f"{self.user.email}'s profile"
-
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """
-    Signal to create a UserProfile whenever a new User is created.
-    """
-    if created:
-        print(f"Creating profile for {instance.username}")
-        UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    """
-    Signal to save or recreate the UserProfile when a User is updated.
-    """
-    try:
-        print(f"Saving profile for {instance.username}")
-        instance.profile.save()
-    except UserProfile.DoesNotExist:
-        print(f"User {instance.username} has no profile, creating now...")
-        UserProfile.objects.create(user=instance)

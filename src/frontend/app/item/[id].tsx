@@ -5,9 +5,10 @@
  * It shows the item's image, description, price, seller info, and category.
  * Users can:
  *  - View the item's full details.
- *  - Request to purchase the item (unless they are the seller).
+ *  - Request to purchase the item & report item (unless they are the seller).
  *  - Edit their listing if they are the item owner.
  *  - See confirmation of a submitted purchase request.
+ *  - See confirmation of a submitted report
  *
  * Features:
  * - Uses React Navigation (Expo Router) for navigation stack handling.
@@ -41,7 +42,7 @@ import { TapGestureHandler } from "react-native-gesture-handler";
 
 import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
 import SingleItem from "@/components/SingleItem";
 import axios from "axios";
@@ -53,6 +54,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ZoomModal from "@/components/ZoomModal";
+import { useItemsStore } from "@/stores/useSearchStore";
+import ReportModal from "@/components/ReportModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,12 +67,15 @@ const ItemDetails = () => {
   );
   const hasFetched = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [hasRequestedItem, setHasRequestedItem] = useState(false);
+  const [hasReportedItem, setHasReportedItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
   const [isZoomVisible, setIsZoomVisible] = useState(false);
   const { authToken } = useAuth();
   const { userData } = useUserStore();
+  const { toggleReport } = useItemsStore();
 
   // image carousel stuff
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -83,7 +89,8 @@ const ItemDetails = () => {
     };
   }, []);
 
-  const getItemImages = () => {
+  // useCallback will memoize the function and return the same instance across renders unless item has changed
+  const getItemImages = useCallback(() => {
     if (!item) return [];
 
     const primary = item.image ? [item.image] : [];
@@ -93,10 +100,10 @@ const ItemDetails = () => {
         ? item.additional_images.map((img: any) => img.image)
         : [];
     return [...primary, ...additional];
-  };
+  }, [item]);
 
-  const images = React.useMemo(() => getItemImages(), [item]);
-  // const images = getItemImages(); // get the images of the item
+  // ensure that the images array is only recalculated if the getItemImages function changes(which only happens when item changes)
+  const images = React.useMemo(() => getItemImages(), [getItemImages]);
 
   // tetch the latest item data from the API
   const fetchItemDetails = async () => {
@@ -128,6 +135,8 @@ const ItemDetails = () => {
       } else {
         setHasRequestedItem(false);
       }
+
+      setHasReportedItem(fetchedItem.is_reported || false);
     } catch (error) {
       console.error("Error fetching item details:", error);
       Alert.alert(
@@ -209,17 +218,6 @@ const ItemDetails = () => {
       />
     );
   };
-  if (isLoading || !item) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator
-          testID="activity-indicator"
-          size="large"
-          color="blue"
-        />
-      </View>
-    );
-  }
 
   const startChat = async () => {
     if (!item || !userData) return;
@@ -228,12 +226,6 @@ const ItemDetails = () => {
 
     try {
       const cleanToken = authToken?.trim();
-      console.log(
-        "Starting chat about item:",
-        item.id,
-        "with seller ID:",
-        item.seller
-      );
       const response = await axios.get(
         `${BASE_URL}/api/chat/get-or-create-room/`,
         {
@@ -244,7 +236,6 @@ const ItemDetails = () => {
         }
       );
       const chatRoom = response.data.room;
-      console.log("Chat room created/retrieved:", chatRoom);
       if (!chatRoom || !chatRoom.id) {
         throw new Error("Invalid room data received");
       }
@@ -265,6 +256,14 @@ const ItemDetails = () => {
     }
   };
 
+  if (isLoading || !item) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
+
   return (
     <>
       <Stack.Screen
@@ -279,6 +278,14 @@ const ItemDetails = () => {
         style={styles.container}
         edges={["left", "right", "bottom"]}
       >
+        <ReportModal
+          isVisible={isReportModalVisible}
+          onClose={() => {
+            setIsReportModalVisible(false);
+            setHasReportedItem(true);
+          }}
+          itemId={item.id}
+        />
         <ItemPurchaseModal
           isVisible={isVisible}
           onClose={closeModal}
@@ -320,7 +327,6 @@ const ItemDetails = () => {
             </View>
           </View>
         </TapGestureHandler>
-        {/* <SingleItem item={item} /> */}
         {/* all the item details */}
         <View style={styles.detailsContainer}>
           <Text style={styles.title}>Price: ${item.price}</Text>
@@ -346,51 +352,67 @@ const ItemDetails = () => {
             </TouchableOpacity>
           )}
 
-          {isLoading ? (
-            <ActivityIndicator
-              testID="activity-indicator"
-              style={{ marginTop: 20 }}
-              size="small"
-              color="blue"
-            />
-          ) : (
-            source !== "myItems" &&
-            !isOwner && (
-              <>
-                <TouchableOpacity
-                  style={[
-                    styles.purchaseRequestButton,
-                    hasRequestedItem && styles.disabledButton,
-                  ]}
-                  onPress={() => handlePurchaseRequest(authToken)}
-                  disabled={hasRequestedItem}
-                >
-                  <Text style={styles.buttonText}>
-                    {hasRequestedItem
-                      ? "Purchase Requested"
-                      : "Request Purchase"}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.chatButton}
-                  onPress={startChat}
-                  disabled={chatLoading}
-                >
-                  {chatLoading ? (
-                    <ActivityIndicator
-                      testID="activity-indicator"
-                      size="small"
-                      color="white"
-                    />
-                  ) : (
-                    <>
-                      <Entypo name="chat" size={20} color="white" />
-                      <Text style={styles.chatButtonText}>Message Seller</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </>
-            )
+          {source !== "myItems" && !isOwner && (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.purchaseRequestButton,
+                  hasRequestedItem && styles.disabledButton,
+                ]}
+                onPress={() => handlePurchaseRequest(authToken)}
+                disabled={hasRequestedItem}
+              >
+                <Text style={styles.buttonText}>
+                  {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.chatButton}
+                onPress={startChat}
+                disabled={chatLoading}
+              >
+                {chatLoading ? (
+                  <ActivityIndicator
+                    testID="activity-indicator"
+                    size="small"
+                    color="white"
+                  />
+                ) : (
+                  <>
+                    <Entypo name="chat" size={20} color="white" />
+                    <Text style={styles.chatButtonText}>Message Seller</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.reportItemButton,
+                  hasReportedItem && styles.disabledButton,
+                ]}
+                onPress={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    if (!item.is_reported) {
+                      setIsReportModalVisible(true);
+                    } else {
+                      await toggleReport(item.id, authToken || "", "");
+                      setHasReportedItem(true);
+                    }
+                  } catch (error) {
+                    console.error("Error toggling report:", error);
+                    Alert.alert(
+                      "Error",
+                      "Failed to report item. Please try again"
+                    );
+                  }
+                }}
+                disabled={hasReportedItem}
+              >
+                <Text style={styles.buttonText}>
+                  {hasReportedItem ? "Item Reported" : "Report Item"}
+                </Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
       </SafeAreaView>
@@ -457,6 +479,14 @@ const styles = StyleSheet.create({
   },
   purchaseRequestButton: {
     backgroundColor: "blue",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+  reportItemButton: {
+    backgroundColor: "red",
     padding: 15,
     borderRadius: 5,
     marginTop: 20,
