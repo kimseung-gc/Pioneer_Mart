@@ -405,7 +405,7 @@ const PurchaseRequests = () => {
         {/* Conditional rendering based on loading state */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="blue" />
+            <ActivityIndicator size="large" color="blue"  testID="activity-indicator"/>
           </View>
         ) : (
           /* FlatList to display the list of purchase requests */
