@@ -26,6 +26,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
+import Toast from "react-native-toast-message";
 
 // const sightEngineTextModeration = async (text: string) => {
 //   const textFormData = new URLSearchParams();
@@ -363,7 +364,11 @@ const AddItemScreen = () => {
         },
       });
       resetForm(); //reset the form after submitting
-      Alert.alert("Success", "Item added successfully");
+      Toast.show({
+        type: "success",
+        text1: "Added",
+        text2: "Item uploaded successfully",
+      });
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);

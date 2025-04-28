@@ -19,6 +19,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { OtpInput } from "react-native-otp-entry";
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import Toast from "react-native-toast-message";
 
 const width = Dimensions.get("window").width;
 const OtpScreen = () => {
@@ -36,7 +37,10 @@ const OtpScreen = () => {
       if (access && refresh) {
         await AsyncStorage.setItem("authToken", access);
         setAuthToken(access); //update the context
-        Alert.alert("Success", "Login successful!");
+        Toast.show({
+          type: "success",
+          text1: "Logged in successfully",
+        });
         router.replace("/(tabs)");
         setTimeout(() => {
           //adding this to REALLYY prevent back navigation
