@@ -25,6 +25,13 @@ from AUTHKEY.config import (
     AWS_S3_REGION_NAME,
     AWS_SECRET_ACCESS_KEY,
     AWS_STORAGE_BUCKET_NAME,
+    EMAIL_BACKEND,
+    EMAIL_HOST_USER,
+    EMAIL_HOST,
+    EMAIL_HOST_PASSWORD,
+    EMAIL_PORT,
+    EMAIL_USE_TLS,
+    DEFAULT_FROM_EMAIL,
 )
 
 # import secret keys. This distinction is required due to different secret keys for github and project.
@@ -39,6 +46,14 @@ except:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+EMAIL_BACKEND = EMAIL_BACKEND
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -48,7 +63,10 @@ SECRET_KEY = config.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "132.161.188.153", "192.168.254.30"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
