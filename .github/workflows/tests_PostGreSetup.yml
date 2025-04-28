@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-latest]
         python-version: ['3.8']
     # Docker Hub image that `container-job` executes in
     container: node:20-bookworm-slim
@@ -51,9 +51,14 @@ jobs:
       - uses: actions/checkout@v2
       # Setting up python
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      # Set PATH Variable
+      - name: set_path
+        working-directory: ./src/backend
+        run: |
+          export PYTHONPATH=$PYTHONPATH:/home/dev/python-files
       # Run a test file with django test
       - name: Install django requirements
         working-directory: ./src/backend
