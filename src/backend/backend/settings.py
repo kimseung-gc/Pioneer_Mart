@@ -12,27 +12,30 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 from pathlib import Path
 
-from AUTHKEY.config import (
-    DB_NAME,
-    DB_USER,
-    HOST,
-    PASSWORD,
-    PORT,
-    AWS_ACCESS_KEY_ID,
-    AWS_S3_CUSTOM_DOMAIN,
-    AWS_S3_REGION_NAME,
-    AWS_SECRET_ACCESS_KEY,
-    AWS_STORAGE_BUCKET_NAME,
-    EMAIL_BACKEND,
-    EMAIL_HOST_USER,
-    EMAIL_HOST,
-    EMAIL_HOST_PASSWORD,
-    EMAIL_PORT,
-    EMAIL_USE_TLS,
-    DEFAULT_FROM_EMAIL,
-)
+# from AUTHKEY.config import (
+#     DB_NAME,
+#     DB_USER,
+#     HOST,
+#     PASSWORD,
+#     PORT,
+#     AWS_ACCESS_KEY_ID,
+#     AWS_S3_CUSTOM_DOMAIN,
+#     AWS_S3_REGION_NAME,
+#     AWS_SECRET_ACCESS_KEY,
+#     AWS_STORAGE_BUCKET_NAME,
+#     EMAIL_BACKEND,
+#     EMAIL_HOST_USER,
+#     EMAIL_HOST,
+#     EMAIL_HOST_PASSWORD,
+#     EMAIL_PORT,
+#     EMAIL_USE_TLS,
+#     DEFAULT_FROM_EMAIL,
+# )
 
 # import secret keys. This distinction is required due to different secret keys for github and project.
 try:
@@ -46,28 +49,24 @@ except:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-EMAIL_BACKEND = EMAIL_BACKEND
-EMAIL_HOST = EMAIL_HOST
-EMAIL_PORT = EMAIL_PORT
-EMAIL_USE_TLS = EMAIL_USE_TLS
-EMAIL_HOST_USER = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
-DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.SECRET_KEY
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-]
-
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 # Application definition
 
@@ -92,10 +91,10 @@ INSTALLED_APPS = [
     "storages",
 ]
 
-AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
-AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
-AWS_S3_REGION_NAME = AWS_S3_REGION_NAME
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
 # AWS_S3_CUSTOM_DOMAIN = AWS_S3_CUSTOM_DOMAIN
 
 # AWS_S3_URL_PROTOCOL = 'https'
@@ -105,7 +104,7 @@ AWS_S3_REGION_NAME = AWS_S3_REGION_NAME
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+DEFAULT_FILE_STORAGE = os.getenv("DEFAULT_FILE_STORAGE")
 
 
 REST_FRAMEWORK = {
@@ -165,7 +164,7 @@ FILE_UPLOAD_HANDLERS = [
 WSGI_APPLICATION = "backend.wsgi.application"
 ASGI_APPLICATION = "backend.asgi.application"
 
-# Channel layers configuration for Redis
+# Channel layers con`figuration for Redis
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",  # ONLY FOR DEVELOPMENTTT
@@ -187,11 +186,11 @@ DATABASES = {
     # }
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": DB_NAME,
-        "USER": DB_USER,
-        "PASSWORD": PASSWORD,
-        "HOST": HOST,
-        "PORT": PORT,
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("PASSWORD"),
+        "HOST": os.getenv("HOST"),
+        "PORT": os.getenv("PORT"),
     }
 }
 
@@ -233,7 +232,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # MEDIA_URL = "media/"
-MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+MEDIA_URL = f"https://{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.{os.getenv("AWS_S3_REGION_NAME")}.amazonaws.com/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type
