@@ -1,4 +1,4 @@
-from AUTHKEY.config import EMAIL_HOST_USER
+# from AUTHKEY.config import EMAIL_HOST_USER
 from userprofile.models import UserProfile
 from rest_framework import status
 from rest_framework.response import Response
