@@ -16,7 +16,7 @@ const WelcomeScreen = (props: Props) => {
 
   const requestOTP = async () => {
     try {
-      const OTP_URL = `${BASE_URL}/api/otpauth/request-otp/`;
+      const OTP_URL = `${BASE_URL}/otpauth/request-otp/`;
       const fullEmail = email + "@grinnell.edu";
       await axios.post(
         OTP_URL,
