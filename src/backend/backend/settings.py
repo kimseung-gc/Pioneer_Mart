@@ -77,7 +77,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud", "localhost", "127.0.0.1"]
-CRSF_TRUSTED_ORIGINS = ["env-2325023.us.reclaim.cloud"]
+CSRF_TRUSTED_ORIGINS = ["https://env-2325023.us.reclaim.cloud"]
 # Application definition
 
 INSTALLED_APPS = [
