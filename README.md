@@ -30,11 +30,36 @@ Notable competitors include Etsy, Facebook Marketplace, and Poshmark. Etsy is an
   - sprint_03.md
   - sprint_04_planning.md
   - sprint_04.md
+  - sprint_05_planning.md
 - src
   - basic_classes
   - frontend
+    - app
+    - assets
+    - components
+    - constants
+    - hooks
+    - scripts
+    - stores
+    - types
+    - package.json
+    - yarn.lock
+  - backend
+    - backend
+    - categories
+    - chat
+    - items
+    - media
+    - otpauth
+    - purchase_requests
+    - report
+    - userprofile
+    - manage.py
+    - requirements.txt
 - tests
 - README.md
+
+For the backend and frontend folders, the main packages and tools to run the packages are included. The backend folder contains all the Django frameworks with the required manage.py to run the frameworks. The requirements.txt is required when installing the required packages for running the framework. For the frontend, there are react native frameworks with the yarn framework that is used for testing. There is also package.json for the requirements for running the frontend.
 
 ## Sprint Reports
 
@@ -111,6 +136,10 @@ Use Case 1, 3 are very doable right now with the current prototype that we have.
 ## Issue Managements
 
 All the issues will be managed in Trello.com. [Link to Trello Board](https://trello.com/b/HqVxVWt0/pioneer-mart)
+
+## Additional Alerts
+
+For the sprints from 5 and onwards, it would be great if it was evaluated based on "dup-main" branch as it does not have any PostGres data framework.
 
 ## Citations
 
