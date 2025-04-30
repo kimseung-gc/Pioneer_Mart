@@ -1,4 +1,4 @@
-from AUTHKEY.config import EMAIL_HOST_USER
+# from AUTHKEY.config import EMAIL_HOST_USER
 from userprofile.models import UserProfile
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,6 +7,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
+import os
+from dotenv import load_dotenv
+
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 
@@ -51,6 +54,7 @@ class RequestOTPView(APIView):
             # Create new OTP
             # TODO: we'll likely need to interact with this otp code or something of the sort to let users login
             # TODO: because users aren't gonna keep asking for a code lmao
+            OTP.objects.filter(email=email).delete()
             otp = OTP.objects.create(email=email)
             print(f"\n\n{otp.otp}\n\n")  # TODO: comment this to send email
             # Send email with OTP

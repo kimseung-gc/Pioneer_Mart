@@ -29,7 +29,7 @@ const OtpScreen = () => {
 
   const verifyOtp = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/otpauth/verify-otp/`, {
+      const response = await axios.post(`${BASE_URL}/otpauth/verify-otp/`, {
         email,
         otp,
       });
