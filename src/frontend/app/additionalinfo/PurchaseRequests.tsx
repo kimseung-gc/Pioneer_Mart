@@ -43,12 +43,13 @@ import {
   Alert,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import { BASE_URL } from "@/config";
 import axios from "axios";
 import SingleItem from "@/components/SingleItem";
 import React from "react";
+import Constants from "expo-constants";
 
 const PurchaseRequests = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // States for PurchaseRequest screen
   const [activeTab, setActiveTab] = useState("sent");
   const [sentRequests, setSentRequests] = useState<PurchaseRequest[]>([]);
@@ -405,7 +406,11 @@ const PurchaseRequests = () => {
         {/* Conditional rendering based on loading state */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="blue"  testID="activity-indicator"/>
+            <ActivityIndicator
+              size="large"
+              color="blue"
+              testID="activity-indicator"
+            />
           </View>
         ) : (
           /* FlatList to display the list of purchase requests */

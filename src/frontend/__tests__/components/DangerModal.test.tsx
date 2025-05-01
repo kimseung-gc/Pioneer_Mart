@@ -86,12 +86,9 @@ describe("DangerModal", () => {
 
     fireEvent.press(getByText("Delete"));
     expect(onDoneMock).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith("this guys crazy..");
-    consoleSpy.mockRestore();
   });
 
   it("should handle missing onDone prop gracefully", () => {
-    const consoleSpy = jest.spyOn(console, "log");
     const { getByText } = render(
       <DangerModal
         isVisible={true}
@@ -103,8 +100,6 @@ describe("DangerModal", () => {
 
     // this should not throw an error even though onDone is undefined
     fireEvent.press(getByText("Delete"));
-    expect(consoleSpy).toHaveBeenCalledWith("this guys crazy..");
-    consoleSpy.mockRestore();
   });
 
   // edge cases

@@ -132,13 +132,13 @@ class ContactFormView(APIView):
 
             subject = "New contact form from PioneerMart"
             message = f"Message from PioneerMart contact form:\n\nUser: {user_email}\n\n{description}"
-            recipient_email = EMAIL_HOST_USER
+            recipient_email = os.getenv("EMAIL_HOST_USER")
             try:
                 send_mail(
                     subject,
                     message,
                     settings.DEFAULT_FROM_EMAIL,
-                    [EMAIL_HOST_USER],
+                    [os.getenv("EMAIL_HOST_USER")],
                     fail_silently=False,
                 )
                 print("Hello")

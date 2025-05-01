@@ -1,6 +1,11 @@
 import TabLayout from "@/app/(tabs)/_layout"; // Adjust the import path as needed
+import { useAuth } from "@/app/contexts/AuthContext";
 import { render } from "@testing-library/react-native";
 import React from "react";
+
+jest.mock("@/app/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
+}));
 
 jest.mock("expo-router", () => {
   const React = require("react");
@@ -45,6 +50,9 @@ describe("TabLayout Component", () => {
   // Just makin' sureeee
   beforeEach(() => {
     jest.clearAllMocks();
+    (useAuth as jest.Mock).mockReturnValue({
+      authToken: "test-token",
+    });
   });
 
   it("renders tabs with correct configuration", async () => {

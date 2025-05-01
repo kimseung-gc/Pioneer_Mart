@@ -11,6 +11,10 @@ jest.mock("@expo/vector-icons/AntDesign", () => {
   };
 });
 
+jest.mock("react-native-toast-message", () => ({
+  show: jest.fn(),
+}));
+
 jest.mock("@expo/vector-icons/MaterialIcons", () => {
   return {
     __esModule: true,

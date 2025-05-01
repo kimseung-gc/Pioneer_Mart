@@ -71,6 +71,7 @@ describe("ReportModal", () => {
     );
     // we can't directly test state, but we can infer the selection happened
     // by checking if submit button becomes enabled, which we'll test separately
+
     fireEvent.press(getByText("Prohibited item"));
   });
   it("Submit button is disabled initially", () => {
@@ -108,7 +109,9 @@ describe("ReportModal", () => {
     );
 
     fireEvent.press(getByText("Prohibited item"));
-    fireEvent.press(getByText("Submit"));
+    await act(async () => {
+      fireEvent.press(getByText("Submit"));
+    });
 
     await waitFor(() => {
       expect(mockToggleReport).toHaveBeenCalledWith(
@@ -129,7 +132,9 @@ describe("ReportModal", () => {
     );
 
     fireEvent.press(getByText("Scam or fraud"));
-    fireEvent.press(getByText("Submit"));
+    await act(async () => {
+      fireEvent.press(getByText("Submit"));
+    });
 
     await waitFor(() => {
       expect(mockToggleReport).toHaveBeenCalledWith(
@@ -156,7 +161,9 @@ describe("ReportModal", () => {
     );
 
     fireEvent.press(getByText("Other"));
-    fireEvent.press(getByTestId("submit-report-button"));
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-report-button"));
+    });
 
     const activityIndicator = getByTestId("activity-indicator");
     expect(activityIndicator).toBeTruthy();
@@ -186,7 +193,9 @@ describe("ReportModal", () => {
     );
 
     fireEvent.press(getByText("Misleading description"));
-    fireEvent.press(getByText("Submit"));
+    await act(async () => {
+      fireEvent.press(getByText("Submit"));
+    });
 
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(

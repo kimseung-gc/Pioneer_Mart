@@ -1,9 +1,10 @@
 import React from "react";
 import { render, waitFor } from "@testing-library/react-native";
 // import { favorites } from "../../../app/(tabs)/favorites";
-import FavoritesScreen  from "../../../app/(tabs)/favorites";
+import FavoritesScreen from "../../../app/(tabs)/favorites";
 import { useAuth } from "../../../app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
+import { NavigationContainer } from "@react-navigation/native";
 
 // Mock subcomponents to avoid deep renders
 jest.mock("expo-router", () => ({
@@ -32,7 +33,7 @@ describe("FavoritesScreen", () => {
       authToken: "test-token",
     });
 
-    (useItemsStore as jest.Mock).mockReturnValue({
+    (useItemsStore as unknown as jest.Mock).mockReturnValue({
       screens: {
         favorites: {
           filteredItems: [{ id: 1, title: "Test Item" }],
@@ -47,7 +48,11 @@ describe("FavoritesScreen", () => {
   });
 
   it("renders without crashing and calls required data loaders", async () => {
-    render(<FavoritesScreen />);
+    render(
+      <NavigationContainer>
+        <FavoritesScreen />
+      </NavigationContainer>
+    );
 
     await waitFor(() => {
       expect(mockSetActiveScreen).toHaveBeenCalledWith("favorites");

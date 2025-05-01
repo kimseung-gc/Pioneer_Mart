@@ -1,10 +1,8 @@
 import { useUserStore } from "@/stores/userStore";
 import { ChatRoom, ChatRoomsScreenRouteParams } from "@/types/chat";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
-// import { StackNavigationProp } from "@react-navigation/stack";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "@/config";
 import {
   Alert,
   Text,
@@ -16,12 +14,12 @@ import {
   RefreshControl,
 } from "react-native";
 import React from "react";
-import { Entypo, EvilIcons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { useChatStore } from "@/stores/chatStore";
 import { useAuth } from "./contexts/AuthContext";
-import { ItemType } from "@/types/types";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
@@ -43,6 +41,7 @@ interface Props {
 }
 
 const ChatRoomsScreen: React.FC<Props> = ({}) => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const { userData } = useUserStore();

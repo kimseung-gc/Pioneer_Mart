@@ -1,11 +1,19 @@
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { router, Stack } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { BASE_URL } from "@/config";
 import InputField from "@/components/InputField";
 import TCModal from "@/components/TCModal";
+import { useAuth } from "../contexts/AuthContext";
+import Constants from "expo-constants";
 
 type Props = {};
 
@@ -13,10 +21,25 @@ const WelcomeScreen = (props: Props) => {
   const [email, setEmail] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [modalVisible, setModalVisible] = useState(true); // this needs to show the modal on first load
+  const { isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.replace("/(tabs)");
+    }
+  }, [loading, isAuthenticated]);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: "center" }]}>
+        <ActivityIndicator size="large" color="#4b0082" />
+      </View>
+    );
+  }
 
   const requestOTP = async () => {
     try {
-      const OTP_URL = `${BASE_URL}/otpauth/request-otp/`;
+      const OTP_URL = `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
       const fullEmail = email + "@grinnell.edu";
       await axios.post(
         OTP_URL,

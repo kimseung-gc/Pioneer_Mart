@@ -1,8 +1,6 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "@/config";
-// import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import {
   ActivityIndicator,
   Alert,
@@ -25,8 +23,13 @@ import CameraModal from "@/components/CameraModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
+import Constants from "expo-constants";
 
 const EditItem = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
+  const SE_API_USER = Constants?.expoConfig?.extra?.SE_API_USER;
+  const SE_SECRET_KEY = Constants?.expoConfig?.extra?.SE_SECRET_KEY;
+  const SE_WORKFLOW = Constants?.expoConfig?.extra?.SE_WORKFLOW;
   const { item: itemString } = useLocalSearchParams();
   const originalItem = JSON.parse(itemString as string);
   const { authToken } = useAuth();
@@ -178,73 +181,73 @@ const EditItem = () => {
       // if (!userData) {
       //   await getProfile();
       // }
-      // for (const image of images) {
-      //   if (image) {
-      //     const sightEngineFormData = new FormData();
-      //     const imageFileName = image.split("/").pop() || "image.jpg";
-      //     const imageType = imageFileName.endsWith("png")
-      //       ? "image/png"
-      //       : "image/jpeg";
-      //     sightEngineFormData.append("media", {
-      //       uri: image,
-      //       name: imageFileName,
-      //       type: imageType,
-      //     } as unknown as Blob);
-      //     //TODO: append image to form data
-      //     type SightEngineParams = {
-      //       workflow: string;
-      //       api_user: string;
-      //       api_secret: string;
-      //     };
+      for (const image of images) {
+        if (image) {
+          const sightEngineFormData = new FormData();
+          const imageFileName = image.split("/").pop() || "image.jpg";
+          const imageType = imageFileName.endsWith("png")
+            ? "image/png"
+            : "image/jpeg";
+          sightEngineFormData.append("media", {
+            uri: image,
+            name: imageFileName,
+            type: imageType,
+          } as unknown as Blob);
+          //TODO: append image to form data
+          type SightEngineParams = {
+            workflow: string;
+            api_user: string;
+            api_secret: string;
+          };
 
-      //     const params: SightEngineParams = {
-      //       workflow: SE_WORKFLOW,
-      //       api_user: SE_API_USER,
-      //       api_secret: SE_SECRET_KEY,
-      //     };
+          const params: SightEngineParams = {
+            workflow: SE_WORKFLOW,
+            api_user: SE_API_USER,
+            api_secret: SE_SECRET_KEY,
+          };
 
-      //     (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
-      //       (key) => {
-      //         sightEngineFormData.append(key, params[key]);
-      //       }
-      //     );
-      //     // Make API call to SightEngine
-      //     const sightEngineResponse = await axios.post(
-      //       "https://api.sightengine.com/1.0/check-workflow.json",
-      //       sightEngineFormData,
-      //       {
-      //         headers: {
-      //           "Content-Type": "multipart/form-data",
-      //         },
-      //       }
-      //     );
-      //     const output = sightEngineResponse.data;
-      //     if (output.status === "failure") {
-      //       console.error("SightEngine API error:", output.error);
-      //       Alert.alert("Error", "Image validation failed. Please try again.");
-      //       setLoading(false);
-      //       return;
-      //     }
-      //     // Check if image should be rejected
-      //     if (output.summary && output.summary.action === "reject") {
-      //       console.log(
-      //         "Image rejected with probability:",
-      //         output.summary.reject_prob
-      //       );
-      //       console.log(
-      //         "Rejection reasons:",
-      //         output.summary.reject_reason[0].text
-      //       );
+          (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
+            (key) => {
+              sightEngineFormData.append(key, params[key]);
+            }
+          );
+          // Make API call to SightEngine
+          const sightEngineResponse = await axios.post(
+            "https://api.sightengine.com/1.0/check-workflow.json",
+            sightEngineFormData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const output = sightEngineResponse.data;
+          if (output.status === "failure") {
+            console.error("SightEngine API error:", output.error);
+            Alert.alert("Error", "Image validation failed. Please try again.");
+            setLoading(false);
+            return;
+          }
+          // Check if image should be rejected
+          if (output.summary && output.summary.action === "reject") {
+            console.log(
+              "Image rejected with probability:",
+              output.summary.reject_prob
+            );
+            console.log(
+              "Rejection reasons:",
+              output.summary.reject_reason[0].text
+            );
 
-      //       Alert.alert(
-      //         "NOT ALLOWED",
-      //         `${output.summary.reject_reason[0].text}`
-      //       );
-      //       setLoading(false);
-      //       return;
-      //     }
-      //   }
-      // }
+            Alert.alert(
+              "NOT ALLOWED",
+              `${output.summary.reject_reason[0].text}`
+            );
+            setLoading(false);
+            return;
+          }
+        }
+      }
 
       //   const formDataObj = createFormData();
       const cleanToken = authToken?.trim();

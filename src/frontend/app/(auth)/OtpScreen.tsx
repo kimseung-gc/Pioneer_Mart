@@ -14,12 +14,12 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { BASE_URL } from "@/config";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { OtpInput } from "react-native-otp-entry";
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
 const width = Dimensions.get("window").width;
 const OtpScreen = () => {
@@ -29,10 +29,13 @@ const OtpScreen = () => {
 
   const verifyOtp = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/otpauth/verify-otp/`, {
-        email,
-        otp,
-      });
+      const response = await axios.post(
+        `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/verify-otp/`,
+        {
+          email,
+          otp,
+        }
+      );
       const { access, refresh } = response.data;
       if (access && refresh) {
         await AsyncStorage.setItem("authToken", access);

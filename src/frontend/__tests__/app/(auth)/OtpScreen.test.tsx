@@ -5,6 +5,7 @@ import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
+import Toast from "react-native-toast-message";
 
 jest.mock("frontend/app/contexts/AuthContext.tsx", () => ({
   useAuth: jest.fn().mockReturnValue({
@@ -78,7 +79,7 @@ describe("OtpScreen Component", () => {
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(
-        expect.stringContaining("/api/otpauth/verify-otp/"),
+        expect.stringContaining("/otpauth/verify-otp/"),
         {
           email: "test@example.com",
           otp: "123456",
@@ -88,7 +89,12 @@ describe("OtpScreen Component", () => {
         "authToken",
         mockAuthToken
       );
-      expect(Alert.alert).toHaveBeenCalledWith("Success", "Login successful!");
+      expect(Toast.show).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "success",
+          text1: "Logged in successfully",
+        })
+      );
       expect(router.replace).toHaveBeenCalledWith("/(tabs)");
     });
   });
@@ -108,7 +114,7 @@ describe("OtpScreen Component", () => {
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(
         //send to the correct endpoint
-        expect.stringContaining("/api/otpauth/verify-otp/"),
+        expect.stringContaining("/otpauth/verify-otp/"),
         {
           email: "test@example.com",
           otp: "999999",

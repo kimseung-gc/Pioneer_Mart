@@ -4,6 +4,11 @@ import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
+import { useAuth } from "@/app/contexts/AuthContext";
+
+jest.mock("@/app/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
+}));
 
 jest.mock("@/components/TCModal", () => {
   const { Modal, View, Text, TouchableOpacity } = require("react-native");
@@ -56,11 +61,19 @@ jest.mock("@/components/InputField", () => {
 jest.spyOn(Alert, "alert");
 
 describe("WelcomeScreen Component", () => {
+  const mockUseAuth = useAuth as jest.Mock;
   beforeEach(() => {
     jest.clearAllMocks(); //just be sure
   });
 
   it("renders with terms modal initially visible", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, queryByTestId, queryByText } = render(
       <WelcomeScreen />
     );
@@ -74,6 +87,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("shows terms acceptance prompt when terms are not accepted", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, getByText } = render(<WelcomeScreen />);
 
     // close the modal without accepting terms
@@ -87,6 +107,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("shows registration form when terms are accepted", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, getByText, queryByText } = render(<WelcomeScreen />);
 
     // accept the terms
@@ -103,6 +130,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("reopens terms modal when 'View Terms and Conditions' link is clicked", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, getByText, queryByTestId } = render(<WelcomeScreen />);
 
     // accept terms to show registration form
@@ -118,28 +152,14 @@ describe("WelcomeScreen Component", () => {
     expect(getByTestId("terms-modal")).toBeTruthy();
   });
 
-  // it("renders correctly with all UI elements", async () => {
-  //   const component = render(<WelcomeScreen />);
-
-  //   //will do this later
-  //   await act(async () => {
-  //     // Ensure all effects complete
-  //   });
-
-  //   const acceptButton = await component.findByTestId("accept-button");
-  //   fireEvent.press(acceptButton);
-
-  //   // these are all the texts thingys on the screen
-  //   expect(component.getByText("Create an Account")).toBeTruthy();
-  //   expect(
-  //     component.getByText("We'll send a code to your Grinnell email account!")
-  //   ).toBeTruthy();
-  //   expect(component.getByTestId("email-input")).toBeTruthy();
-  //   expect(component.getByText("@grinnell.edu")).toBeTruthy();
-  //   expect(component.getByText("Send Code")).toBeTruthy();
-  // });
-
   it("updates email state when input changes", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const component = render(<WelcomeScreen />); //render welcome screen
 
     const acceptButton = await component.findByTestId("accept-button");
@@ -162,7 +182,7 @@ describe("WelcomeScreen Component", () => {
 
     // Just checking that axios was called with the correct email
     expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/api/otpauth/request-otp/"),
+      expect.stringContaining("/otpauth/request-otp/"),
       {
         email: "khalidmu@grinnell.edu",
       },
@@ -171,6 +191,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("handles successful OTP request and navigates to OTP screen", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const component = render(<WelcomeScreen />);
 
     const acceptButton = await component.findByTestId("accept-button");
@@ -199,6 +226,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("handles error during OTP request", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const consoleSpy = jest
       .spyOn(console, "error")
       .mockImplementation(() => {});
@@ -231,6 +265,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("doesn't allow otp request if email is empty", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, getByText } = render(<WelcomeScreen />);
 
     // accept terms
@@ -244,7 +285,7 @@ describe("WelcomeScreen Component", () => {
 
     // should still attempt the request with empty string
     expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/api/otpauth/request-otp/"),
+      expect.stringContaining("/otpauth/request-otp/"),
       {
         email: "@grinnell.edu",
       },
@@ -252,6 +293,13 @@ describe("WelcomeScreen Component", () => {
     );
   });
   it("properly formats the email with @grinnell.edu domain", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, getByText } = render(<WelcomeScreen />);
 
     // accept terms
@@ -281,6 +329,13 @@ describe("WelcomeScreen Component", () => {
   });
 
   it("closes modal without accepting terms when close button is pressed", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: null,
+      setAuthToken: jest.fn(),
+      isAuthenticated: false,
+      loading: false,
+      onLogout: jest.fn(),
+    });
     const { getByTestId, queryByTestId, getByText } = render(<WelcomeScreen />);
 
     // modal should be visible initially
@@ -296,5 +351,20 @@ describe("WelcomeScreen Component", () => {
     expect(
       getByText("Please accept the terms and conditions to continue")
     ).toBeTruthy();
+  });
+  it("redirects to /tabs if user is authenticated", async () => {
+    mockUseAuth.mockReturnValue({
+      authToken: "test-token",
+      setAuthToken: jest.fn(),
+      isAuthenticated: true,
+      loading: false,
+      onLogout: jest.fn(),
+    });
+
+    render(<WelcomeScreen />);
+
+    await waitFor(() => {
+      expect(router.replace).toHaveBeenCalledWith("/(tabs)");
+    });
   });
 });

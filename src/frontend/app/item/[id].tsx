@@ -40,14 +40,11 @@ import {
 } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
 
-import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
-import SingleItem from "@/components/SingleItem";
 import axios from "axios";
-import { BASE_URL } from "@/config";
-import useSingleItemStore from "@/stores/singleItemStore";
 import { useUserStore } from "@/stores/userStore";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -56,10 +53,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ZoomModal from "@/components/ZoomModal";
 import { useItemsStore } from "@/stores/useSearchStore";
 import ReportModal from "@/components/ReportModal";
+import Constants from "expo-constants";
 
 const { width, height } = Dimensions.get("window");
 
 const ItemDetails = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const router = useRouter();
   const { id, item: itemString, source, refreshKey } = useLocalSearchParams();
   const [item, setItem] = useState(
@@ -259,7 +258,11 @@ const ItemDetails = () => {
   if (isLoading || !item) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator
+          testID="activity-indicator"
+          size="large"
+          color="blue"
+        />
       </View>
     );
   }

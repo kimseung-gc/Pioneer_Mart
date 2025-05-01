@@ -1,6 +1,5 @@
-import { BASE_URL } from "@/config";
 import { Entypo } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -17,9 +16,10 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 import { useUserStore } from "@/stores/userStore";
+import Constants from "expo-constants";
 
 const ContactUs = () => {
-  const router = useRouter();
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { authToken } = useAuth();
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,11 +30,12 @@ const ContactUs = () => {
       Alert.alert("Error", "Please enter a description");
       return;
     }
+    setIsSubmitting(true);
     try {
       const cleanToken = authToken?.trim();
       const user_email = userData?.email;
       const response = await axios.post(
-        `${BASE_URL}/api/otpauth/contact`,
+        `${BASE_URL}/otpauth/contact`,
         { description, user_email },
         {
           headers: {

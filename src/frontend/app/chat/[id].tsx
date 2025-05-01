@@ -1,4 +1,3 @@
-import { BASE_URL } from "@/config";
 import { Message, WebSocketMessage } from "@/types/chat";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -19,8 +18,10 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/stores/userStore";
 import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
+import Constants from "expo-constants";
 
 const ChatScreen = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { id, username, itemTitle } = useLocalSearchParams();
   const roomId = typeof id === "string" ? id : "";
   const roomName = typeof username === "string" ? username : "Chat Room";

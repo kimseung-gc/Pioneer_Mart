@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { UserInfo } from "@/types/types";
 import axios from "axios";
-import { BASE_URL } from "@/config";
 import { PaginatedResponse } from "@/types/api";
+import Constants from "expo-constants";
+
+const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
 
 interface UserState {
   userData: UserInfo | null;

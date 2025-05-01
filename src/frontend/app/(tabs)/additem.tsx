@@ -16,8 +16,6 @@ import {
   FlatList,
 } from "react-native";
 import axios from "axios";
-import { BASE_URL } from "@/config";
-// import { BASE_URL, SE_API_USER, SE_SECRET_KEY, SE_WORKFLOW } from "@/config";
 import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
@@ -27,28 +25,34 @@ import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
-// const sightEngineTextModeration = async (text: string) => {
-//   const textFormData = new URLSearchParams();
-//   textFormData.append("text", text);
-//   textFormData.append("lang", "en");
-//   textFormData.append("api_user", SE_API_USER);
-//   textFormData.append("api_secret", SE_SECRET_KEY);
-//   textFormData.append("mode", "rules");
-//   textFormData.append("categories", "profanity,drug,extremism,violence");
-//   const response = await axios.post(
-//     "https://api.sightengine.com/1.0/text/check.json",
-//     textFormData,
-//     {
-//       headers: {
-//         "Content-Type": "application/x-www-form-urlencoded",
-//       },
-//     }
-//   );
-//   return response.data;
-// };
+const SE_API_USER = Constants?.expoConfig?.extra?.SE_API_USER;
+const SE_SECRET_KEY = Constants?.expoConfig?.extra?.SE_SECRET_KEY;
+const SE_WORKFLOW = Constants?.expoConfig?.extra?.SE_WORKFLOW;
+
+const sightEngineTextModeration = async (text: string) => {
+  const textFormData = new URLSearchParams();
+  textFormData.append("text", text);
+  textFormData.append("lang", "en");
+  textFormData.append("api_user", SE_API_USER);
+  textFormData.append("api_secret", SE_SECRET_KEY);
+  textFormData.append("mode", "rules");
+  textFormData.append("categories", "profanity,drug,extremism,violence");
+  const response = await axios.post(
+    "https://api.sightengine.com/1.0/text/check.json",
+    textFormData,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  return response.data;
+};
 
 const AddItemScreen = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
   const initialFormState = {
     name: "",
@@ -256,103 +260,107 @@ const AddItemScreen = () => {
       }
 
       // TODO: Uncomment for sightengine stuff
+      const combinedText = `${formData.name}\n${formData.description}`; //combine all the text
+      const textModerationResult = await sightEngineTextModeration(
+        combinedText
+      );
 
-      // const combinedText = `${formData.name}\n${formData.description}`; //combine all the text
-      // const textModerationResult = await sightEngineTextModeration(
-      //   combinedText
-      // );
+      if (textModerationResult.status === "failure") {
+        console.error(
+          "SightEngine text moderation error:",
+          textModerationResult.error
+        );
+        Alert.alert("Error", "Text validation failed. Please try again");
+        setLoading(false);
+        return;
+      }
+      if (
+        (textModerationResult.profanity.matches[0] &&
+          textModerationResult.profanity.matches[0].intensity === "high") ||
+        (textModerationResult.drug.matches[0] &&
+          textModerationResult.drug.matches[0].intensity === "high") ||
+        (textModerationResult.extremism.matches[0] &&
+          textModerationResult.extremism.matches[0].intensity === "high") ||
+        (textModerationResult.violence.matches[0] &&
+          textModerationResult.violence.matches[0].intensity === "high")
+      ) {
+        console.log(
+          "Text rejected:",
+          "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+        );
+        Alert.alert(
+          "NOT ALLOWED",
+          "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+        );
+        setLoading(false);
+        return;
+      }
+      for (const image of images) {
+        if (image) {
+          const sightEngineFormData = new FormData();
+          const imageFileName = image.split("/").pop() || "image.jpg";
+          const imageType = imageFileName.endsWith("png")
+            ? "image/png"
+            : "image/jpeg";
+          sightEngineFormData.append("media", {
+            uri: image,
+            name: imageFileName,
+            type: imageType,
+          } as unknown as Blob);
+          //TODO: append image to form data
+          type SightEngineParams = {
+            workflow: string;
+            api_user: string;
+            api_secret: string;
+          };
 
-      // if (textModerationResult.status === "failure") {
-      //   console.error(
-      //     "SightEngine text moderation error:",
-      //     textModerationResult.error
-      //   );
-      //   Alert.alert("Error", "Text validation failed. Please try again");
-      //   setLoading(false);
-      //   return;
-      // }
-      // if (
-      //   (textModerationResult.profanity.matches[0] &&
-      //     textModerationResult.profanity.matches[0].intensity === "high") ||
-      //   (textModerationResult.drug.matches[0] &&
-      //     textModerationResult.drug.matches[0].intensity === "high") ||
-      //   (textModerationResult.extremism.matches[0] &&
-      //     textModerationResult.extremism.matches[0].intensity === "high") ||
-      //   (textModerationResult.violence.matches[0] &&
-      //     textModerationResult.violence.matches[0].intensity === "high")
-      // ) {
-      //   console.log(
-      //     "Text rejected:",
-      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
-      //   );
-      //   Alert.alert(
-      //     "NOT ALLOWED",
-      //     "Please make sure all text is free of profanity, illegal content, extremism, and violence"
-      //   );
-      //   setLoading(false);
-      //   return;
-      // }
-      // for (const image of images) {
-      //   if (image) {
-      //     const sightEngineFormData = new FormData();
-      //     const imageFileName = image.split("/").pop() || "image.jpg";
-      //     const imageType = imageFileName.endsWith("png")
-      //       ? "image/png"
-      //       : "image/jpeg";
-      //     sightEngineFormData.append("media", {
-      //       uri: image,
-      //       name: imageFileName,
-      //       type: imageType,
-      //     } as unknown as Blob);
-      //     //TODO: append image to form data
-      //     type SightEngineParams = {
-      //       workflow: string;
-      //       api_user: string;
-      //       api_secret: string;
-      //     };
+          const params: SightEngineParams = {
+            workflow: SE_WORKFLOW,
+            api_user: SE_API_USER,
+            api_secret: SE_SECRET_KEY,
+          };
 
-      //     const params: SightEngineParams = {
-      //       workflow: SE_WORKFLOW,
-      //       api_user: SE_API_USER,
-      //       api_secret: SE_SECRET_KEY,
-      //     };
-
-      //     (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
-      //       (key) => {
-      //         sightEngineFormData.append(key, params[key]);
-      //       }
-      //     );
-      //     // Make API call to SightEngine
-      //     const sightEngineResponse = await axios.post(
-      //       "https://api.sightengine.com/1.0/check-workflow.json",
-      //       sightEngineFormData,
-      //       {
-      //         headers: {
-      //           "Content-Type": "multipart/form-data",
-      //         },
-      //       }
-      //     );
-      //     const output = sightEngineResponse.data;
-      //     if (output.status === "failure") {
-      //       console.error("SightEngine API error:", output.error);
-      //       Alert.alert("Error", "Image validation failed. Please try again.");
-      //       setLoading(false);
-      //       return;
-      //     }
-      //     // Check if image should be rejected
-      //     if (output.summary && output.summary.action === "reject") {
-      //       Alert.alert(
-      //         "NOT ALLOWED",
-      //         `${output.summary.reject_reason[0].text}`
-      //       );
-      //       setLoading(false);
-      //       return;
-      //     }
-      //   }
-      // }
-
+          (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
+            (key) => {
+              sightEngineFormData.append(key, params[key]);
+            }
+          );
+          // Make API call to SightEngine
+          console.log(BASE_URL);
+          console.log(SE_API_USER);
+          console.log(SE_WORKFLOW);
+          console.log(SE_SECRET_KEY);
+          const sightEngineResponse = await axios.post(
+            "https://api.sightengine.com/1.0/check-workflow.json",
+            sightEngineFormData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const output = sightEngineResponse.data;
+          console.log(output);
+          if (output.status === "failure") {
+            console.error("SightEngine API error:", output.error);
+            Alert.alert("Error", "Image validation failed. Please try again.");
+            setLoading(false);
+            return;
+          }
+          // Check if image should be rejected
+          if (output.summary && output.summary.action === "reject") {
+            Alert.alert(
+              "NOT ALLOWED",
+              `${output.summary.reject_reason[0].text}`
+            );
+            setLoading(false);
+            return;
+          }
+        }
+      }
       const formDataObj = createFormData();
       const cleanToken = authToken?.trim();
+      console.log(BASE_URL);
       const response = await axios.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -372,7 +380,7 @@ const AddItemScreen = () => {
       router.back();
     } catch (error) {
       console.error("Error submitting item:", error);
-      Alert.alert("Error", "Could not edit item. Please try again later.");
+      Alert.alert("Error", "Could not add item. Please try again later.");
     } finally {
       setLoading(false);
     }

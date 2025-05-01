@@ -30,7 +30,6 @@ const DangerModal: React.FC<DangerModalProps> = ({
               if (onDone) {
                 onDone();
               }
-              console.log("this guys crazy..");
             }}
           >
             <Text testID="danger-option" style={styles.logoutText}>

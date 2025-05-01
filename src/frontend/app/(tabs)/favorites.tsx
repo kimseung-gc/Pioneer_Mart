@@ -7,13 +7,14 @@ import { useItemsStore } from "@/stores/useSearchStore";
 import ProductList from "@/components/ProductList";
 import Header from "@/components/Header";
 import Categories from "@/components/Categories";
-import { BASE_URL } from "@/config";
 import axios from "axios";
 import { Alert, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { useUserStore } from "@/stores/userStore";
 import { useFocusEffect } from "@react-navigation/native";
+import Constants from "expo-constants";
 
 const FavoritesScreen = () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
   const { authToken } = useAuth();
@@ -42,11 +43,10 @@ const FavoritesScreen = () => {
   );
 
   const handleRequestAllItems = async () => {
-    if (!authToken || filteredItems.length <= 1) return;
+    if (!authToken || notRequestedItems.length < 1) return;
     setIsRequesting(true);
     let successCount = 0;
     let failCount = 0;
-
     try {
       for (const item of notRequestedItems) {
         try {
@@ -90,8 +90,6 @@ const FavoritesScreen = () => {
       }
     }
   };
-  console.log(notRequestedItems);
-
   return (
     <>
       <Stack.Screen
@@ -122,6 +120,7 @@ const FavoritesScreen = () => {
               isRequesting && styles.floatingButtonDisabled,
             ]}
             onPress={handleRequestAllItems}
+            // onPress={() => console.log("Hello")}
             disabled={isRequesting}
           >
             <Text style={styles.floatingButtonText}>

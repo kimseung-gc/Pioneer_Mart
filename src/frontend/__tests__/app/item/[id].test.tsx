@@ -4,16 +4,15 @@ import {
   screen,
   fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react-native";
 import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemDetails from "@/app/item/[id]";
 import { useUserStore } from "@/stores/userStore";
-import { BASE_URL } from "@/config";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { ItemType } from "@/types/types";
+import Constants from "expo-constants";
 
 // Mock the required dependencies
 jest.mock("expo-router", () => ({
@@ -51,6 +50,7 @@ jest.mock("@/components/SingleItem", () => "SingleItem");
 jest.mock("@/components/ZoomModal", () => "ZoomModal");
 
 describe("ItemDetails Component", () => {
+  const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const mockItem: ItemType = {
     id: 1,
     title: "Test Item",

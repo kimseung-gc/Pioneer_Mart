@@ -13,7 +13,13 @@ describe("Categories Component", () => {
     (useItemsStore as unknown as jest.Mock).mockReturnValue({
       screens: {
         home: {
-          selectedCategory: null,
+          selectedCategory: 2,
+          filterOptions: {
+            priceRange: [10, 100],
+            hasActivePurchaseRequest: false,
+            isSold: false,
+            sortByPrice: null,
+          },
         },
       },
       filterByCategory: mockFilterByCategory,
@@ -62,6 +68,12 @@ describe("Categories Component", () => {
       screens: {
         home: {
           selectedCategory: 2,
+          filterOptions: {
+            priceRange: [10, 100],
+            hasActivePurchaseRequest: false,
+            isSold: false,
+            sortByPrice: null,
+          },
         },
       },
       filterByCategory: mockFilterByCategory,

@@ -1,8 +1,8 @@
 import { AuthContextType } from "@/app/contexts/AuthContext";
-import { BASE_URL } from "@/config";
 import { PaginatedResponse } from "@/types/api";
 import { CategoryType, ItemType, ScreenId } from "@/types/types";
 import axios from "axios";
+import Constants from "expo-constants";
 import { create } from "zustand";
 
 // interface for filters
@@ -85,6 +85,7 @@ const initialScreenState: ScreenState = {
   hasMore: false,
 };
 
+const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
 export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   //initial states
   screens: {
@@ -490,7 +491,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else if (screenId === "reported") {
         endpoint = `api/items/search_reported_items/?${query}`; // TODO
       }
-      console.log("This is the endpoint:", endpoint);
       const response = await axios.get<PaginatedResponse<ItemType>>(
         `${BASE_URL}/${endpoint}`,
         {
@@ -899,7 +899,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
 
         return { screens: updatedScreens };
       });
-      console.log("\n\nreported:", itemId, "\n\n");
     } catch (error: any) {
       if (error.response) {
         console.log("Error reporting item:", error.response.data);

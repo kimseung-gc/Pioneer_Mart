@@ -8,6 +8,7 @@ export type AuthContextType = {
   setAuthToken: (token: string | null) => void;
   isAuthenticated: boolean;
   onLogout: () => Promise<void>; //promise to log user out...going to use it with await
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     // Load token from storage when the app starts
     const loadToken = async () => {
@@ -27,6 +28,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error("Failed to load auth token", error);
+      } finally {
+        setLoading(false);
       }
     };
     loadToken();
@@ -49,6 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         authToken,
         setAuthToken,
         isAuthenticated: !!authToken,
+        loading,
         onLogout,
       }}
     >
