@@ -114,49 +114,6 @@ const PurchaseRequests = () => {
   };
 
   /**
-   * @function cancelRequest
-   * @async
-   * @param {number} requestId - The ID of the purchase request to cancel.
-   * @description Sends a request to the backend API to cancel a specific purchase request.
-   * Upon successful cancellation, it updates the local `sentRequests` state to remove the cancelled request.
-   * Handles potential errors during the cancellation process.
-   */
-  const cancelRequest = async (requestId: number) => {
-    try {
-      const cleanToken = authToken?.trim();
-      await axios.post(
-        `${BASE_URL}/api/requests/${requestId}/cancel/`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-            Accept: "application/json",
-          },
-        }
-      );
-
-      // // Update the local state to remove the cancelled request
-      // setSentRequests((prevRequests) =>
-      //   prevRequests.filter((request) => request.id !== requestId)
-      // );
-
-      // update each cancelled request's staate to cancelled & is active to false
-      setSentRequests((prevRequests) =>
-        prevRequests.map((request) =>
-          request.id === requestId
-            ? { ...request, status: "cancelled" }
-            : request
-        )
-      );
-      alert("Purchase request cancelled successfully");
-    } catch (error) {
-      console.error("Error cancelling request:", error);
-      alert("Failed to cancel purchase request. Please try again later.");
-    }
-  };
-
-  /**
    * @function acceptRequest
    * @async
    * @param {number} requestId - The ID of the purchase request to accept.
@@ -261,7 +218,7 @@ const PurchaseRequests = () => {
                   prevRequests.filter((request) => request.id !== requestId)
                 );
               }
-              alert("Request cancelled & removed");
+              alert("Request cancelled & deleted");
             } catch (error) {
               console.error("Error removing request:", error);
               alert("Failed to remove request. Please try again later");
@@ -286,8 +243,6 @@ const PurchaseRequests = () => {
         return "#2ecc71"; // Green
       case "declined":
         return "#e74c3c"; // Red
-      case "cancelled":
-        return "#95a5a6"; // Gray
       default:
         return "#3498db"; // Blue (default)
     }
@@ -325,15 +280,6 @@ const PurchaseRequests = () => {
 
           {item.status === "pending" && (
             <View style={styles.actionButtonsContainer}>
-              {activeTab === "sent" && (
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => cancelRequest(item.id)}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              )}
-
               {activeTab === "received" && (
                 <>
                   <TouchableOpacity
@@ -353,8 +299,11 @@ const PurchaseRequests = () => {
             </View>
           )}
           <View style={styles.removeButtonContainer}>
-            <TouchableOpacity onPress={() => removeRequest(item.id)}>
-              <Text style={styles.removeButtonText}>Remove</Text>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => removeRequest(item.id)}
+            >
+              <Text style={styles.removeButtonText}>Delete Request</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -527,17 +476,6 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 10,
   },
-  cancelButton: {
-    backgroundColor: "#ff4757",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    alignSelf: "flex-start",
-  },
-  cancelButtonText: {
-    color: "black",
-    fontWeight: "500",
-  },
   acceptButton: {
     backgroundColor: "#2ecc71",
     paddingVertical: 8,
@@ -565,6 +503,12 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: "black",
     fontWeight: "500",
+  },
+  removeButton: {
+    backgroundColor: "#ff4757",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
   },
   emptyContainer: {
     padding: 20,
