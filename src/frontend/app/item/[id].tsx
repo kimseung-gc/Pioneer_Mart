@@ -54,6 +54,7 @@ import ZoomModal from "@/components/ZoomModal";
 import { useItemsStore } from "@/stores/useSearchStore";
 import ReportModal from "@/components/ReportModal";
 import Constants from "expo-constants";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -166,6 +167,39 @@ const ItemDetails = () => {
 
   const closeModal = () => {
     setIsVisible(false);
+  };
+
+  const handleDelete = async () => {
+    if (!id) {
+      console.log("No item Id provided");
+      setIsLoading(false);
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const cleanToken = authToken?.trim();
+      const response = await axios.delete(
+        `${BASE_URL}/api/items/${id}/delete_item/`,
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
+          timeout: 10000,
+        }
+      );
+      Toast.show({
+        type: "success",
+        text1: "Item deleted successfully",
+      });
+      router.replace("/(tabs)");
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to delete item. Please try again",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePurchaseRequest = React.useCallback(
@@ -339,20 +373,28 @@ const ItemDetails = () => {
           <Text style={styles.title}>Date Posted: {item.created_at}</Text>
           <Text style={styles.title}>Category: {item.category_name}</Text>
           {isOwner && (
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => {
-                router.push({
-                  pathname: "/item/[id]/edit",
-                  params: {
-                    id: item.id.toString(),
-                    item: JSON.stringify(item),
-                  },
-                });
-              }}
-            >
-              <Text style={styles.buttonText}>Edit Listing</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => {
+                  router.push({
+                    pathname: "/item/[id]/edit",
+                    params: {
+                      id: item.id.toString(),
+                      item: JSON.stringify(item),
+                    },
+                  });
+                }}
+              >
+                <Text style={styles.buttonText}>Edit Listing</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+              >
+                <Text style={styles.buttonText}>Delete Item</Text>
+              </TouchableOpacity>
+            </>
           )}
 
           {source !== "myItems" && !isOwner && (
@@ -474,6 +516,14 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: "#4CAF50",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+  deleteButton: {
+    backgroundColor: "red",
     padding: 15,
     borderRadius: 5,
     marginTop: 20,
