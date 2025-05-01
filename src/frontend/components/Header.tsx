@@ -8,7 +8,7 @@ import React, { useEffect } from "react";
 import { ScreenId } from "@/types/types";
 import { useChatStore } from "@/stores/chatStore";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { Badge } from "react-native-elements";
+import { Badge } from "react-native-paper";
 
 type HeaderProps = {
   screenId: ScreenId;
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
     }
     const intervalId = setInterval(() => {
       fetchUnreadCount(authToken);
-    }, 60000); // check unread count every minute
+    }, 120000); // check unread count every minute
 
     return () => clearInterval(intervalId);
   }, [authToken]); //runs when authToken changes
@@ -68,14 +68,18 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
                 <Entypo name="chat" size={24} color="black" />
                 {unreadCount > 0 && (
                   <Badge
-                    value={unreadCount > 99 ? "99+" : unreadCount}
-                    status="error"
-                    containerStyle={{
+                    style={{
                       position: "absolute",
                       top: -4,
                       right: -4,
+                      backgroundColor: "red",
+                      color: "white",
+                      fontSize: 10,
                     }}
-                  />
+                    size={18}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
                 )}
               </TouchableOpacity>
             </View>
@@ -94,10 +98,18 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
               <Entypo name="chat" size={24} color="black" />
               {unreadCount > 0 && (
                 <Badge
-                  value={unreadCount > 99 ? "99+" : unreadCount}
-                  status="error"
-                  containerStyle={{ position: "absolute", top: -8, right: -8 }}
-                />
+                  style={{
+                    position: "absolute",
+                    top: -8,
+                    right: -8,
+                    backgroundColor: "red",
+                    color: "white",
+                    fontSize: 10,
+                  }}
+                  size={18}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
               )}
             </TouchableOpacity>
           </View>

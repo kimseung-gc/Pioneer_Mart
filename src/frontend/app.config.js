@@ -23,6 +23,7 @@ module.exports = {
       supportsTablet: true
     },
     android: {
+      package: "com.khalidmu.pioneermart",
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
