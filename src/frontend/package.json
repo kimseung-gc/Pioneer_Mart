@@ -17,14 +17,14 @@
       "./setupTests.tsx"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)|@react-native-async-storage/async-storage"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@ptomasroos/react-native-multi-slider)|@react-native-async-storage/async-storage"
     ]
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@openspacelabs/react-native-zoomable-view": "^2.3.1",
+    "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-native-async-storage/async-storage": "1.23.1",
-    "@react-native-community/slider": "4.5.5",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
@@ -36,6 +36,7 @@
     "expo-blur": "~14.0.3",
     "expo-camera": "~16.0.18",
     "expo-constants": "~17.0.8",
+    "expo-dev-client": "~5.0.20",
     "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
     "expo-image-picker": "~16.0.6",
@@ -59,8 +60,7 @@
     "react-native-toast-message": "^2.3.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "zustand": "^5.0.3",
-    "expo-dev-client": "~5.0.20"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

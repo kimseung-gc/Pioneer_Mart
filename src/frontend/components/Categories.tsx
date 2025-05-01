@@ -9,7 +9,7 @@ import {
   FlatList,
   Switch,
 } from "react-native";
-import Slider from "@react-native-community/slider";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { CategoryType, ScreenId } from "@/types/types";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -55,12 +55,14 @@ const Categories: React.FC<CategoriesProps> = ({
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [localFilterOptions, setLocalFilterOptions] =
     useState<FilterOptions>(filterOptions);
-
-  // // default filter values
-  // const [filterOptions, setFilterOptions] = useState<FilterOptions>(storeFilterOptions);
+  // memoisze price values to prevent excessive re-renders
+  const [sliderValues, setSliderValues] = useState<[number, number]>(
+    filterOptions.priceRange
+  );
 
   useEffect(() => {
     setLocalFilterOptions(filterOptions);
+    setSliderValues(filterOptions.priceRange);
   }, [filterOptions]);
 
   const handleCategorySelect = (categoryId: string | null) => {
@@ -71,7 +73,11 @@ const Categories: React.FC<CategoriesProps> = ({
 
   const handleFilterApply = () => {
     // console.log("Applying filters:", filterOptions);
-    useItemsStore.getState().applyFilters(screenId, localFilterOptions);
+    const updatedFilterOptions = {
+      ...localFilterOptions,
+      priceRange: sliderValues,
+    };
+    useItemsStore.getState().applyFilters(screenId, updatedFilterOptions);
     setFilterModalVisible(false);
   };
 
@@ -83,7 +89,12 @@ const Categories: React.FC<CategoriesProps> = ({
       sortByPrice: null,
     };
     setLocalFilterOptions(defaultFilters);
+    setSliderValues([0, 1000]);
     useItemsStore.getState().resetFilters(screenId);
+  };
+
+  const handlePriceRangeChange = (values: number[]) => {
+    setSliderValues([values[0], values[1]]);
   };
 
   return (
@@ -246,24 +257,57 @@ const Categories: React.FC<CategoriesProps> = ({
                 <Text style={styles.filterSectionTitle}>Price Range</Text>
                 <View style={styles.priceRangeContainer}>
                   <Text style={styles.priceLabel}>
-                    ${localFilterOptions.priceRange[0]} - $
-                    {localFilterOptions.priceRange[1]}
+                    ${sliderValues[0]} - ${sliderValues[1]}
                   </Text>
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={0}
-                    maximumValue={1000}
-                    step={10}
-                    value={localFilterOptions.priceRange[1]}
-                    minimumTrackTintColor="#4285F4"
-                    maximumTrackTintColor="#ECECEC"
-                    onValueChange={(value) =>
-                      setLocalFilterOptions({
-                        ...localFilterOptions,
-                        priceRange: [localFilterOptions.priceRange[0], value],
-                      })
-                    }
-                  />
+                  <View style={styles.sliderContainer}>
+                    <MultiSlider
+                      values={[sliderValues[0], sliderValues[1]]}
+                      min={0}
+                      max={1000}
+                      step={10}
+                      sliderLength={280}
+                      onValuesChange={handlePriceRangeChange}
+                      allowOverlap={false}
+                      minMarkerOverlapDistance={10}
+                      snapped
+                      selectedStyle={{
+                        backgroundColor: "#4285F4",
+                      }}
+                      unselectedStyle={{
+                        backgroundColor: "#ECECEC",
+                      }}
+                      containerStyle={{
+                        height: 40,
+                      }}
+                      markerStyle={{
+                        backgroundColor: "#4285F4",
+                        height: 24,
+                        width: 24,
+                        borderRadius: 12,
+                        borderWidth: 2,
+                        borderColor: "#FFFFFF",
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1,
+                        elevation: 2,
+                      }}
+                      pressedMarkerStyle={{
+                        backgroundColor: "#2A73E8",
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                      }}
+                      trackStyle={{
+                        height: 6,
+                        borderRadius: 3,
+                      }}
+                    />
+                  </View>
+                  <View style={styles.priceRangeLabels}>
+                    <Text style={styles.priceRangeLabel}>$0</Text>
+                    <Text style={styles.priceRangeLabel}>$1000</Text>
+                  </View>
                 </View>
               </View>
               {/* sort by price section */}
@@ -531,10 +575,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     marginBottom: 8,
+    textAlign: "center",
   },
-  slider: {
-    width: "100%",
-    height: 40,
+  sliderContainer: {
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  priceRangeLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginTop: 5,
+  },
+  priceRangeLabel: {
+    fontSize: 12,
+    color: "#888",
   },
   sortOptionsContainer: {
     flexDirection: "row",
