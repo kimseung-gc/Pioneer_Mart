@@ -76,7 +76,9 @@ CSRF_COOKIE_SECURE = True
 DEBUG = True
 
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud"]
+ALLOWED_HOSTS = [
+    "env-2325023.us.reclaim.cloud",
+]
 CSRF_TRUSTED_ORIGINS = ["https://env-2325023.us.reclaim.cloud"]
 # Application definition
 
@@ -242,7 +244,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # MEDIA_URL = "media/"
-MEDIA_URL = f"https://{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.{os.getenv("AWS_S3_REGION_NAME")}.amazonaws.com/"
+MEDIA_URL = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.{os.getenv("AWS_S3_REGION_NAME")}.amazonaws.com/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type
