@@ -44,9 +44,6 @@ from pathlib import Path
 #     from AUTHKEY import config_github
 
 #     config = config_github
-from AUTHKEY import config_github
-
-config = config_github
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +62,15 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    try:
+        from AUTHKEY import config_github
+
+        SECRET_KEY = config_github.SECRET_KEY
+    except ImportError:
+        raise RuntimeError(
+            "SECRET_KEY not set and config_github.py could not be imported."
+        )
 
 # security settings for https
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
