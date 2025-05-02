@@ -244,7 +244,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # MEDIA_URL = "media/"
-MEDIA_URL = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.{os.getenv("AWS_S3_REGION_NAME")}.amazonaws.com/"
+MEDIA_URL = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.{os.getenv('AWS_S3_REGION_NAME')}.amazonaws.com/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type
