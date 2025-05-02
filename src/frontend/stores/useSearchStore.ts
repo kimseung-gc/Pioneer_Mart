@@ -93,6 +93,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
     favorites: { ...initialScreenState },
     reported: { ...initialScreenState },
     myItems: { ...initialScreenState },
+    notifications: { ...initialScreenState }, 
   },
   activeScreen: "home",
   categories: [],
@@ -663,6 +664,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         "favorites",
         "myItems",
         "reported",
+        "notifications",
       ] as ScreenId[]) {
         const item = state.screens[screenKey].items.find(
           (item) => item.id === itemId
@@ -700,7 +702,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
+        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
           (screenKey) => {
             const screen = updatedScreens[screenKey];
 
@@ -798,6 +800,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         "favorites",
         "myItems",
         "reported",
+        "notifications",
       ] as ScreenId[]) {
         const item = state.screens[screenKey].items.find(
           (item) => item.id === itemId
@@ -833,7 +836,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported"] as ScreenId[]).forEach(
+        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
           (screenKey) => {
             const screen = updatedScreens[screenKey];
 
