@@ -16,4 +16,4 @@ channels==4.2.2
 psycopg2-binary>=2.9.10
 django-storages==1.14.6
 boto3==1.37.38
-python-dotenv==1.1.0
+python-dotenv==1.0.1
