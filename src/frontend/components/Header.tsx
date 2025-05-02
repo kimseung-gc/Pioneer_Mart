@@ -9,12 +9,14 @@ import { ScreenId } from "@/types/types";
 import { useChatStore } from "@/stores/chatStore";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { Badge } from "react-native-paper";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 type HeaderProps = {
   screenId: ScreenId;
 };
 
 const Header: React.FC<HeaderProps> = ({ screenId }) => {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const route = useRoute();
   const { unreadCount, fetchUnreadCount } = useChatStore();
@@ -45,7 +47,12 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
     router.push("/ChatRoomScreen");
   };
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, paddingTop: insets.top },
+      ]}
+    >
       {route.name === "additionalinfo/MyItems" ||
       route.name == "additionalinfo/ReportedItems" ? (
         <View style={styles.myItemsContainer}>
@@ -123,10 +130,16 @@ export default Header;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
     paddingHorizontal: 16,
     paddingBottom: 12,
+    backgroundColor: "#FFF9F0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4, // for Android
   },
+
   myItemsContainer: {
     flexDirection: "row",
     alignItems: "center",

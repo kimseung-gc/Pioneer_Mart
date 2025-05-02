@@ -1,8 +1,10 @@
 import { Stack, Tabs } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React from "react";
+import React, { useRef } from "react";
 import { AppInitialier } from "@/components/AppInitializer";
+import { Animated, Pressable } from "react-native";
+import { AnimatedTabBarButton } from "@/components/AnimatedTabBarButton";
 
 // This defines the basic layout of the app after user's logged in
 export default function TabLayout() {
@@ -17,7 +19,24 @@ export default function TabLayout() {
         }}
       />
       <AppInitialier />
-      <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: "#FFF9F0",
+            borderTopColor: "#FFE0B2",
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 6,
+          },
+          tabBarActiveTintColor: "#C98474",
+          tabBarInactiveTintColor: "#888888",
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
+          tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
@@ -45,7 +64,6 @@ export default function TabLayout() {
           name="favorites"
           options={{
             title: "Favorites",
-            tabBarBadge: 3,
             tabBarIcon: () => (
               <MaterialIcons name="favorite-outline" size={22} />
             ),

@@ -98,13 +98,6 @@ const ProductList = ({
                 : "Your"}{" "}
               {route.name === "favorites" ? "Favorites" : "Items"}
             </Text>
-            {route.name !== "favorites" &&
-              route.name !== "additionalinfo/ReportedItems" && (
-                <View style={styles.myTimeTagContainer}>
-                  <View style={styles.myItemTag} />
-                  <Text>My Items</Text>
-                </View>
-              )}
           </View>
         )}
       />
@@ -118,6 +111,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
+    backgroundColor: "#FFF9F0",
   },
   titleContainer: {
     flexDirection: "row",
@@ -160,6 +154,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   footerContainer: {
+    backgroundColor: "#FFF9F0",
     paddingVertical: 20,
     justifyContent: "center",
     alignItems: "center",

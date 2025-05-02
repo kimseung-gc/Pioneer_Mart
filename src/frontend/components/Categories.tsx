@@ -272,16 +272,16 @@ const Categories: React.FC<CategoriesProps> = ({
                       minMarkerOverlapDistance={10}
                       snapped
                       selectedStyle={{
-                        backgroundColor: "#4285F4",
+                        backgroundColor: "#A25E5E",
                       }}
                       unselectedStyle={{
-                        backgroundColor: "#ECECEC",
+                        backgroundColor: "#EADFD2",
                       }}
                       containerStyle={{
                         height: 40,
                       }}
                       markerStyle={{
-                        backgroundColor: "#4285F4",
+                        backgroundColor: "#A25E5E",
                         height: 24,
                         width: 24,
                         borderRadius: 12,
@@ -294,7 +294,7 @@ const Categories: React.FC<CategoriesProps> = ({
                         elevation: 2,
                       }}
                       pressedMarkerStyle={{
-                        backgroundColor: "#2A73E8",
+                        backgroundColor: "#8E4F4F",
                         height: 30,
                         width: 30,
                         borderRadius: 15,
@@ -395,7 +395,7 @@ const Categories: React.FC<CategoriesProps> = ({
                     Has Active Purchase Requests
                   </Text>
                   <Switch
-                    trackColor={{ false: "#ECECEC", true: "#4285F4" }}
+                    trackColor={{ false: "#ECECEC", true: "#A25E5E" }}
                     thumbColor="#FFFFFF"
                     ios_backgroundColor="#ECECEC"
                     onValueChange={(value) =>
@@ -456,13 +456,13 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EFF4FE",
+    backgroundColor: "#F5E3DC",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
   },
   filterText: {
-    color: "#4285F4",
+    color: "#A25E5E",
     fontSize: 12,
     fontWeight: "500",
     marginLeft: 4,
@@ -485,17 +485,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginHorizontal: 5,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F5E3DC",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#EADFD2",
   },
   selectedCategory: {
-    backgroundColor: "#4285F4",
-    borderColor: "#4285F4",
+    backgroundColor: "#A25E5E",
+    borderColor: "#A25E5E",
   },
   categoryText: {
     fontSize: 14,
-    color: "#333",
+    color: "#4A4A4A",
   },
   selectedCategoryText: {
     color: "white",
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: "#FFF9F0",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 30,
@@ -535,6 +535,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#4A4A4A",
   },
   modalCategoryItem: {
     flexDirection: "row",
@@ -549,10 +550,10 @@ const styles = StyleSheet.create({
   },
   modalCategoryText: {
     fontSize: 16,
-    color: "#333",
+    color: "#4A4A4A",
   },
   modalSelectedCategoryText: {
-    color: "#4285F4",
+    color: "#A25E5E",
     fontWeight: "500",
   },
   filterScrollView: {
@@ -604,17 +605,17 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
     borderRadius: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F5E3DC",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#EADFD2",
   },
   selectedSortOption: {
-    backgroundColor: "#4285F4",
-    borderColor: "#4285F4",
+    backgroundColor: "#A25E5E",
+    borderColor: "#A25E5E",
   },
   sortOptionText: {
     fontSize: 14,
-    color: "#333",
+    color: "#4A4A4A",
   },
   selectedSortOptionText: {
     color: "white",
@@ -653,11 +654,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
-    backgroundColor: "#4285F4",
+    backgroundColor: "#A25E5E",
   },
   applyButtonText: {
-    fontSize: 14,
     color: "white",
     fontWeight: "500",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });

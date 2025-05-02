@@ -111,7 +111,6 @@ describe("TabLayout Component", () => {
         name: "favorites",
         options: expect.objectContaining({
           title: "Favorites",
-          tabBarBadge: 3,
           tabBarIcon: expect.any(Function),
         }),
       }),

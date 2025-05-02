@@ -12,8 +12,10 @@ import { useUserStore } from "@/stores/userStore";
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
 const FavoritesScreen = () => {
+  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
@@ -98,37 +100,39 @@ const FavoritesScreen = () => {
           header: () => <Header screenId={screenId} />,
         }}
       />
-      <Categories screenId={screenId} categories={categories} />
-      <ProductList
-        items={filteredItems}
-        isLoading={isLoading}
-        source={"favorites"}
-      />
-      {notRequestedItems.length > 0 && (
-        <View style={styles.floatingButtonContainer}>
-          {requestSuccess && (
-            <View style={styles.successMessageContainer}>
-              <Text style={styles.successMessage}>
-                Request sent successfully!
-              </Text>
-            </View>
-          )}
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Categories screenId={screenId} categories={categories} />
+        <ProductList
+          items={filteredItems}
+          isLoading={isLoading}
+          source={"favorites"}
+        />
+        {notRequestedItems.length > 0 && (
+          <View style={styles.floatingButtonContainer}>
+            {requestSuccess && (
+              <View style={styles.successMessageContainer}>
+                <Text style={styles.successMessage}>
+                  Request sent successfully!
+                </Text>
+              </View>
+            )}
 
-          <TouchableOpacity
-            style={[
-              styles.floatingButton,
-              isRequesting && styles.floatingButtonDisabled,
-            ]}
-            onPress={handleRequestAllItems}
-            // onPress={() => console.log("Hello")}
-            disabled={isRequesting}
-          >
-            <Text style={styles.floatingButtonText}>
-              {isRequesting ? "Requesting..." : "Request All"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            <TouchableOpacity
+              style={[
+                styles.floatingButton,
+                isRequesting && styles.floatingButtonDisabled,
+              ]}
+              onPress={handleRequestAllItems}
+              // onPress={() => console.log("Hello")}
+              disabled={isRequesting}
+            >
+              <Text style={styles.floatingButtonText}>
+                {isRequesting ? "Requesting..." : "Request All"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </>
   );
 };

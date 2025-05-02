@@ -17,9 +17,11 @@ import DangerModal from "@/components/DangerModal";
 import AsyncStorage from "@react-native-async-storage/async-storage"; //qwerty
 import api from "@/types/api"; //qwerty
 import Constants from "expo-constants";
+import { useTheme } from "../contexts/ThemeContext";
 
 const ProfileScreen = () => {
   const { authToken, onLogout } = useAuth();
+  const { colors } = useTheme();
   const [isClearHistoryVisible, setIsClearHistoryVisible] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
   const insets = useSafeAreaInsets();
@@ -85,7 +87,12 @@ const ProfileScreen = () => {
   }
 
   return (
-    <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, paddingTop: insets.top },
+      ]}
+    >
       <DangerModal
         isVisible={isClearHistoryVisible}
         onClose={closeClearHistoryModal}
