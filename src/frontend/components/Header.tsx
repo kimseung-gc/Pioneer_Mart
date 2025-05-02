@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchBar from "./SearchBar";
 import { useRoute, useFocusEffect } from "@react-navigation/native";
@@ -44,11 +44,16 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
   const handleChatPress = () => {
     router.push("/ChatRoomScreen");
   };
+
+  const isNotificationScreen = screenId === "notifications";
+  const showBackButton =
+    route.name === "additionalinfo/MyItems" ||
+    route.name === "additionalinfo/ReportedItems";
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {route.name === "additionalinfo/MyItems" ||
-      route.name == "additionalinfo/ReportedItems" ? (
-        <View style={styles.myItemsContainer}>
+      {showBackButton ? (
+        <View style={styles.row}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
@@ -56,63 +61,48 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
           >
             <Entypo name="chevron-left" size={24} color="black" />
           </TouchableOpacity>
-          <View style={styles.myItemsContainer}>
-            <View style={styles.searchContainer}>
-              <SearchBar screenId={screenId} />
-            </View>
-            <View style={styles.iconContainer}>
-              <TouchableOpacity
-                onPress={handleChatPress}
-                style={{ position: "relative" }}
-              >
-                <Entypo name="chat" size={24} color="black" />
-                {unreadCount > 0 && (
-                  <Badge
-                    style={{
-                      position: "absolute",
-                      top: -4,
-                      right: -4,
-                      backgroundColor: "red",
-                      color: "white",
-                      fontSize: 10,
-                    }}
-                    size={18}
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </Badge>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      ) : (
-        <View style={styles.myItemsContainer}>
-          <View style={styles.searchContainer}>
-            <SearchBar screenId={screenId} />
-          </View>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={handleChatPress}
-              style={{ position: "relative" }}
-            >
+          <View style={styles.row}>
+            {!isNotificationScreen && (
+              <View style={styles.searchContainer}>
+                <SearchBar screenId={screenId} />
+              </View>
+            )}
+            <TouchableOpacity onPress={handleChatPress} style={styles.chatWrapper}>
               <Entypo name="chat" size={24} color="black" />
               {unreadCount > 0 && (
-                <Badge
-                  style={{
-                    position: "absolute",
-                    top: -8,
-                    right: -8,
-                    backgroundColor: "red",
-                    color: "white",
-                    fontSize: 10,
-                  }}
-                  size={18}
-                >
+                <Badge style={styles.badge} size={18}>
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Badge>
               )}
             </TouchableOpacity>
           </View>
+        </View>
+      ) : isNotificationScreen ? (
+        <View style={styles.titleRow}>
+          <View style={{ width: 24 }} /> {/* Left spacer for symmetry */}
+          <Text style={styles.titleText}>Notifications</Text>
+          <TouchableOpacity onPress={handleChatPress} style={styles.chatWrapper}>
+            <Entypo name="chat" size={24} color="black" />
+            {unreadCount > 0 && (
+              <Badge style={styles.badge} size={18}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Badge>
+            )}
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.row}>
+          <View style={styles.searchContainer}>
+            <SearchBar screenId={screenId} />
+          </View>
+          <TouchableOpacity onPress={handleChatPress} style={styles.chatWrapper}>
+            <Entypo name="chat" size={24} color="black" />
+            {unreadCount > 0 && (
+              <Badge style={styles.badge} size={18}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Badge>
+            )}
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -127,28 +117,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
-  myItemsContainer: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: "95%",
   },
-  backButton: {
-    marginTop: 16,
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   searchContainer: {
     flex: 1,
   },
+  titleText: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+    flex: 1,
+  },
   chatWrapper: {
+    width: 24,
+    alignItems: "flex-end",
     justifyContent: "center",
-    alignItems: "center",
     position: "relative",
   },
-  chatIcon: {
-    zIndex: 2, //so that icon stays on the top
+  badge: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: "red",
+    color: "white",
+    fontSize: 10,
   },
-  iconContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+  backButton: {
+    marginTop: 16,
   },
 });
