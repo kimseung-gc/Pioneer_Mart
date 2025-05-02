@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import {
   TouchableOpacity,
@@ -20,16 +19,17 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import Toast from "react-native-toast-message";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const width = Dimensions.get("window").width;
 const OtpScreen = () => {
   const { email } = useLocalSearchParams();
   const [otp, setOtp] = useState("");
-  const { setAuthToken } = useAuth();
+  const { setTokens } = useAuth();
 
   const verifyOtp = async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/verify-otp/`,
         {
           email,
@@ -38,8 +38,7 @@ const OtpScreen = () => {
       );
       const { access, refresh } = response.data;
       if (access && refresh) {
-        await AsyncStorage.setItem("authToken", access);
-        setAuthToken(access); //update the context
+        await setTokens(access, refresh);
         Toast.show({
           type: "success",
           text1: "Logged in successfully",

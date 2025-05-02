@@ -1,10 +1,10 @@
 import WelcomeScreen from "@/app/(auth)";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
 import { useAuth } from "@/app/contexts/AuthContext";
+import api from "@/types/api";
 
 jest.mock("@/app/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
@@ -174,14 +174,14 @@ describe("WelcomeScreen Component", () => {
 
     const sendCodeButton = component.getByText("Send Code");
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
-    // Just checking that axios was called with the correct email
-    expect(axios.post).toHaveBeenCalledWith(
+    // Just checking that api was called with the correct email
+    expect(api.post).toHaveBeenCalledWith(
       expect.stringContaining("/otpauth/request-otp/"),
       {
         email: "khalidmu@grinnell.edu",
@@ -210,14 +210,14 @@ describe("WelcomeScreen Component", () => {
       fireEvent.changeText(emailInput, "khalidmu"); //username for my email
     });
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalled();
+      expect(api.post).toHaveBeenCalled();
       expect(router.push).toHaveBeenCalledWith({
         pathname: "/(auth)/OtpScreen",
         params: { email: "khalidmu@grinnell.edu" },
@@ -249,14 +249,14 @@ describe("WelcomeScreen Component", () => {
     });
 
     // This si for all the godforsaken networks errors we've been getting when testing the whole thing
-    (axios.post as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
+    (api.post as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalled();
+      expect(api.post).toHaveBeenCalled();
       expect(Alert.alert).toHaveBeenCalledWith("Failed to do OTP stuff");
       // Make sure we didn't navigate
       expect(router.push).not.toHaveBeenCalled();
@@ -284,7 +284,7 @@ describe("WelcomeScreen Component", () => {
     });
 
     // should still attempt the request with empty string
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       expect.stringContaining("/otpauth/request-otp/"),
       {
         email: "@grinnell.edu",
@@ -313,13 +313,13 @@ describe("WelcomeScreen Component", () => {
 
     const sendCodeButton = getByText("Send Code");
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       expect.any(String),
       {
         email: "testuser@grinnell.edu",

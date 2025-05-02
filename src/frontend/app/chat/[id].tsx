@@ -19,6 +19,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const ChatScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -91,7 +92,7 @@ const ChatScreen = () => {
   const markRoomAsRead = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
         {},
         {
@@ -109,7 +110,7 @@ const ChatScreen = () => {
   const fetchChatHistory = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();
-      const response = await axios.get(
+      const response = await api.get(
         `${BASE_URL}/api/chat/history/${roomId}/`,
         {
           headers: {

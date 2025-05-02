@@ -8,12 +8,12 @@ import {
 } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import InputField from "@/components/InputField";
 import TCModal from "@/components/TCModal";
 import { useAuth } from "../contexts/AuthContext";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 type Props = {};
 
@@ -41,7 +41,7 @@ const WelcomeScreen = (props: Props) => {
     try {
       const OTP_URL = `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
       const fullEmail = email + "@grinnell.edu";
-      await axios.post(
+      await api.post(
         OTP_URL,
         {
           // response for future error checking

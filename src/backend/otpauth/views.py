@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)  # built in view from rest framework simple jwt
 from django.core.mail import send_mail
 from django.conf import settings
 import os
@@ -119,6 +122,10 @@ class VerifyOTPView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RefreshTokenView(TokenRefreshView):
+    permsision_classes = [AllowAny]
 
 
 class ContactFormView(APIView):

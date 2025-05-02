@@ -14,6 +14,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesome, Foundation, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import DangerModal from "@/components/DangerModal";
+import AsyncStorage from "@react-native-async-storage/async-storage"; //qwerty
+import api from "@/types/api"; //qwerty
+import Constants from "expo-constants";
 
 const ProfileScreen = () => {
   const { authToken, onLogout } = useAuth();
@@ -23,6 +26,25 @@ const ProfileScreen = () => {
   const router = useRouter();
 
   const { userData, isLoading, error, fetchUserData } = useUserStore();
+
+  const testprotectedendpoint = async () => {
+    //qwerty
+    try {
+      console.log("Testing protected endpoint...");
+      const response = await api.get(
+        `${Constants?.expoConfig?.extra?.apiUrl}/api/categories/`
+      );
+      console.log("Request succeeded:", response.data);
+      // Verify the token was refreshed
+      const newToken = await AsyncStorage.getItem("authToken");
+      console.log(
+        "New token after refresh:",
+        newToken?.substring(0, 10) + "..."
+      );
+    } catch (error) {
+      console.error("Test failed:", error);
+    }
+  };
 
   useEffect(() => {
     if (authToken) {
@@ -181,6 +203,22 @@ const ProfileScreen = () => {
           style={styles.logoutIcon}
         />
         <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={async () => {
+          //qwerty
+          await AsyncStorage.setItem("authToken", "invalid_token");
+          await AsyncStorage.setItem("refreshToken", "invalid_refresh_token");
+        }}
+      >
+        <MaterialIcons
+          name="logout"
+          size={22}
+          color="white"
+          style={styles.logoutIcon}
+        />
+        <Text style={styles.logoutText}>test</Text>
       </TouchableOpacity>
     </ScrollView>
   );

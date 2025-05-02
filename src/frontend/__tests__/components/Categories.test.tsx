@@ -3,7 +3,14 @@ import { render, fireEvent } from "@testing-library/react-native";
 import Categories from "../../components/Categories";
 import { useItemsStore } from "@/stores/useSearchStore";
 
-jest.mock("@/stores/useSearchStore");
+jest.mock("@/stores/useSearchStore", () => ({
+  useItemsStore: jest.fn(),
+  __esModule: true,
+}));
+
+const mockFilterByCategory = jest.fn();
+const mockApplyFilters = jest.fn();
+const mockResetFilters = jest.fn();
 
 describe("Categories Component", () => {
   const mockFilterByCategory = jest.fn();

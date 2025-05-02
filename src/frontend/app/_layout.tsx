@@ -10,6 +10,9 @@ import { AppInitialier } from "@/components/AppInitializer";
 import Toast from "react-native-toast-message";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useItemsStore } from "@/stores/useSearchStore";
+// import NetworkStatusProvider from "./contexts/OfflineProvider";
+// import NetworkStatusProvider from "./contexts/OfflineProvider";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +22,7 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
   const pathname = usePathname();
+  const setIsConnected = useItemsStore((state) => state.setIsConnected);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,6 +51,7 @@ export default function RootLayout() {
   }
 
   return (
+    // <NetworkStatusProvider>
     <AuthProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar barStyle="dark-content" backgroundColor={"#fff"} />
@@ -63,5 +68,6 @@ export default function RootLayout() {
       </GestureHandlerRootView>
       <Toast />
     </AuthProvider>
+    // </NetworkStatusProvider>
   );
 }

@@ -47,6 +47,7 @@ import axios from "axios";
 import SingleItem from "@/components/SingleItem";
 import React from "react";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const PurchaseRequests = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -75,14 +76,14 @@ const PurchaseRequests = () => {
   const fetchRequests = async () => {
     try {
       setIsLoading(true); // start loading
-      const sentResponse = await axios.get(`${BASE_URL}/api/requests/sent/`, {
+      const sentResponse = await api.get(`${BASE_URL}/api/requests/sent/`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
-      const receivedResponse = await axios.get(
+      const receivedResponse = await api.get(
         `${BASE_URL}/api/requests/received/`,
         {
           headers: {
@@ -97,7 +98,7 @@ const PurchaseRequests = () => {
       setReceivedRequests(receivedResponse.data);
     } catch (error) {
       console.error("Error fetching purchase requests:", error);
-      alert("Failed to load purchase requests. Please try again later");
+      Alert.alert("Failed to load purchase requests. Please try again later");
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -123,7 +124,7 @@ const PurchaseRequests = () => {
   const acceptRequest = async (requestId: number) => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/requests/${requestId}/accept/`,
         {},
         {
@@ -153,7 +154,7 @@ const PurchaseRequests = () => {
   const declineRequest = async (requestId: number) => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/requests/${requestId}/decline/`,
         {},
         {
@@ -199,7 +200,7 @@ const PurchaseRequests = () => {
           onPress: async () => {
             try {
               const cleanToken = authToken?.trim();
-              await axios.delete(
+              await api.delete(
                 `${BASE_URL}/api/requests/${requestId}/remove/`,
                 {
                   headers: {

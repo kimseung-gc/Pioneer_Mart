@@ -59,6 +59,7 @@ const Categories: React.FC<CategoriesProps> = ({
   const [sliderValues, setSliderValues] = useState<[number, number]>(
     filterOptions.priceRange
   );
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLocalFilterOptions(filterOptions);
@@ -555,7 +556,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   filterScrollView: {
-    maxHeight: "60%",
+    // maxHeight: "60%",
+    // flex: 1,
   },
   filterSection: {
     paddingHorizontal: 16,

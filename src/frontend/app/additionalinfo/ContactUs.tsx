@@ -14,9 +14,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import axios from "axios";
 import { useUserStore } from "@/stores/userStore";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const ContactUs = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -34,7 +34,7 @@ const ContactUs = () => {
     try {
       const cleanToken = authToken?.trim();
       const user_email = userData?.email;
-      const response = await axios.post(
+      const response = await api.post(
         `${BASE_URL}/otpauth/contact`,
         { description, user_email },
         {

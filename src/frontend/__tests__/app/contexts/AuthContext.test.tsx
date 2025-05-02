@@ -1,6 +1,6 @@
 // Test suite for AuthContext
 
-import { AuthProvider, useAuth } from "@/app/contexts/AuthContext";
+// import AuthProvider, { useAuth } from "@/app/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
@@ -19,6 +19,10 @@ beforeAll(() => {
 afterAll(() => {
   (console.error as jest.Mock).mockRestore();
 });
+
+// dedicted unmock cause of auth error
+jest.unmock("@/app/contexts/AuthContext");
+import { AuthProvider, useAuth } from "@/app/contexts/AuthContext";
 
 describe("AuthContext", () => {
   //ensure all mock functions are cleared before testing...prevent state from leading bw tests
@@ -59,12 +63,21 @@ describe("AuthContext", () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AuthProvider>{children}</AuthProvider>
     );
+
     const { result } = renderHook(() => useAuth(), { wrapper });
-    act(() => {
-      result.current.setAuthToken("new-token"); //setting new token
+
+    await act(async () => {
+      await result.current.setTokens("new-token", "new-refresh-token");
     });
-    expect(result.current.authToken).toBe("new-token"); //check if updated token
-    expect(result.current.isAuthenticated).toBe(true); //isAuthenticated is now true
+
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith("authToken", "new-token");
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      "refreshToken",
+      "new-refresh-token"
+    );
+    expect(result.current.authToken).toBe("new-token");
+    expect(result.current.refreshToken).toBe("new-refresh-token");
+    expect(result.current.isAuthenticated).toBe(true);
   });
 
   it("logs out user and redireccts to authscreen", async () => {

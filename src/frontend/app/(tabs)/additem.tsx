@@ -15,11 +15,10 @@ import {
   TouchableWithoutFeedback,
   FlatList,
 } from "react-native";
-import axios from "axios";
 import { router } from "expo-router";
 import { UserInfo } from "@/types/types";
 import { useAuth } from "../contexts/AuthContext";
-import { PaginatedResponse } from "@/types/api";
+import api, { PaginatedResponse } from "@/types/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CameraModal from "@/components/CameraModal";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -39,7 +38,7 @@ const sightEngineTextModeration = async (text: string) => {
   textFormData.append("api_secret", SE_SECRET_KEY);
   textFormData.append("mode", "rules");
   textFormData.append("categories", "profanity,drug,extremism,violence");
-  const response = await axios.post(
+  const response = await api.post(
     "https://api.sightengine.com/1.0/text/check.json",
     textFormData,
     {
@@ -106,7 +105,7 @@ const AddItemScreen = () => {
     // this gets the user's data but I don't think we need it paginated. I'll keep it for nw tho
     try {
       const cleanToken = authToken.trim();
-      const response = await axios.get<PaginatedResponse<UserInfo>>(
+      const response = await api.get<PaginatedResponse<UserInfo>>(
         `${BASE_URL}/api/users/`,
         {
           headers: {
@@ -330,7 +329,7 @@ const AddItemScreen = () => {
           console.log(SE_API_USER);
           console.log(SE_WORKFLOW);
           console.log(SE_SECRET_KEY);
-          const sightEngineResponse = await axios.post(
+          const sightEngineResponse = await api.post(
             "https://api.sightengine.com/1.0/check-workflow.json",
             sightEngineFormData,
             {
@@ -361,7 +360,7 @@ const AddItemScreen = () => {
       const formDataObj = createFormData();
       const cleanToken = authToken?.trim();
       console.log(BASE_URL);
-      const response = await axios.post(`${BASE_URL}/api/items/`, formDataObj, {
+      const response = await api.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${cleanToken}`,

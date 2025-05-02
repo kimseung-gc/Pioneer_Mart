@@ -55,6 +55,7 @@ import { useItemsStore } from "@/stores/useSearchStore";
 import ReportModal from "@/components/ReportModal";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
+import api from "@/types/api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -115,7 +116,7 @@ const ItemDetails = () => {
     try {
       setIsLoading(true);
       const cleanToken = authToken?.trim();
-      const response = await axios.get(`${BASE_URL}/api/items/${id}/`, {
+      const response = await api.get(`${BASE_URL}/api/items/${id}/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",
@@ -178,7 +179,7 @@ const ItemDetails = () => {
     try {
       setIsLoading(true);
       const cleanToken = authToken?.trim();
-      const response = await axios.delete(
+      const response = await api.delete(
         `${BASE_URL}/api/items/${id}/delete_item/`,
         {
           headers: {
@@ -208,7 +209,7 @@ const ItemDetails = () => {
 
       try {
         const cleanToken = authToken?.trim();
-        const response = await axios.post(
+        const response = await api.post(
           `${BASE_URL}/api/items/${item.id}/request_purchase/`,
           {},
           {
@@ -259,7 +260,7 @@ const ItemDetails = () => {
 
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get(
+      const response = await api.get(
         `${BASE_URL}/api/chat/get-or-create-room/`,
         {
           params: { user_id: item.seller, item_id: item.id }, // Assuming item.seller contains the seller's user id

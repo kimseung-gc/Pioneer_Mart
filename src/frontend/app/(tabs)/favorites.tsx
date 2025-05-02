@@ -7,11 +7,11 @@ import { useItemsStore } from "@/stores/useSearchStore";
 import ProductList from "@/components/ProductList";
 import Header from "@/components/Header";
 import Categories from "@/components/Categories";
-import axios from "axios";
 import { Alert, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { useUserStore } from "@/stores/userStore";
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const FavoritesScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -50,7 +50,7 @@ const FavoritesScreen = () => {
     try {
       for (const item of notRequestedItems) {
         try {
-          await axios.post(
+          await api.post(
             `${BASE_URL}/api/items/${item.id}/request_purchase/`,
             {},
             {
