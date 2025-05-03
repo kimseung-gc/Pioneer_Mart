@@ -25,6 +25,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useItemsStore } from "@/stores/useSearchStore";
 import Toast from "react-native-toast-message";
 import Constants from "expo-constants";
+import { useTheme } from "../contexts/ThemeContext";
 
 const SE_API_USER = Constants?.expoConfig?.extra?.SE_API_USER;
 const SE_SECRET_KEY = Constants?.expoConfig?.extra?.SE_SECRET_KEY;
@@ -60,7 +61,7 @@ const AddItemScreen = () => {
     category: "", //default category
   };
   const [formData, setFormData] = useState(initialFormState);
-
+  const { colors } = useTheme();
   const [images, setImages] = useState<string[]>([]);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -431,7 +432,7 @@ const AddItemScreen = () => {
     // flex: 1 makes the SafeAreaView fill the whole screen...without it the screen goes blank
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={{ flex: 1, backgroundColor: colors.background }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
@@ -523,7 +524,12 @@ const AddItemScreen = () => {
                         <MaterialIcons name="close" size={24} color="#fff" />
                       </TouchableOpacity>
                       {index === 0 && (
-                        <View style={styles.primaryBadge}>
+                        <View
+                          style={[
+                            styles.primaryBadge,
+                            { backgroundColor: colors.accent },
+                          ]}
+                        >
                           <Text style={styles.primaryBadgeText}>Primary</Text>
                         </View>
                       )}
@@ -538,11 +544,19 @@ const AddItemScreen = () => {
             )}
             <View style={styles.imageActions}>
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <MaterialIcons name="photo-library" size={24} color="#007BFF" />
+                <MaterialIcons
+                  name="photo-library"
+                  size={24}
+                  color={colors.accent}
+                />
                 <Text style={styles.imageButtonText}>Gallery</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.imageButton} onPress={openCamera}>
-                <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
+                <MaterialIcons
+                  name="camera-alt"
+                  size={24}
+                  color={colors.accent}
+                />
                 <Text style={styles.imageButtonText}>Camera</Text>
               </TouchableOpacity>
             </View>
@@ -554,14 +568,14 @@ const AddItemScreen = () => {
           </View>
 
           <TouchableOpacity
-            style={styles.button}
+            style={styles.saveButton}
             onPress={handleSubmit}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Save Item</Text>
+              <Text style={styles.saveButtonText}>Save Item</Text>
             )}
           </TouchableOpacity>
         </ScrollView>
@@ -574,11 +588,6 @@ const AddItemScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // padding: 16,
-    backgroundColor: "#fff",
-  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -603,9 +612,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    backgroundColor: "#FFFFFF",
   },
   textarea: {
     height: 100,
+    backgroundColor: "#FFFFFF",
     textAlignVertical: "top",
   },
   pickerContainer: {
@@ -631,7 +642,6 @@ const styles = StyleSheet.create({
   },
   imageButtonText: {
     marginLeft: 8,
-    color: "#007BFF",
     fontWeight: "500",
   },
   imagePicker: {
@@ -667,7 +677,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 123, 255, 0.8)",
     padding: 4,
     alignItems: "center",
   },
@@ -684,17 +693,25 @@ const styles = StyleSheet.create({
   imagePickerText: {
     color: "#777",
   },
-  button: {
-    backgroundColor: "#007BFF",
-    borderRadius: 8,
-    padding: 16,
+  saveButton: {
+    flexDirection: "row",
     alignItems: "center",
-    marginVertical: 20,
+    justifyContent: "center",
+    backgroundColor: "#B45757",
+    paddingVertical: 14,
+    borderRadius: 30,
+    marginTop: 30,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  buttonText: {
-    color: "#fff",
+  saveButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
+    color: "#FFF9F0",
   },
   dropdownStyle: {
     borderColor: "#ddd",
@@ -734,8 +751,8 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   dropdownContainer: {
-    width: "80%",
-    maxHeight: 300,
+    width: "85%",
+    height: "70%",
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 10,

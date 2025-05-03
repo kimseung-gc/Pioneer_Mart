@@ -14,39 +14,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesome, Foundation, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import DangerModal from "@/components/DangerModal";
-import AsyncStorage from "@react-native-async-storage/async-storage"; //qwerty
-import api from "@/types/api"; //qwerty
-import Constants from "expo-constants";
 import { useTheme } from "../contexts/ThemeContext";
 
 const ProfileScreen = () => {
   const { authToken, onLogout } = useAuth();
   const { colors } = useTheme();
-  const [isClearHistoryVisible, setIsClearHistoryVisible] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
   const { userData, isLoading, error, fetchUserData } = useUserStore();
-
-  const testprotectedendpoint = async () => {
-    //qwerty
-    try {
-      console.log("Testing protected endpoint...");
-      const response = await api.get(
-        `${Constants?.expoConfig?.extra?.apiUrl}/api/categories/`
-      );
-      console.log("Request succeeded:", response.data);
-      // Verify the token was refreshed
-      const newToken = await AsyncStorage.getItem("authToken");
-      console.log(
-        "New token after refresh:",
-        newToken?.substring(0, 10) + "..."
-      );
-    } catch (error) {
-      console.error("Test failed:", error);
-    }
-  };
 
   useEffect(() => {
     if (authToken) {
@@ -60,14 +37,6 @@ const ProfileScreen = () => {
     } catch (error) {
       Alert.alert("Error", "Failed to load profile. Please try again");
     }
-  };
-
-  const openClearHistoryModal = () => {
-    setIsClearHistoryVisible(true);
-  };
-
-  const closeClearHistoryModal = () => {
-    setIsClearHistoryVisible(false);
   };
 
   const openLogoutModal = () => {
@@ -93,13 +62,6 @@ const ProfileScreen = () => {
         { backgroundColor: colors.background, paddingTop: insets.top },
       ]}
     >
-      <DangerModal
-        isVisible={isClearHistoryVisible}
-        onClose={closeClearHistoryModal}
-        dangerMessage={"Are you sure you want to clear your history?"}
-        dangerOption1="Yes"
-        // TODO: add clear history function
-      />
       <DangerModal
         isVisible={isLogoutVisible}
         onClose={closeLogoutModal}
@@ -166,18 +128,6 @@ const ProfileScreen = () => {
         {/* Divider */}
         <View style={styles.divider} />
 
-        {/* Clear History */}
-        <TouchableOpacity
-          style={styles.infoItem}
-          onPress={openClearHistoryModal}
-        >
-          <View style={styles.infoItemLeft}>
-            <MaterialIcons name="delete-outline" size={22} color="#555" />
-            <Text style={styles.infoItemText}>Clear History</Text>
-          </View>
-          <MaterialIcons name="chevron-right" size={22} color="#999" />
-        </TouchableOpacity>
-
         {/* FAQs */}
         <TouchableOpacity
           style={styles.infoItem}
@@ -206,26 +156,11 @@ const ProfileScreen = () => {
         <MaterialIcons
           name="logout"
           size={22}
-          color="white"
+          color="#FFF9F0"
           style={styles.logoutIcon}
         />
+
         <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={async () => {
-          //qwerty
-          await AsyncStorage.setItem("authToken", "invalid_token");
-          await AsyncStorage.setItem("refreshToken", "invalid_refresh_token");
-        }}
-      >
-        <MaterialIcons
-          name="logout"
-          size={22}
-          color="white"
-          style={styles.logoutIcon}
-        />
-        <Text style={styles.logoutText}>test</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -322,19 +257,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f44336",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    backgroundColor: "#B45757",
+    paddingVertical: 14,
+    borderRadius: 30,
+    marginTop: 30,
     width: "100%",
-    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   logoutIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   logoutText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: "600",
+    color: "#FFF9F0",
   },
 });

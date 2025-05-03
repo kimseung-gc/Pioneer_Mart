@@ -50,61 +50,60 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    // backgroundColor: "rgba(0,0,0,0.1)", // light overlay
   },
   modalView: {
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF", // soft muted rose-beige
     borderRadius: 20,
-    padding: 35,
+    paddingVertical: 30,
+    paddingHorizontal: 25,
     alignItems: "center",
-    elevation: 5,
-    width: "80%", // Adjust width as needed
+    width: "85%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
   },
   modalText: {
-    marginBottom: 15,
-    textAlign: "center",
     fontSize: 16,
-  },
-  cancelButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#2196F3",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    width: "70%",
-    marginVertical: 5,
-  },
-  cancelButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    fontWeight: "500",
     textAlign: "center",
+    color: "#3A2E2E", // soft dark brown for readability
+    marginBottom: 15,
   },
   divider: {
     width: "100%",
     height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
+    backgroundColor: "#DABEB5", // warm neutral line
+    marginVertical: 12,
   },
   logoutButton: {
-    flexDirection: "row",
+    backgroundColor: "#B45757", // soft clay red
+    borderRadius: 30,
+    paddingVertical: 12,
+    width: "85%",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f44336",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    width: "70%",
-    marginVertical: 5,
-  },
-  logoutIcon: {
-    marginRight: 8,
+    marginVertical: 6,
   },
   logoutText: {
+    color: "#FFF9F0",
     fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: "600",
+  },
+  cancelButton: {
+    backgroundColor: "#E6D2C3", // soft beige tone
+    borderRadius: 30,
+    paddingVertical: 12,
+    width: "85%",
+    alignItems: "center",
+    marginVertical: 6,
+  },
+  cancelButtonText: {
+    color: "#3A2E2E",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });
 
