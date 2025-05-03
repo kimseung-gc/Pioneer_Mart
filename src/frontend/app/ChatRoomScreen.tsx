@@ -130,12 +130,13 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
     if (room.unread_count && room.unread_count > 0) {
       markRoomAsRead(Number(room.id));
     }
-
     // navigate to the chat room
     router.push({
       pathname: "/chat/[id]",
       params: {
         id: room.id.toString(),
+        receiver_id: otherUser.id,
+        user_id: userData.id,
         username: otherUser.username,
         itemTitle: room.item_title || "No item",
       },

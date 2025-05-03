@@ -23,10 +23,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message = data["message"]
-        user_id = data["user_id"]
+        sender_id = data["user_id"]
+        receiver_id = data["receiver_id"]
 
         # Save message to database w/ is_read=False for unread_messages stuff
-        message_obj = await self.save_message(user_id, message)
+        message_obj = await self.save_message(sender_id, receiver_id, message)
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -34,8 +35,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 "type": "chat_message",
                 "message": message,
-                "user_id": user_id,
-                "username": await self.get_username(user_id),
+                "user_id": sender_id,
+                "receiver_id": receiver_id,
+                "username": await self.get_username(sender_id),
                 "timestamp": (
                     message_obj.timestamp.isoformat()
                     if message_obj
@@ -52,6 +54,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     "message": event["message"],
                     "user_id": event["user_id"],
+                    "receiver_id": event["receiver_id"],
                     "username": event["username"],
                     "timestamp": event.get("timestamp"),
                 }
@@ -59,23 +62,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     @database_sync_to_async
-    def save_message(self, user_id, message):
-        print(f"room_id received: {self.room_id} (type={type(self.room_id)})")
-        try:
-            room = ChatRoom.objects.get(id=int(self.room_id))
-        except ChatRoom.DoesNotExist:
-            print(f"[ERROR] No room found with id={self.room_id}")
-            raise
-        user = User.objects.get(id=user_id)
-
+    def save_message(self, sender_id, receiver_id, message):
+        room = ChatRoom.objects.get(id=int(self.room_id))
+        sender = User.objects.get(id=sender_id)
+        receiver = User.objects.get(id=receiver_id)
         # create message with is_read=False by defualt
-        message_obj = Message.objects.create(
-            user=user,
-            room=room,
-            content=message,
-            is_read=False,  # this need to be explicity set as unread
+        return Message.objects.create(
+            room=room, sender=sender, receiver=receiver, content=message, is_read=False
         )
-        return message_obj
 
     @database_sync_to_async
     def get_username(self, user_id):

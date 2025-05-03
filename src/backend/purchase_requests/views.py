@@ -115,7 +115,6 @@ class PurchaseRequestViewSet(viewsets.ModelViewSet):
         Returns:
             Response: A response indicating the acceptance status.
         """
-        print("hello")
         purchase_request = self.get_object()
         listing = purchase_request.listing
 

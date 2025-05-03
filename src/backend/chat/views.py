@@ -29,7 +29,7 @@ def room_list(request):
                 room=room,
                 is_read=False,
             )
-            .exclude(user=user)
+            .exclude(sender=user)
             .count()
         )
 
@@ -74,7 +74,7 @@ def unread_count(request):
                 room=room,
                 is_read=False,
             )
-            .exclude(user=user)
+            .exclude(sender=user)
             .count()
         )
         total_unread += unread_count
@@ -100,7 +100,7 @@ def chat_history(request, room_id):
         messages = Message.objects.filter(room=room).order_by("timestamp")
 
         # filter messages that are read when history is fetched
-        unread_messagees = messages.filter(is_read=False).exclude(user=user)
+        unread_messagees = messages.filter(is_read=False).exclude(sender=user)
         current_time = timezone.now()
 
         # mark those messages as read
@@ -172,12 +172,11 @@ def mark_room_as_read(request, room_id):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        print("hello")
         # Now find the messagees that are unread nad not sent by the current user
         unread_messages = Message.objects.filter(
             room=room,
             is_read=False,
-        ).exclude(user=user)
+        ).exclude(sender=user)
 
         # Mark messages as read with a timestamp
         unread_count = unread_messages.count()

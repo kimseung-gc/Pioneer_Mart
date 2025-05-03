@@ -1,16 +1,22 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { Stack } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Header from "@/components/Header";
+import { notificationsApi } from "@/services/notificationsApi";
+import Toast from "react-native-toast-message";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../contexts/AuthContext";
 
-type Notification = {
+export type AppNotification = {
   id: number;
   // type: "purchase" | "favorite" | "report";
   type: "purchase" | "chat";
@@ -45,7 +51,7 @@ type Notification = {
 //   },
 // ];
 
-const mockNotifications: Notification[] = [
+const mockNotifications: AppNotification[] = [
   {
     id: 1,
     type: "purchase",
@@ -65,7 +71,7 @@ const mockNotifications: Notification[] = [
     time: "1d ago",
   },
 ];
-const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
+const NotificationIcon = ({ type }: { type: AppNotification["type"] }) => {
   const iconProps = {
     purchase: { name: "shopping-cart", color: "#4CAF50" },
     // favorite: { name: "favorite", color: "#E91E63" },
@@ -83,7 +89,7 @@ const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
   );
 };
 
-const NotificationCard = ({ item }: { item: Notification }) => (
+const NotificationCard = ({ item }: { item: AppNotification }) => (
   <View style={styles.card}>
     <NotificationIcon type={item.type} />
     <View style={styles.messageContainer}>
@@ -95,15 +101,64 @@ const NotificationCard = ({ item }: { item: Notification }) => (
 
 export default function NotificationsScreen() {
   const screenId = "notifications";
-  const [filterType, setFilterType] = useState<"all" | "purchase" | "chat">(
-    "all"
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [filterType, setFilterType] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const { authToken } = useAuth();
+
+  const fetchNotifications = async (type = filterType) => {
+    try {
+      setLoading(true);
+      const data = await notificationsApi.getNotifications("all", authToken);
+      setNotifications(data);
+      console.log("hello", data);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to load notifications",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        await fetchNotifications();
+        try {
+          await notificationsApi.resetUnreadCount(authToken);
+        } catch (error) {
+          Toast.show({
+            type: "error",
+            text1: "Failed to mark notifications as read",
+          });
+        }
+      };
+      loadData();
+    }, [])
   );
+
+  useEffect(() => {
+    fetchNotifications(filterType);
+  }, [filterType]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications(filterType);
+    setRefreshing(false);
+  };
+
+  const handleFilterChange = (type: string) => {
+    setFilterType(type);
+  };
 
   const filteredNotifications = useMemo(() => {
     return filterType === "all"
-      ? mockNotifications
-      : mockNotifications.filter((n) => n.type === filterType);
-  }, [filterType]);
+      ? notifications
+      : notifications.filter((n) => n.type === filterType);
+  }, [filterType, notifications]);
 
   return (
     <>
@@ -118,7 +173,7 @@ export default function NotificationsScreen() {
         {["all", "purchase", "chat"].map((type) => (
           <TouchableOpacity
             key={type}
-            onPress={() => setFilterType(type as any)}
+            onPress={() => handleFilterChange(type)}
             style={[
               styles.filterButton,
               filterType === type && styles.activeFilterButton,
@@ -136,16 +191,29 @@ export default function NotificationsScreen() {
         ))}
       </View>
 
-      <FlatList
-        data={filteredNotifications}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <NotificationCard item={item} />}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No notifications to show.</Text>
-        }
-        contentContainerStyle={styles.listContent}
-        scrollIndicatorInsets={{ top: 0, bottom: 0 }}
-      />
+      {loading && !refreshing ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="007BFF" />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredNotifications}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <NotificationCard item={item} />}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No notifications to show.</Text>
+          }
+          contentContainerStyle={styles.listContent}
+          scrollIndicatorInsets={{ top: 0, bottom: 0 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={["#007BFF"]}
+            />
+          }
+        />
+      )}
     </>
   );
 }
@@ -154,6 +222,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingTop: 6,
+    flexGrow: 1,
   },
   card: {
     flexDirection: "row",
@@ -183,6 +252,11 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 60,
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   filterContainer: {
     flexDirection: "row",

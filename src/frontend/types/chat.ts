@@ -9,6 +9,7 @@ export interface Message {
   id: string;
   content: string;
   userId: string;
+  receiverId: string | null;
   username: string;
   timestamp: string;
 }
@@ -27,8 +28,10 @@ export interface ChatRoom {
 
 export interface WebSocketMessage {
   message: string;
-  user_id: number | undefined;
+  user_id?: number;
+  receiver_id?: number;
   username?: string;
+  timestamp?: string;
 }
 
 export interface ChatScreenRouteParams {

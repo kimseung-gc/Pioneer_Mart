@@ -97,7 +97,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
     favorites: { ...initialScreenState },
     reported: { ...initialScreenState },
     myItems: { ...initialScreenState },
-    notifications: { ...initialScreenState }, 
+    notifications: { ...initialScreenState },
   },
   activeScreen: "home",
   categories: [],
@@ -725,70 +725,76 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
-          (screenKey) => {
-            const screen = updatedScreens[screenKey];
+        (
+          [
+            "home",
+            "favorites",
+            "myItems",
+            "reported",
+            "notifications",
+          ] as ScreenId[]
+        ).forEach((screenKey) => {
+          const screen = updatedScreens[screenKey];
 
-            // Update items array with the new status
-            const updatedItems = screen.items.map((item) =>
-              item.id === itemId
-                ? { ...item, is_favorited: newFavoriteStatus }
-                : item
-            );
+          // Update items array with the new status
+          const updatedItems = screen.items.map((item) =>
+            item.id === itemId
+              ? { ...item, is_favorited: newFavoriteStatus }
+              : item
+          );
 
-            // Update filtered items array with the new status
-            const updatedFilteredItems = screen.filteredItems.map((item) =>
-              item.id === itemId
-                ? { ...item, is_favorited: newFavoriteStatus }
-                : item
-            );
+          // Update filtered items array with the new status
+          const updatedFilteredItems = screen.filteredItems.map((item) =>
+            item.id === itemId
+              ? { ...item, is_favorited: newFavoriteStatus }
+              : item
+          );
 
-            // Handle special cases for the favorites screen
-            if (screenKey === "favorites") {
-              if (!newFavoriteStatus) {
-                // If unfavoriting, remove from favorites screen
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems.filter((item) => item.id !== itemId),
-                  filteredItems: updatedFilteredItems.filter(
-                    (item) => item.id !== itemId
-                  ),
-                };
-              } else if (
-                newFavoriteStatus &&
-                !screen.items.some((item) => item.id === itemId)
-              ) {
-                // If favoriting AND the item isn't already in favorites screen, add it
-                // This is the key part that was missing
-                const itemToAdd = { ...currentItem!, is_favorited: true };
+          // Handle special cases for the favorites screen
+          if (screenKey === "favorites") {
+            if (!newFavoriteStatus) {
+              // If unfavoriting, remove from favorites screen
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems.filter((item) => item.id !== itemId),
+                filteredItems: updatedFilteredItems.filter(
+                  (item) => item.id !== itemId
+                ),
+              };
+            } else if (
+              newFavoriteStatus &&
+              !screen.items.some((item) => item.id === itemId)
+            ) {
+              // If favoriting AND the item isn't already in favorites screen, add it
+              // This is the key part that was missing
+              const itemToAdd = { ...currentItem!, is_favorited: true };
 
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: [itemToAdd, ...screen.items],
-                  filteredItems:
-                    screen.selectedCategory === null ||
-                    Number(itemToAdd.category) === screen.selectedCategory
-                      ? [itemToAdd, ...screen.filteredItems]
-                      : screen.filteredItems,
-                };
-              } else {
-                // Just update status
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems,
-                  filteredItems: updatedFilteredItems,
-                };
-              }
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: [itemToAdd, ...screen.items],
+                filteredItems:
+                  screen.selectedCategory === null ||
+                  Number(itemToAdd.category) === screen.selectedCategory
+                    ? [itemToAdd, ...screen.filteredItems]
+                    : screen.filteredItems,
+              };
             } else {
-              // For non-favorites screens, just update the items
+              // Just update status
               updatedScreens[screenKey] = {
                 ...screen,
                 items: updatedItems,
                 filteredItems: updatedFilteredItems,
               };
             }
+          } else {
+            // For non-favorites screens, just update the items
+            updatedScreens[screenKey] = {
+              ...screen,
+              items: updatedItems,
+              filteredItems: updatedFilteredItems,
+            };
           }
-        );
+        });
 
         return { screens: updatedScreens };
       });
@@ -866,69 +872,75 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
-          (screenKey) => {
-            const screen = updatedScreens[screenKey];
+        (
+          [
+            "home",
+            "favorites",
+            "myItems",
+            "reported",
+            "notifications",
+          ] as ScreenId[]
+        ).forEach((screenKey) => {
+          const screen = updatedScreens[screenKey];
 
-            // Update items array with the new status
-            const updatedItems = screen.items.map((item) =>
-              item.id === itemId
-                ? { ...item, is_reported: newReportedStatus }
-                : item
-            );
+          // Update items array with the new status
+          const updatedItems = screen.items.map((item) =>
+            item.id === itemId
+              ? { ...item, is_reported: newReportedStatus }
+              : item
+          );
 
-            // Update filtered items array with the new status
-            const updatedFilteredItems = screen.filteredItems.map((item) =>
-              item.id === itemId
-                ? { ...item, is_reported: newReportedStatus }
-                : item
-            );
+          // Update filtered items array with the new status
+          const updatedFilteredItems = screen.filteredItems.map((item) =>
+            item.id === itemId
+              ? { ...item, is_reported: newReportedStatus }
+              : item
+          );
 
-            // Handle special cases for the favorites screen
-            if (screenKey === "reported") {
-              if (!newReportedStatus) {
-                // If unreporting, remove from reported screen
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems.filter((item) => item.id !== itemId),
-                  filteredItems: updatedFilteredItems.filter(
-                    (item) => item.id !== itemId
-                  ),
-                };
-              } else if (
-                newReportedStatus &&
-                !screen.items.some((item) => item.id === itemId)
-              ) {
-                // If reporting AND the item isn't already in reported screen, add it
-                const itemToAdd = { ...currentItem!, is_reported: true };
+          // Handle special cases for the favorites screen
+          if (screenKey === "reported") {
+            if (!newReportedStatus) {
+              // If unreporting, remove from reported screen
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems.filter((item) => item.id !== itemId),
+                filteredItems: updatedFilteredItems.filter(
+                  (item) => item.id !== itemId
+                ),
+              };
+            } else if (
+              newReportedStatus &&
+              !screen.items.some((item) => item.id === itemId)
+            ) {
+              // If reporting AND the item isn't already in reported screen, add it
+              const itemToAdd = { ...currentItem!, is_reported: true };
 
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: [itemToAdd, ...screen.items],
-                  filteredItems:
-                    screen.selectedCategory === null ||
-                    Number(itemToAdd.category) === screen.selectedCategory
-                      ? [itemToAdd, ...screen.filteredItems]
-                      : screen.filteredItems,
-                };
-              } else {
-                // Just update status
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems,
-                  filteredItems: updatedFilteredItems,
-                };
-              }
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: [itemToAdd, ...screen.items],
+                filteredItems:
+                  screen.selectedCategory === null ||
+                  Number(itemToAdd.category) === screen.selectedCategory
+                    ? [itemToAdd, ...screen.filteredItems]
+                    : screen.filteredItems,
+              };
             } else {
-              // For non-favorites screens, just update the items
+              // Just update status
               updatedScreens[screenKey] = {
                 ...screen,
                 items: updatedItems,
                 filteredItems: updatedFilteredItems,
               };
             }
+          } else {
+            // For non-favorites screens, just update the items
+            updatedScreens[screenKey] = {
+              ...screen,
+              items: updatedItems,
+              filteredItems: updatedFilteredItems,
+            };
           }
-        );
+        });
 
         return { screens: updatedScreens };
       });
