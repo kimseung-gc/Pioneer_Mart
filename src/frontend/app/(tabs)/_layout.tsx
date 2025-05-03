@@ -3,7 +3,6 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useRef } from "react";
 import { AppInitialier } from "@/components/AppInitializer";
-import { Animated, Pressable } from "react-native";
 import { AnimatedTabBarButton } from "@/components/AnimatedTabBarButton";
 
 // This defines the basic layout of the app after user's logged in
@@ -41,18 +40,30 @@ export default function TabLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: () => <Ionicons name="home-outline" size={22} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
+            ),
           }}
         />
+
         <Tabs.Screen
           name="notifications"
           options={{
             title: "Notification",
-            tabBarIcon: () => (
-              <Ionicons name="notifications-outline" size={22} />
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "notifications" : "notifications-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />
+
         <Tabs.Screen
           name="additem"
           options={{
@@ -64,8 +75,12 @@ export default function TabLayout() {
           name="favorites"
           options={{
             title: "Favorites",
-            tabBarIcon: () => (
-              <MaterialIcons name="favorite-outline" size={22} />
+            tabBarIcon: ({ focused }) => (
+              <MaterialIcons
+                name={focused ? "favorite" : "favorite-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />
@@ -73,8 +88,12 @@ export default function TabLayout() {
           name="settings"
           options={{
             title: "Settings",
-            tabBarIcon: () => (
-              <Ionicons name="settings-outline" size={22} color="black" />
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "settings" : "settings-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />
