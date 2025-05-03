@@ -55,4 +55,15 @@ export interface SingleItemProps {
   showFavoritesIcon?: boolean;
 }
 
-export type ScreenId = "home" | "myItems" | "favorites" | "reported" | "notifications";
+export type ScreenId =
+  | "home"
+  | "myItems"
+  | "favorites"
+  | "reported"
+  | "notifications";
+
+export interface NotificationContextType {
+  unreadCount: number;
+  refreshUnreadCount: () => void;
+  resetUnreadCount: () => void;
+}

@@ -7,47 +7,22 @@ import { AnimatedTabBarButton } from "@/components/AnimatedTabBarButton";
 import { useAuth } from "../contexts/AuthContext";
 import { notificationsApi } from "@/services/notificationsApi";
 import { useNavigationState } from "@react-navigation/native";
+import { useNotification } from "../contexts/NotificationContext";
 
 // This defines the basic layout of the app after user's logged in
 export default function TabLayout() {
   const { authToken } = useAuth();
-  const [unreadCount, setUnreadCount] = useState<number | null>(null);
+  const { unreadCount, refreshUnreadCount } = useNotification();
   const currentRoute = useNavigationState(
     (state) => state.routes[state.index]?.name
   );
 
   useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        if (authToken) {
-          const count = await notificationsApi.getUnreadcount(authToken);
-          setUnreadCount(count);
-        }
-      } catch (error) {
-        console.error("Failed to fetch unread notifications:", error);
-      }
-    };
-
-    fetchUnread();
-
-    // Optional: refresh every 60 seconds
-    const interval = setInterval(fetchUnread, 120000);
+    refreshUnreadCount();
+    const interval = setInterval(refreshUnreadCount, 120000);
     return () => clearInterval(interval);
-  }, [authToken]);
+  }, []);
 
-  useEffect(() => {
-    const resetCount = async () => {
-      if (currentRoute === "notifications" && unreadCount && unreadCount > 0) {
-        try {
-          await notificationsApi.resetUnreadCount(authToken);
-          setUnreadCount(0);
-        } catch (err) {
-          console.error("Failed to reset unread count", err);
-        }
-      }
-    };
-    resetCount();
-  }, [currentRoute]);
   return (
     <>
       <Stack.Screen

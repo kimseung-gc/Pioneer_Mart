@@ -15,6 +15,7 @@ import { notificationsApi } from "@/services/notificationsApi";
 import Toast from "react-native-toast-message";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
+import { useNotification } from "../contexts/NotificationContext";
 
 export type AppNotification = {
   id: number;
@@ -106,6 +107,7 @@ export default function NotificationsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { authToken } = useAuth();
+  const { resetUnreadCount, refreshUnreadCount } = useNotification();
 
   const fetchNotifications = async (type = filterType) => {
     try {
@@ -127,14 +129,7 @@ export default function NotificationsScreen() {
     useCallback(() => {
       const loadData = async () => {
         await fetchNotifications();
-        try {
-          await notificationsApi.resetUnreadCount(authToken);
-        } catch (error) {
-          Toast.show({
-            type: "error",
-            text1: "Failed to mark notifications as read",
-          });
-        }
+        resetUnreadCount();
       };
       loadData();
     }, [])

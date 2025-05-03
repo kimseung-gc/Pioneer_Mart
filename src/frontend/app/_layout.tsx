@@ -12,6 +12,7 @@ import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 // import NetworkStatusProvider from "./contexts/OfflineProvider";
 // import NetworkStatusProvider from "./contexts/OfflineProvider";
 
@@ -55,20 +56,22 @@ export default function RootLayout() {
     // <NetworkStatusProvider>
     <ThemeProvider>
       <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar barStyle="dark-content" backgroundColor={"#FFF9F0"} />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-              name="(tabs)"
-              options={{ gestureEnabled: false, headerBackVisible: false }} //prevent user from going back to (auth) tabs
-            />
-            <Stack.Screen
-              name="(auth)"
-              options={{ gestureEnabled: false, headerShown: false }} // user can't go back from here either but just putting this in case
-            />
-          </Stack>
-        </GestureHandlerRootView>
-        <Toast />
+        <NotificationProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <StatusBar barStyle="dark-content" backgroundColor={"#FFF9F0"} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+                name="(tabs)"
+                options={{ gestureEnabled: false, headerBackVisible: false }} //prevent user from going back to (auth) tabs
+              />
+              <Stack.Screen
+                name="(auth)"
+                options={{ gestureEnabled: false, headerShown: false }} // user can't go back from here either but just putting this in case
+              />
+            </Stack>
+          </GestureHandlerRootView>
+          <Toast />
+        </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>
     // </NetworkStatusProvider>

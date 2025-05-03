@@ -31,7 +31,7 @@ export const notificationsApi = {
       }
     );
   },
-  getUnreadcount: async (token: string | null) => {
+  getUnreadCount: async (token: string | null) => {
     const response = await api.get(
       `${BASE_URL}/api/notifications/unread_count/`,
       {
