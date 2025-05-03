@@ -1,5 +1,6 @@
 import TabLayout from "@/app/(tabs)/_layout"; // Adjust the import path as needed
 import { useAuth } from "@/app/contexts/AuthContext";
+import { NavigationContainer } from "@react-navigation/native";
 import { render } from "@testing-library/react-native";
 import React from "react";
 
@@ -56,7 +57,11 @@ describe("TabLayout Component", () => {
   });
 
   it("renders tabs with correct configuration", async () => {
-    const component = render(<TabLayout />); // render tablayout using mocked env & store in component
+    const component = render(
+      <NavigationContainer>
+        <TabLayout />
+      </NavigationContainer>
+    ); // render tablayout using mocked env & store in component
 
     // Changed this cause tabs.default wasn't being used anymore
     const { Tabs } = require("expo-router");

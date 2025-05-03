@@ -128,7 +128,6 @@ class ContactFormView(APIView):
                     [os.getenv("EMAIL_HOST_USER")],
                     fail_silently=False,
                 )
-                print("Hello")
                 return Response(
                     {"detail": "Your message has been sent successfully"},
                     status=status.HTTP_200_OK,

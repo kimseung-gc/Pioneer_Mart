@@ -151,6 +151,8 @@ describe("ChatRoomsScreen", () => {
           id: "123",
           username: "OtherUser1",
           itemTitle: "Test Item 1",
+          receiver_id: 789,
+          user_id: 456,
         },
       });
     });

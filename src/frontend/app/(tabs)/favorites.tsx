@@ -11,8 +11,8 @@ import { Alert, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { useUserStore } from "@/stores/userStore";
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
-import api from "@/types/api";
 import { useTheme } from "../contexts/ThemeContext";
+import api from "@/types/api";
 
 const FavoritesScreen = () => {
   const { colors } = useTheme();
@@ -123,7 +123,6 @@ const FavoritesScreen = () => {
                 isRequesting && styles.floatingButtonDisabled,
               ]}
               onPress={handleRequestAllItems}
-              // onPress={() => console.log("Hello")}
               disabled={isRequesting}
             >
               <Text style={styles.floatingButtonText}>

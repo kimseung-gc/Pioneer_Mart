@@ -13,9 +13,6 @@ import { useNotification } from "../contexts/NotificationContext";
 export default function TabLayout() {
   const { authToken } = useAuth();
   const { unreadCount, refreshUnreadCount } = useNotification();
-  const currentRoute = useNavigationState(
-    (state) => state.routes[state.index]?.name
-  );
 
   useEffect(() => {
     refreshUnreadCount();

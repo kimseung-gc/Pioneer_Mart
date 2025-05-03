@@ -114,7 +114,6 @@ export default function NotificationsScreen() {
       setLoading(true);
       const data = await notificationsApi.getNotifications("all", authToken);
       setNotifications(data);
-      console.log("hello", data);
     } catch (error) {
       Toast.show({
         type: "error",
