@@ -12,10 +12,38 @@ import Header from "@/components/Header";
 
 type Notification = {
   id: number;
-  type: "purchase" | "favorite" | "report";
+  // type: "purchase" | "favorite" | "report";
+  type: "purchase" | "chat";
   message: string;
   time: string;
 };
+
+// const mockNotifications: Notification[] = [
+//   {
+//     id: 1,
+//     type: "purchase",
+//     message: "Alex requested to buy your item 'Bike'",
+//     time: "2h ago",
+//   },
+//   {
+//     id: 2,
+//     type: "favorite",
+//     message: "Lily favorited your item 'Desk Lamp'",
+//     time: "4h ago",
+//   },
+//   {
+//     id: 3,
+//     type: "report",
+//     message: "Your item 'Microwave' was reported",
+//     time: "1d ago",
+//   },
+//   {
+//     id: 4,
+//     type: "purchase",
+//     message: "Ben sent a purchase request for 'Bookshelf'",
+//     time: "1d ago",
+//   },
+// ];
 
 const mockNotifications: Notification[] = [
   {
@@ -26,29 +54,23 @@ const mockNotifications: Notification[] = [
   },
   {
     id: 2,
-    type: "favorite",
-    message: "Lily favorited your item 'Desk Lamp'",
-    time: "4h ago",
+    type: "chat",
+    message: "Lily sent a message about 'Desk Lamp'",
+    time: "1h ago",
   },
   {
     id: 3,
-    type: "report",
-    message: "Your item 'Microwave' was reported",
-    time: "1d ago",
-  },
-  {
-    id: 4,
     type: "purchase",
     message: "Ben sent a purchase request for 'Bookshelf'",
     time: "1d ago",
   },
 ];
-
 const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
   const iconProps = {
     purchase: { name: "shopping-cart", color: "#4CAF50" },
-    favorite: { name: "favorite", color: "#E91E63" },
-    report: { name: "report-problem", color: "#F44336" },
+    // favorite: { name: "favorite", color: "#E91E63" },
+    // report: { name: "report-problem", color: "#F44336" },
+    chat: { name: "chat", color: "#2196F3" },
   }[type];
 
   return (
@@ -73,9 +95,9 @@ const NotificationCard = ({ item }: { item: Notification }) => (
 
 export default function NotificationsScreen() {
   const screenId = "notifications";
-  const [filterType, setFilterType] = useState<
-    "all" | "purchase" | "favorite" | "report"
-  >("all");
+  const [filterType, setFilterType] = useState<"all" | "purchase" | "chat">(
+    "all"
+  );
 
   const filteredNotifications = useMemo(() => {
     return filterType === "all"
@@ -93,7 +115,7 @@ export default function NotificationsScreen() {
       />
 
       <View style={styles.filterContainer}>
-        {["all", "purchase", "favorite", "report"].map((type) => (
+        {["all", "purchase", "chat"].map((type) => (
           <TouchableOpacity
             key={type}
             onPress={() => setFilterType(type as any)}

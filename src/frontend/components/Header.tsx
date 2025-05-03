@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
         </View>
       ) : isNotificationScreen ? (
         <View style={styles.titleRow}>
-          <View style={{ width: 24 }} /> {/* Left spacer for symmetry */}
+          <View style={{ width: 24 }} />
           <Text style={styles.titleText}>Notifications</Text>
           <TouchableOpacity
             onPress={handleChatPress}
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
             <Entypo name="chat" size={24} color="black" />
             {unreadCount > 0 && (
               <Badge style={styles.badge} size={18}>
-                {unreadCount > 99 ? "99+" : unreadCount}
+                {unreadCount > 99 ? "99+" : unreadCount.toString()}
               </Badge>
             )}
           </TouchableOpacity>
