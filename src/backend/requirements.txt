@@ -14,6 +14,6 @@ urllib3==2.2.3
 django-filter==24.3
 daphne==4.1.2
 channels==4.2.2
-psycopg2-binary>=2.9.10
+psycopg2-binary>=2.9.9
 django-storages==1.14.6
 boto3==1.38.3
