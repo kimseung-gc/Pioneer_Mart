@@ -71,7 +71,6 @@ jobs:
       #   run: |
       #     python3 generate_random_key.py
       - name: Test with django
-        shell: cmd
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DB_NAME: ${{ secrets.DB_NAME }}
