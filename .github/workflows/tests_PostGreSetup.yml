@@ -22,13 +22,9 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ['3.9']
-    # Docker Hub image that `container-job` executes in
-    container: node:20-bookworm-slim
     defaults:
       run: 
         working-directory: ./src/backend
-
-
     # Service containers to run with `container-job`
     services:
       # Label used to access the service container
@@ -59,7 +55,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install pip
-        run: python3 -m ensurepip --upgrade
+        run: |
+          unset LD_LIBRARY_PATH
+          python3 -m ensurepip --upgrade
       # Set PATH Variable
       - name: set_path
         run: |
