@@ -1,5 +1,5 @@
 # Basic workflow
-name: Python-testing
+name: PostGreSetUp-testing
 
 # Controls
 on:
@@ -14,27 +14,56 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ['3.8', '3.9']
+        os: [ubuntu-latest]
+        python-version: ['3.9']
+    defaults:
+      run: 
+        working-directory: ./src/backend
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:14
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       # Setting up python
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: install pip
+        run: |
+          unset LD_LIBRARY_PATH
+          python3 -m ensurepip --upgrade
+      # Set PATH Variable
+      - name: set_path
+        run: |
+          export PYTHONPATH=$PYTHONPATH:/home/dev/python-files
       # Run a test file with django test
       - name: Install django requirements
-        working-directory: ./src/backend
         run: |
           pip install -r requirements.txt
       # - name: Generate Random Key
@@ -42,7 +71,14 @@ jobs:
       #   run: |
       #     python3 generate_random_key.py
       - name: Test with django
-        working-directory: ./src/backend
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          HOST: ${{ secrets.HOST }}
+          PORT: ${{ secrets.PORT }}
+          ENV: development
         run: |
           python3 manage.py migrate
           python3 manage.py test
