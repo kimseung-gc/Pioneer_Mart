@@ -81,6 +81,10 @@ Sprint 04 planning (named sprint_04_planning.md) can be found in the link in mar
 
 Sprint 04 outcomes (named sprint_04.md) can be found in the link in markdown file in the sprint_reports folder.
 
+Sprint 05 planning (named sprint_05_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 05 outcomes (named sprint_05.md) can be found in the link in markdown file in the sprint_reports folder.
+
 ## Installing modules
 
 ### Installing Frontend Dependencies
