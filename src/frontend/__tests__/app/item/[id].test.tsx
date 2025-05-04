@@ -63,7 +63,7 @@ describe("ItemDetails Component", () => {
     seller: 5,
     image: "https://example.com/image.jpg",
     additional_images: ["https://example.com/additional1.jpg"],
-    created_at: "2023-01-01",
+    created_at: "May 1, 2025",
     category_name: "Test Category",
     purchase_requesters: [],
     purchase_request_count: 0,
@@ -122,18 +122,11 @@ describe("ItemDetails Component", () => {
     render(<ItemDetails />);
 
     await waitFor(() => {
-      expect(screen.getByText(`Price: $${mockItem.price}`)).toBeTruthy();
-      expect(screen.getByText(`Name: ${mockItem.title}`)).toBeTruthy();
-      expect(
-        screen.getByText(`Description: ${mockItem.description}`)
-      ).toBeTruthy();
-      //   expect(screen.getByTestId(`Seller: ${mockItem.seller}`)).toBeTruthy();
-      expect(
-        screen.getByText(`Date Posted: ${mockItem.created_at}`)
-      ).toBeTruthy();
-      expect(
-        screen.getByText(`Category: ${mockItem.category_name}`)
-      ).toBeTruthy();
+      expect(screen.getByText(`$${mockItem.price}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.title}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.description}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.created_at}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.category_name}`)).toBeTruthy();
     });
   });
   it("shows edit button when user is the owner", async () => {

@@ -17,7 +17,6 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { FontAwesome } from "@expo/vector-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
-import axios from "axios";
 import { useUserStore } from "@/stores/userStore";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
