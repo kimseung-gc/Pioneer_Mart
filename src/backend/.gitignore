@@ -1,5 +1,5 @@
 # ignore unrequired files
+env
 .env
 */__pycache__/
 */migrations/__pycache__/
-env
