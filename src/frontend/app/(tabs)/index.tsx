@@ -22,7 +22,6 @@ const HomeScreen = () => {
   const { filteredItems, isLoading } = screens[screenId];
   const { colors } = useTheme();
   const { authToken } = useAuth(); //auth context
-
   // Load items and categories when component mounts
   useEffect(() => {
     setActiveScreen(screenId);

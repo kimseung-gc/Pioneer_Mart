@@ -67,7 +67,7 @@ const ReportedItemsScreen = () => {
           <View style={{ flex: 1, backgroundColor: colors.background }}>
             <Categories screenId={screenId} categories={categories} />
             <ProductList
-              items={filteredItems}
+              items={reportedItems}
               isLoading={isLoading}
               source="myItems"
             />
@@ -83,6 +83,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFF9F0", // 👈 soft cream background
+    backgroundColor: "#FFF9F0",
   },
 });

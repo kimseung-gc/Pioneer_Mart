@@ -1,32 +1,3 @@
-/**
- * ItemDetails.tsx
- *
- * This screen displays the detailed view of a marketplace item.
- * It shows the item's image, description, price, seller info, and category.
- * Users can:
- *  - View the item's full details.
- *  - Request to purchase the item & report item (unless they are the seller).
- *  - Edit their listing if they are the item owner.
- *  - See confirmation of a submitted purchase request.
- *  - See confirmation of a submitted report
- *
- * Features:
- * - Uses React Navigation (Expo Router) for navigation stack handling.
- * - Uses Axios to fetch and post purchase request data from backend API.
- * - Uses AuthContext and Zustand stores for user and item state.
- * - Includes a modal component to confirm request submission.
- * - Displays loading state while fetching request status.
- *
- * Props:
- * - Receives item data via URL params (`item`, `source`, `refreshKey`).
- *
- * Dependencies:
- * - React Native components
- * - Expo Router for navigation
- * - Zustand for state management
- * - Axios for HTTP requests
- * - Custom components: ItemPurchaseModal, SingleItem
- */
 import {
   Dimensions,
   View,
@@ -37,11 +8,13 @@ import {
   Alert,
   Image,
   FlatList,
+  ScrollView,
 } from "react-native";
 import { TapGestureHandler } from "react-native-gesture-handler";
 
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
+import { FontAwesome } from "@expo/vector-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ItemPurchaseModal from "@/components/ItemPurchaseModal";
 import axios from "axios";
@@ -106,7 +79,7 @@ const ItemDetails = () => {
   // ensure that the images array is only recalculated if the getItemImages function changes(which only happens when item changes)
   const images = React.useMemo(() => getItemImages(), [getItemImages]);
 
-  // tetch the latest item data from the API
+  // fetch the latest item data from the API
   const fetchItemDetails = async () => {
     if (!id) {
       console.log("No item Id provided");
@@ -162,6 +135,7 @@ const ItemDetails = () => {
       };
     }, [id, authToken])
   );
+
   const openModal = () => {
     setIsVisible(true);
   };
@@ -253,6 +227,26 @@ const ItemDetails = () => {
     );
   };
 
+  // Render pagination dots
+  const renderPaginationDots = () => {
+    return (
+      <View style={styles.paginationContainer}>
+        {(images.length > 0
+          ? images
+          : ["src/frontend/assets/images/defaultpic.png"]
+        ).map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.paginationDot,
+              currentImageIndex === index && styles.paginationDotActive,
+            ]}
+          />
+        ))}
+      </View>
+    );
+  };
+
   const startChat = async () => {
     if (!item || !userData) return;
 
@@ -292,13 +286,23 @@ const ItemDetails = () => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   if (isLoading || !item) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loaderContainer}>
         <ActivityIndicator
           testID="activity-indicator"
           size="large"
-          color="blue"
+          color="#3498db"
         />
       </View>
     );
@@ -338,131 +342,213 @@ const ItemDetails = () => {
             item={item} // Use the updated item
           />
         )}
-        <TapGestureHandler
-          numberOfTaps={1}
-          onActivated={() => setIsZoomVisible(true)}
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.carouselContainer}>
-            <FlatList
-              ref={flatListRef}
-              data={
-                images.length > 0
-                  ? images
-                  : ["src/frontend/assets/images/defaultpic.png"]
-              }
-              renderItem={renderImageItem}
-              keyExtractor={(_, index) => index.toString()}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onScroll={handleScroll}
-              scrollEventThrottle={16}
-            />
+          <TapGestureHandler
+            numberOfTaps={1}
+            onActivated={() => setIsZoomVisible(true)}
+          >
+            <View style={styles.carouselContainer}>
+              <FlatList
+                ref={flatListRef}
+                data={
+                  images.length > 0
+                    ? images
+                    : ["src/frontend/assets/images/defaultpic.png"]
+                }
+                renderItem={renderImageItem}
+                keyExtractor={(_, index) => index.toString()}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+              />
 
-            {/* image counter overlay */}
-            <View style={styles.imageCounterContainer}>
-              <Text style={styles.imageCounter}>
-                {currentImageIndex + 1} of {images.length || 1}
-              </Text>
+              {renderPaginationDots()}
+
+              {/* image counter overlay */}
+              <View style={styles.imageCounterContainer}>
+                <Text style={styles.imageCounter}>
+                  {currentImageIndex + 1} of {images.length || 1}
+                </Text>
+              </View>
+            </View>
+          </TapGestureHandler>
+
+          {/* Item details section */}
+          <View style={styles.detailsContainer}>
+            <View style={styles.headerRow}>
+              <Text style={styles.itemTitle}>{item.title}</Text>
+              <Text style={styles.price}>${item.price}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoItem}>
+                <FontAwesome
+                  name="user"
+                  size={16}
+                  color="#888"
+                  style={styles.infoIcon}
+                />
+                <Text style={styles.infoText}>{item.seller_name}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <FontAwesome
+                  name="calendar"
+                  size={16}
+                  color="#888"
+                  style={styles.infoIcon}
+                />
+                <Text style={styles.infoText}>
+                  {formatDate(item.created_at)}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.categoryContainer}>
+              <FontAwesome
+                name="tag"
+                size={16}
+                color="#888"
+                style={styles.infoIcon}
+              />
+              <Text style={styles.categoryText}>{item.category_name}</Text>
+            </View>
+
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.descriptionText}>{item.description}</Text>
+            </View>
+
+            {/* Action buttons */}
+            <View style={styles.actionsContainer}>
+              {isOwner ? (
+                <>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => {
+                      router.push({
+                        pathname: "/item/[id]/edit",
+                        params: {
+                          id: item.id.toString(),
+                          item: JSON.stringify(item),
+                        },
+                      });
+                    }}
+                  >
+                    <FontAwesome
+                      name="edit"
+                      size={18}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                    <Text style={styles.buttonText}>Edit Listing</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={handleDelete}
+                  >
+                    <FontAwesome
+                      name="trash"
+                      size={18}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                    <Text style={styles.buttonText}>Delete Item</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                source !== "myItems" && (
+                  <>
+                    <TouchableOpacity
+                      style={[
+                        styles.purchaseRequestButton,
+                        hasRequestedItem && styles.disabledButton,
+                      ]}
+                      onPress={() => handlePurchaseRequest(authToken)}
+                      disabled={hasRequestedItem}
+                    >
+                      <FontAwesome
+                        name={hasRequestedItem ? "check" : "shopping-cart"}
+                        size={18}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                      <Text style={styles.buttonText}>
+                        {hasRequestedItem
+                          ? "Purchase Requested"
+                          : "Request Purchase"}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.chatButton}
+                      onPress={startChat}
+                      disabled={chatLoading}
+                    >
+                      {chatLoading ? (
+                        <ActivityIndicator
+                          testID="activity-indicator"
+                          size="small"
+                          color="white"
+                        />
+                      ) : (
+                        <>
+                          <Entypo
+                            name="chat"
+                            size={20}
+                            color="white"
+                            style={styles.buttonIcon}
+                          />
+                          <Text style={styles.buttonText}>Message Seller</Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.reportItemButton,
+                        hasReportedItem && styles.disabledButton,
+                      ]}
+                      onPress={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          if (!item.is_reported) {
+                            setIsReportModalVisible(true);
+                          } else {
+                            await toggleReport(item.id, authToken || "", "");
+                            setHasReportedItem(true);
+                          }
+                        } catch (error) {
+                          console.error("Error toggling report:", error);
+                          Alert.alert(
+                            "Error",
+                            "Failed to report item. Please try again"
+                          );
+                        }
+                      }}
+                      disabled={hasReportedItem}
+                    >
+                      <FontAwesome
+                        name="flag"
+                        size={18}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                      <Text style={styles.buttonText}>
+                        {hasReportedItem ? "Item Reported" : "Report Item"}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )
+              )}
             </View>
           </View>
-        </TapGestureHandler>
-        {/* all the item details */}
-        <View style={styles.detailsContainer}>
-          <Text style={styles.title}>Price: ${item.price}</Text>
-          <Text style={styles.title}>Name: {item.title}</Text>
-          <Text style={styles.title}>Description: {item.description}</Text>
-          <Text style={styles.title}>Seller: {item.seller_name}</Text>
-          <Text style={styles.title}>Date Posted: {item.created_at}</Text>
-          <Text style={styles.title}>Category: {item.category_name}</Text>
-          {isOwner && (
-            <>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => {
-                  router.push({
-                    pathname: "/item/[id]/edit",
-                    params: {
-                      id: item.id.toString(),
-                      item: JSON.stringify(item),
-                    },
-                  });
-                }}
-              >
-                <Text style={styles.buttonText}>Edit Listing</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={handleDelete}
-              >
-                <Text style={styles.buttonText}>Delete Item</Text>
-              </TouchableOpacity>
-            </>
-          )}
-
-          {source !== "myItems" && !isOwner && (
-            <>
-              <TouchableOpacity
-                style={[
-                  styles.purchaseRequestButton,
-                  hasRequestedItem && styles.disabledButton,
-                ]}
-                onPress={() => handlePurchaseRequest(authToken)}
-                disabled={hasRequestedItem}
-              >
-                <Text style={styles.buttonText}>
-                  {hasRequestedItem ? "Purchase Requested" : "Request Purchase"}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.chatButton}
-                onPress={startChat}
-                disabled={chatLoading}
-              >
-                {chatLoading ? (
-                  <ActivityIndicator
-                    testID="activity-indicator"
-                    size="small"
-                    color="white"
-                  />
-                ) : (
-                  <>
-                    <Entypo name="chat" size={20} color="white" />
-                    <Text style={styles.chatButtonText}>Message Seller</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.reportItemButton,
-                  hasReportedItem && styles.disabledButton,
-                ]}
-                onPress={async (e) => {
-                  e.stopPropagation();
-                  try {
-                    if (!item.is_reported) {
-                      setIsReportModalVisible(true);
-                    } else {
-                      await toggleReport(item.id, authToken || "", "");
-                      setHasReportedItem(true);
-                    }
-                  } catch (error) {
-                    console.error("Error toggling report:", error);
-                    Alert.alert(
-                      "Error",
-                      "Failed to report item. Please try again"
-                    );
-                  }
-                }}
-                disabled={hasReportedItem}
-              >
-                <Text style={styles.buttonText}>
-                  {hasReportedItem ? "Item Reported" : "Report Item"}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );
@@ -473,27 +559,56 @@ export default ItemDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    backgroundColor: "#f8f9fa",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#fff",
   },
-
+  scrollView: {
+    flex: 1,
+  },
   carouselContainer: {
     width: width,
-    height: height * 0.35,
+    height: height * 0.4,
     position: "relative",
+    backgroundColor: "#f0f0f0",
   },
   itemImage: {
     width: width,
     height: "100%",
   },
+  paginationContainer: {
+    position: "absolute",
+    bottom: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+  },
+  paginationDotActive: {
+    backgroundColor: "#fff",
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
   imageCounterContainer: {
     position: "absolute",
-    bottom: 10,
-    right: 10,
+    bottom: 20,
+    right: 20,
     backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   imageCounter: {
     color: "white",
@@ -502,73 +617,157 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     padding: 20,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -20,
+    flex: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 10,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  itemTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#333",
     flex: 1,
   },
-  favBtn: {
-    position: "absolute",
-    right: 20,
-    top: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
-    padding: 5,
-    borderRadius: 30,
+  price: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#22a45d",
   },
-  title: {
+  infoRow: {
+    flexDirection: "row",
+    marginBottom: 16,
+  },
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  infoIcon: {
+    marginRight: 6,
+  },
+  infoText: {
+    fontSize: 15,
+    color: "#666",
+  },
+  categoryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f4f8",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+    marginBottom: 24,
+  },
+  categoryText: {
     fontSize: 14,
+    color: "#3498db",
     fontWeight: "600",
-    color: "black",
+    marginLeft: 6,
+  },
+  descriptionContainer: {
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 8,
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: "#555",
+    lineHeight: 24,
+  },
+  actionsContainer: {
+    gap: 12,
   },
   editButton: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    width: "100%",
+    backgroundColor: "#3498db",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   deleteButton: {
-    backgroundColor: "red",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    width: "100%",
+    backgroundColor: "#e74c3c",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   purchaseRequestButton: {
-    backgroundColor: "blue",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    width: "100%",
+    backgroundColor: "#3498db",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   reportItemButton: {
-    backgroundColor: "red",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    width: "100%",
+    backgroundColor: "#e74c3c",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   disabledButton: {
-    backgroundColor: "gray",
+    backgroundColor: "#95a5a6",
+  },
+  chatButton: {
+    backgroundColor: "#22a45d",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
+    fontWeight: "600",
   },
-  chatButton: {
-    backgroundColor: "#22a45d",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 15,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chatButtonText: {
-    color: "white",
-    fontSize: 16,
-    marginLeft: 8,
+  buttonIcon: {
+    marginRight: 8,
   },
 });
