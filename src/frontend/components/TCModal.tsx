@@ -86,7 +86,7 @@ const TCModal: React.FC<TCModalProps> = ({
           >
             <Text style={styles.introText}>
               By creating an account, you agree to the following terms and
-              conditions. Please read these carefully before proceeding.
+              conditions.
             </Text>
 
             <SectionHeader

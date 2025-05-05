@@ -33,6 +33,7 @@ type FilterOptions = {
   hasActivePurchaseRequest: boolean;
   isSold: boolean;
   sortByPrice: "asc" | "desc" | null;
+  sortByDatePosted: "recent" | "older" | null;
 };
 
 /**
@@ -88,6 +89,7 @@ const Categories: React.FC<CategoriesProps> = ({
       hasActivePurchaseRequest: false,
       isSold: false,
       sortByPrice: null,
+      sortByDatePosted: null,
     };
     setLocalFilterOptions(defaultFilters);
     setSliderValues([0, 1000]);
@@ -382,6 +384,83 @@ const Categories: React.FC<CategoriesProps> = ({
                       ]}
                     >
                       High to Low
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {/* sort by date section */}
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>
+                  Sort By Date Posted
+                </Text>
+                <View style={styles.sortOptionsContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.sortOption,
+                      localFilterOptions.sortByDatePosted === null &&
+                        styles.selectedSortOption,
+                    ]}
+                    onPress={() =>
+                      setLocalFilterOptions({
+                        ...localFilterOptions,
+                        sortByDatePosted: null,
+                      })
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.sortOptionText,
+                        localFilterOptions.sortByDatePosted === null &&
+                          styles.selectedSortOptionText,
+                      ]}
+                    >
+                      None
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.sortOption,
+                      localFilterOptions.sortByDatePosted === "recent" &&
+                        styles.selectedSortOption,
+                    ]}
+                    onPress={() =>
+                      setLocalFilterOptions({
+                        ...localFilterOptions,
+                        sortByDatePosted: "recent",
+                      })
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.sortOptionText,
+                        localFilterOptions.sortByDatePosted === "recent" &&
+                          styles.selectedSortOptionText,
+                      ]}
+                    >
+                      Recent
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.sortOption,
+                      localFilterOptions.sortByDatePosted === "older" &&
+                        styles.selectedSortOption,
+                    ]}
+                    onPress={() =>
+                      setLocalFilterOptions({
+                        ...localFilterOptions,
+                        sortByDatePosted: "older",
+                      })
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.sortOptionText,
+                        localFilterOptions.sortByDatePosted === "older" &&
+                          styles.selectedSortOptionText,
+                      ]}
+                    >
+                      Older
                     </Text>
                   </TouchableOpacity>
                 </View>

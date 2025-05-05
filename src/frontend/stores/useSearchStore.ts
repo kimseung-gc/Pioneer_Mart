@@ -13,6 +13,7 @@ interface FilterOptions {
   hasActivePurchaseRequest: boolean;
   isSold: boolean;
   sortByPrice: "asc" | "desc" | null;
+  sortByDatePosted: "recent" | "older" | null;
 }
 
 // interface for the state and actions of each screen
@@ -81,6 +82,7 @@ const initialScreenState: ScreenState = {
     hasActivePurchaseRequest: false,
     isSold: false,
     sortByPrice: null,
+    sortByDatePosted: null,
   },
   isLoading: false,
   isLoadingMore: false,
@@ -1001,6 +1003,18 @@ function applyAllFilters(
     result.sort((a, b) => Number(a.price) - Number(b.price));
   } else if (filterOptions.sortByPrice === "desc") {
     result.sort((a, b) => Number(b.price) - Number(a.price));
+  }
+
+  if (filterOptions.sortByDatePosted === "recent") {
+    result.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  } else if (filterOptions.sortByDatePosted === "older") {
+    result.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
   }
 
   return result;
