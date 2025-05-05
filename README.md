@@ -81,26 +81,37 @@ Sprint 04 planning (named sprint_04_planning.md) can be found in the link in mar
 
 Sprint 04 outcomes (named sprint_04.md) can be found in the link in markdown file in the sprint_reports folder.
 
+Sprint 05 planning (named sprint_05_planning.md) can be found in the link in markdown file in the sprint_reports folder.
+
+Sprint 05 outcomes (named sprint_05.md) can be found in the link in markdown file in the sprint_reports folder.
+
+## Installing modules
+
+### Installing Frontend Dependencies
+> cd src/frontend
+
+> npm install
+
+### Installing Frontend Dependencies
+> cd src/backend
+
+> pip install -r requirements.txt
+
 ## Testing
 
 We are using pytest, flake8, and mypy in order to test our back-end code. For the front end, we are using Jest, React Testing Library, and human-driven testing. The git actions are set up in the repository.
 
 ### How to run the tests?
 
-Backend (Non-Django related)
-
-> pip install tox tox-gh-actions
-
-> tox
-
 Backend (Django related)
-Pre-requisite: be in the src/backend folder
+Pre-requisite: be in the src/backend folder and install all the requirements from requirements.txt.
+
+> python3 manage.py migrate
 
 > python3 manage.py test
 
 Frontend
-
-> npm install
+Pre-requisite: be in the src/frontend folder and install all the requirements from package.json. Also requires react native in one's environment.
 
 > export PATH="./node_modules/.bin:$PATH"
 
@@ -110,13 +121,15 @@ Frontend
 
 Pre-requisites:
 
-- XCode must be installed on Macbooks for simulations. Otherwise, Expo Go must be installed on either an iOS or Android.
+- XCode must be installed on Macbooks for simulations. Otherwise, Expo Go must be installed on either an iOS or Android (for iOS and Android, separate environmental variables are required and some code segments must be changed such as the allowed hosts).
 - The root directory must be within src, and depending on backend or frontend (there must also be 2 separate terminals to run the application)
 - npm must be installed. For more details about installing NPM, please refer to this [link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
 Running the Backend (server)
 
 > pip install -r requirements.txt
+
+> python3 manage.py migrate
 
 > python3 manage.py runserver
 
@@ -125,9 +138,6 @@ Running the Frontend (npm)
 > npm install
 
 > npx expo start
-
-- Please note that npm install may leave out some installations out, so it is highly recommended to install extra dependencies via following
-  > npm install [name of extra package]
 
 ## Operational Use Cases
 
