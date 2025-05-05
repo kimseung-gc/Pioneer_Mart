@@ -34,14 +34,12 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
   }, [authToken]); //runs when authToken changes
 
   // Refresh unread count when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      if (authToken) {
-        fetchUnreadCount(authToken);
-      }
-      return () => {};
-    }, [authToken])
-  );
+  React.useCallback(() => {
+    if (authToken) {
+      fetchUnreadCount(authToken);
+    }
+    return () => {};
+  }, [authToken]);
 
   const handleChatPress = () => {
     router.push("/ChatRoomScreen");

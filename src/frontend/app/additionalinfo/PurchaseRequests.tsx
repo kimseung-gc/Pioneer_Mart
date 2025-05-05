@@ -30,7 +30,7 @@
 
 import { PurchaseRequest } from "@/types/types";
 import { Ionicons } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -45,13 +45,14 @@ import {
   Platform,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import axios from "axios";
 import SingleItem from "@/components/SingleItem";
 import React from "react";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
 const PurchaseRequests = () => {
+  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // States for PurchaseRequest screen
   const [activeTab, setActiveTab] = useState("sent");
@@ -390,7 +391,8 @@ const PurchaseRequests = () => {
               <Text
                 style={[
                   styles.tabText,
-                  activeTab === "sent" && styles.activeTabText,
+                  { color: colors.textSecondary },
+                  activeTab === "sent" && { color: colors.accent },
                 ]}
               >
                 Sent Requests
@@ -403,7 +405,8 @@ const PurchaseRequests = () => {
               <Text
                 style={[
                   styles.tabText,
-                  activeTab === "received" && styles.activeTabText,
+                  { color: colors.textSecondary },
+                  activeTab === "received" && { color: colors.accent },
                 ]}
               >
                 Received Requests
@@ -413,6 +416,7 @@ const PurchaseRequests = () => {
               style={[
                 styles.tabIndicator,
                 {
+                  backgroundColor: colors.background,
                   left: indicatorLeft,
                 },
               ]}
@@ -514,7 +518,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "50%",
     height: "100%",
-    backgroundColor: "white",
     borderRadius: 10,
     zIndex: 0,
     ...Platform.select({
@@ -531,7 +534,6 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontWeight: "600",
-    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 15,
   },
   activeTabText: {

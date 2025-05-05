@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { Stack } from "expo-router";
 
@@ -120,6 +120,7 @@ const FavoritesScreen = () => {
             <TouchableOpacity
               style={[
                 styles.floatingButton,
+                { backgroundColor: colors.accent },
                 isRequesting && styles.floatingButtonDisabled,
               ]}
               onPress={handleRequestAllItems}

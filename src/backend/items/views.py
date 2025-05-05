@@ -50,7 +50,10 @@ class ItemViewSet(viewsets.ModelViewSet):
         request_purchase(request, pk=None): Creates a purchase request for a listing.
     """
 
-    queryset = Listing.objects.filter(is_sold=False)  # get all listing objects
+    # We aren't using default queryset cause we need to allow user to click on sold item on purchase request screen.
+    # if they're retrieving ONE item, they can retrieve even the sold items though the frontend wont show it unless
+    # for my items and purchase requests. For everything else, it won't return the sold item
+    # queryset = Listing.objects.filter(is_sold=False)  # get all listing objects
     serializer_class = ItemSerializer  # specify the serializer to use for converting Listing objects to and from JSON
     authentication_classes = [
         JWTAuthentication
@@ -69,6 +72,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "price", "title"]
     ordering = ["-created_at"]  # order by creation date in descending order
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
+
+    def get_queryset(self):
+        if self.action == "retrieve":
+            return Listing.objects.all()  # allow sold items in detail view
+        return Listing.objects.filter(is_sold=False)  # hide sold items everywhere else
 
     def create(self, request, *args, **kwargs):
         """
@@ -329,7 +337,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         """
         query = request.query_params.get("q", "")
         if query:
-            items = self.queryset.filter(
+            items = self.get_queryset.filter(
                 Q(title__icontains=query)
                 | Q(description__icontains=query)
                 | Q(
@@ -337,7 +345,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                 )  # search in title, description, and category name
             )
         else:
-            items = self.queryset
+            items = self.get_queryset()
         return self.get_paginated_response(
             self.get_serializer(self.paginate_queryset(items), many=True).data
         )
@@ -375,7 +383,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             Response: A response containing the search results.
         """
         query = request.query_params.get("q", "")
-        base_queryset = self.queryset.filter(seller=request.user)
+        base_queryset = self.get_queryset.filter(seller=request.user)
         if query:
             items = base_queryset.filter(
                 Q(title__icontains=query)
