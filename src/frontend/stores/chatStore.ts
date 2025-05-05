@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
 
@@ -20,7 +21,7 @@ export const useChatStore = create<ChatState>((set) => ({
     try {
       set({ isLoading: true });
       const cleanToken = token.trim();
-      const response = await axios.get(`${BASE_URL}/api/chat/unread-count/`, {
+      const response = await api.get(`${BASE_URL}/api/chat/unread-count/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",

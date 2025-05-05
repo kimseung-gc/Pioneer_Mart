@@ -5,7 +5,6 @@ import {
   fireEvent,
   waitFor,
 } from "@testing-library/react-native";
-import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemDetails from "@/app/item/[id]";
@@ -13,6 +12,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { ItemType } from "@/types/types";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 // Mock the required dependencies
 jest.mock("expo-router", () => ({
@@ -63,7 +63,7 @@ describe("ItemDetails Component", () => {
     seller: 5,
     image: "https://example.com/image.jpg",
     additional_images: ["https://example.com/additional1.jpg"],
-    created_at: "2023-01-01",
+    created_at: "May 1, 2025",
     category_name: "Test Category",
     purchase_requesters: [],
     purchase_request_count: 0,
@@ -95,8 +95,8 @@ describe("ItemDetails Component", () => {
       userData: mockUserData,
     });
 
-    // Mock axios
-    (axios.get as jest.Mock).mockImplementation((url) => {
+    // Mock api
+    (api.get as jest.Mock).mockImplementation((url) => {
       if (url.includes("/api/items/")) {
         return Promise.resolve({ data: mockItem });
       }
@@ -109,7 +109,7 @@ describe("ItemDetails Component", () => {
       return Promise.reject(new Error("Unknown URL"));
     });
 
-    (axios.post as jest.Mock).mockResolvedValue({ data: { success: true } });
+    (api.post as jest.Mock).mockResolvedValue({ data: { success: true } });
   });
 
   it("renders loading state initially", async () => {
@@ -122,18 +122,11 @@ describe("ItemDetails Component", () => {
     render(<ItemDetails />);
 
     await waitFor(() => {
-      expect(screen.getByText(`Price: $${mockItem.price}`)).toBeTruthy();
-      expect(screen.getByText(`Name: ${mockItem.title}`)).toBeTruthy();
-      expect(
-        screen.getByText(`Description: ${mockItem.description}`)
-      ).toBeTruthy();
-      //   expect(screen.getByTestId(`Seller: ${mockItem.seller}`)).toBeTruthy();
-      expect(
-        screen.getByText(`Date Posted: ${mockItem.created_at}`)
-      ).toBeTruthy();
-      expect(
-        screen.getByText(`Category: ${mockItem.category_name}`)
-      ).toBeTruthy();
+      expect(screen.getByText(`$${mockItem.price}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.title}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.description}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.created_at}`)).toBeTruthy();
+      expect(screen.getByText(`${mockItem.category_name}`)).toBeTruthy();
     });
   });
   it("shows edit button when user is the owner", async () => {
@@ -180,7 +173,7 @@ describe("ItemDetails Component", () => {
     fireEvent.press(button);
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(api.post).toHaveBeenCalledWith(
         `${BASE_URL}/api/items/${mockItem.id}/request_purchase/`,
         {},
         {
@@ -199,7 +192,7 @@ describe("ItemDetails Component", () => {
       callback();
       return () => {};
     });
-    (axios.get as jest.Mock).mockResolvedValueOnce({ data: mockItem });
+    (api.get as jest.Mock).mockResolvedValueOnce({ data: mockItem });
 
     const utils = render(<ItemDetails />);
 
@@ -211,8 +204,8 @@ describe("ItemDetails Component", () => {
     mockItem.purchase_request_count = 1;
     mockItem.purchase_requesters = [mockUserData];
 
-    //re mock axios to reflect updated data
-    (axios.get as jest.Mock).mockResolvedValueOnce({ data: mockItem });
+    //re mock api to reflect updated data
+    (api.get as jest.Mock).mockResolvedValueOnce({ data: mockItem });
 
     render(<ItemDetails />);
     await waitFor(() => {

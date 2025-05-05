@@ -9,11 +9,15 @@ from .serializers import UserSerializer
 
 class UserProfileModelTest(TestCase):
     def test_profile_created_with_user(self):
-        user = User.objects.create_user(username="tester", email="tester@test.com", password="pass")
+        user = User.objects.create_user(
+            username="tester", email="tester@test.com", password="pass"
+        )
+        UserProfile.objects.create(user=user)
         self.assertTrue(UserProfile.objects.filter(user=user).exists())
 
     def test_profile_str_method(self):
         user = User.objects.create_user(username="john", email="john@test.com")
+        UserProfile.objects.create(user=user)
         profile = user.profile
         self.assertEqual(str(profile), "john@test.com's profile")
 
@@ -21,14 +25,16 @@ class UserProfileModelTest(TestCase):
 class UserProfileAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="tester", email="tester@test.com", password="pass")
+        self.user = User.objects.create_user(
+            username="tester", email="tester@test.com", password="pass"
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_get_user_profile(self):
         response = self.client.get(reverse("user-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['results'][0]['email'], "tester@test.com")
-        self.assertIn("profile", response.data['results'][0])
+        self.assertEqual(response.data["results"][0]["email"], "tester@test.com")
+        self.assertIn("profile", response.data["results"][0])
 
     def test_signup_success(self):
         self.client.logout()
@@ -41,7 +47,6 @@ class UserProfileAPITest(TestCase):
         response = self.client.post(reverse("signup"), {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "The email field is required")
-
 
 
 class UserSerializerTest(TestCase):

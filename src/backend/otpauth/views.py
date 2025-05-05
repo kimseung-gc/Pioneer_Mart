@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)  # built in view from rest framework simple jwt
 from django.core.mail import send_mail
 from django.conf import settings
 import os
@@ -28,32 +31,16 @@ from .serializers import (
 # matches with the associated email in the request. If it does then we generate a
 # a JWT for the user to be able to access all the data
 
-# TODO: implement refresh token functionality
-# b/c the access token will eventually expire and so to avoid forcing the user to log in again the client
-# needs a way to get a new valid access token using the refresh token.
-# therefore i need to implement a dedicated endpoint for the refresh token
-# (e.g. api/auth/refresh/). The client will then store
-# the new access token in local storage replacing the expired one. The refresh endpoint should probably
-# go in the views.py file or smth once we migrate to viewsets cause those are a lot easier to deal with.
-
 
 class RequestOTPView(APIView):
     permission_classes = [AllowAny]
 
-    # TODO: Check if email sent from frontend is valid i.e. however many characters ppl's usernames are
     def post(self, request):
         serializer = EmailSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
 
-            # # Create or get user
-            # # TODO: This gets the entire user's grinnell email...I need to only get their username
-            # user, created = User.objects.get_or_create(
-            #     email=email, defaults={"username": email}
-            # )
             # Create new OTP
-            # TODO: we'll likely need to interact with this otp code or something of the sort to let users login
-            # TODO: because users aren't gonna keep asking for a code lmao
             OTP.objects.filter(email=email).delete()
             otp = OTP.objects.create(email=email)
             print(f"\n\n{otp.otp}\n\n")  # TODO: comment this to send email
@@ -81,13 +68,10 @@ class VerifyOTPView(APIView):
 
             # get latest OTP for this email
             try:
-                # pretty sure this contains multiple OTP code lol don't know when i wrote thi
-                # also idk if I wanna keep this...it seems like extra useless data
                 otp = OTP.objects.filter(email=email).latest("created_at")
 
                 if otp.otp == otp_code and otp.is_valid():
                     # retrieve the User object associated with the email
-                    # user = User.objects.get(email=email)
                     user, created = User.objects.get_or_create(
                         email=email, defaults={"username": email}
                     )
@@ -105,7 +89,6 @@ class VerifyOTPView(APIView):
                     response_data = {
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
-                        # "user": UserSerializer(user).data, #TODO: userprofile api
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
@@ -119,6 +102,10 @@ class VerifyOTPView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RefreshTokenView(TokenRefreshView):
+    permission_classes = [AllowAny]
 
 
 class ContactFormView(APIView):
@@ -141,7 +128,6 @@ class ContactFormView(APIView):
                     [os.getenv("EMAIL_HOST_USER")],
                     fail_silently=False,
                 )
-                print("Hello")
                 return Response(
                     {"detail": "Your message has been sent successfully"},
                     status=status.HTTP_200_OK,

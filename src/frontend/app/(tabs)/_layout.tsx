@@ -1,11 +1,25 @@
 import { Stack, Tabs } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AppInitialier } from "@/components/AppInitializer";
+import { AnimatedTabBarButton } from "@/components/AnimatedTabBarButton";
+import { useAuth } from "../contexts/AuthContext";
+import { notificationsApi } from "@/services/notificationsApi";
+import { useNavigationState } from "@react-navigation/native";
+import { useNotification } from "../contexts/NotificationContext";
 
 // This defines the basic layout of the app after user's logged in
 export default function TabLayout() {
+  const { authToken } = useAuth();
+  const { unreadCount, refreshUnreadCount } = useNotification();
+
+  useEffect(() => {
+    refreshUnreadCount();
+    const interval = setInterval(refreshUnreadCount, 120000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Stack.Screen
@@ -17,23 +31,53 @@ export default function TabLayout() {
         }}
       />
       <AppInitialier />
-      <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: "#FFF9F0",
+            borderTopColor: "#FFE0B2",
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 6,
+          },
+          tabBarActiveTintColor: "#C98474",
+          tabBarInactiveTintColor: "#888888",
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
+          tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: () => <Ionicons name="home-outline" size={22} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
+            ),
           }}
         />
+
         <Tabs.Screen
           name="notifications"
           options={{
             title: "Notification",
-            tabBarIcon: () => (
-              <Ionicons name="notifications-outline" size={22} />
+            tabBarBadge: unreadCount ? unreadCount : undefined,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "notifications" : "notifications-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />
+
         <Tabs.Screen
           name="additem"
           options={{
@@ -45,9 +89,12 @@ export default function TabLayout() {
           name="favorites"
           options={{
             title: "Favorites",
-            tabBarBadge: 3,
-            tabBarIcon: () => (
-              <MaterialIcons name="favorite-outline" size={22} />
+            tabBarIcon: ({ focused }) => (
+              <MaterialIcons
+                name={focused ? "favorite" : "favorite-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />
@@ -55,8 +102,12 @@ export default function TabLayout() {
           name="settings"
           options={{
             title: "Settings",
-            tabBarIcon: () => (
-              <Ionicons name="settings-outline" size={22} color="black" />
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "settings" : "settings-outline"}
+                size={22}
+                color={focused ? "#9E8FB2" : "#888888"}
+              />
             ),
           }}
         />

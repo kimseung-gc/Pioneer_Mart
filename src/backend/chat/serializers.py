@@ -10,11 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    sender = UserSerializer(read_only=True)
 
     class Meta:
         model = Message
-        fields = ["id", "content", "user", "timestamp", "is_read", "read_at"]
+        fields = ["id", "content", "sender", "timestamp", "is_read", "read_at"]
 
     def get_username(self, obj):
         return obj.user.username if obj.user else "Unknown"

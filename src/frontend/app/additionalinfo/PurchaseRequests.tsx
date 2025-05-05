@@ -12,10 +12,10 @@
  * - Dynamically renders content based on tab selection and request availability.
  *
  * Features:
- * - Tab interface to toggle between "Sent" and "Received" requests
+ * - Modern tab interface with animation
  * - Header navigation with back button using Expo Router
- * - Custom rendering of each item using the <SingleItem /> component
- * - Responsive design and empty state handling
+ * - Elevated card design for request items
+ * - Responsive design and improved empty state handling
  *
  * Dependencies:
  * - React Navigation (Expo Router)
@@ -29,8 +29,8 @@
  */
 
 import { PurchaseRequest } from "@/types/types";
-import { Entypo } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -41,17 +41,22 @@ import {
   FlatList,
   RefreshControl,
   Alert,
+  Animated,
+  Platform,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import axios from "axios";
 import SingleItem from "@/components/SingleItem";
 import React from "react";
 import Constants from "expo-constants";
+import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
 const PurchaseRequests = () => {
+  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // States for PurchaseRequest screen
   const [activeTab, setActiveTab] = useState("sent");
+  const [tabPosition] = useState(new Animated.Value(0));
   const [sentRequests, setSentRequests] = useState<PurchaseRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<PurchaseRequest[]>(
     []
@@ -65,6 +70,16 @@ const PurchaseRequests = () => {
     fetchRequests();
   }, []);
 
+  // Animate tab indicator when tab changes
+  useEffect(() => {
+    Animated.spring(tabPosition, {
+      toValue: activeTab === "sent" ? 0 : 1,
+      useNativeDriver: false,
+      friction: 8,
+      tension: 70,
+    }).start();
+  }, [activeTab]);
+
   /**
    * @function fetchRequests
    * @async
@@ -75,14 +90,14 @@ const PurchaseRequests = () => {
   const fetchRequests = async () => {
     try {
       setIsLoading(true); // start loading
-      const sentResponse = await axios.get(`${BASE_URL}/api/requests/sent/`, {
+      const sentResponse = await api.get(`${BASE_URL}/api/requests/sent/`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
-      const receivedResponse = await axios.get(
+      const receivedResponse = await api.get(
         `${BASE_URL}/api/requests/received/`,
         {
           headers: {
@@ -97,7 +112,11 @@ const PurchaseRequests = () => {
       setReceivedRequests(receivedResponse.data);
     } catch (error) {
       console.error("Error fetching purchase requests:", error);
-      alert("Failed to load purchase requests. Please try again later");
+      Alert.alert(
+        "Error",
+        "Failed to load purchase requests. Please try again later.",
+        [{ text: "OK" }]
+      );
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -114,49 +133,6 @@ const PurchaseRequests = () => {
   };
 
   /**
-   * @function cancelRequest
-   * @async
-   * @param {number} requestId - The ID of the purchase request to cancel.
-   * @description Sends a request to the backend API to cancel a specific purchase request.
-   * Upon successful cancellation, it updates the local `sentRequests` state to remove the cancelled request.
-   * Handles potential errors during the cancellation process.
-   */
-  const cancelRequest = async (requestId: number) => {
-    try {
-      const cleanToken = authToken?.trim();
-      await axios.post(
-        `${BASE_URL}/api/requests/${requestId}/cancel/`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-            Accept: "application/json",
-          },
-        }
-      );
-
-      // // Update the local state to remove the cancelled request
-      // setSentRequests((prevRequests) =>
-      //   prevRequests.filter((request) => request.id !== requestId)
-      // );
-
-      // update each cancelled request's staate to cancelled & is active to false
-      setSentRequests((prevRequests) =>
-        prevRequests.map((request) =>
-          request.id === requestId
-            ? { ...request, status: "cancelled" }
-            : request
-        )
-      );
-      alert("Purchase request cancelled successfully");
-    } catch (error) {
-      console.error("Error cancelling request:", error);
-      alert("Failed to cancel purchase request. Please try again later.");
-    }
-  };
-
-  /**
    * @function acceptRequest
    * @async
    * @param {number} requestId - The ID of the purchase request to accept.
@@ -166,7 +142,7 @@ const PurchaseRequests = () => {
   const acceptRequest = async (requestId: number) => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/requests/${requestId}/accept/`,
         {},
         {
@@ -179,10 +155,16 @@ const PurchaseRequests = () => {
       );
       // update all requests related to this listing
       fetchRequests(); // we need to re-fetch everything since multiple listings might be affected?
-      alert("Purchase request accepted successfully");
+      Alert.alert("Success", "Purchase request accepted successfully", [
+        { text: "OK" },
+      ]);
     } catch (error) {
       console.error("Error accepting request:", error);
-      alert("Failed to accept purchase request. Please try again later");
+      Alert.alert(
+        "Error",
+        "Failed to accept purchase request. Please try again later.",
+        [{ text: "OK" }]
+      );
     }
   };
 
@@ -196,7 +178,7 @@ const PurchaseRequests = () => {
   const declineRequest = async (requestId: number) => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/requests/${requestId}/decline/`,
         {},
         {
@@ -216,10 +198,16 @@ const PurchaseRequests = () => {
             : request
         )
       );
-      alert("Purchase request declined successfully");
+      Alert.alert("Success", "Purchase request declined successfully", [
+        { text: "OK" },
+      ]);
     } catch (error) {
       console.error("Error declining request:", error);
-      alert("Failed to decline purchase request. Please try again later");
+      Alert.alert(
+        "Error",
+        "Failed to decline purchase request. Please try again later.",
+        [{ text: "OK" }]
+      );
     }
   };
 
@@ -242,7 +230,7 @@ const PurchaseRequests = () => {
           onPress: async () => {
             try {
               const cleanToken = authToken?.trim();
-              await axios.delete(
+              await api.delete(
                 `${BASE_URL}/api/requests/${requestId}/remove/`,
                 {
                   headers: {
@@ -261,10 +249,16 @@ const PurchaseRequests = () => {
                   prevRequests.filter((request) => request.id !== requestId)
                 );
               }
-              alert("Request cancelled & removed");
+              Alert.alert("Success", "Request cancelled & deleted", [
+                { text: "OK" },
+              ]);
             } catch (error) {
               console.error("Error removing request:", error);
-              alert("Failed to remove request. Please try again later");
+              Alert.alert(
+                "Error",
+                "Failed to remove request. Please try again later.",
+                [{ text: "OK" }]
+              );
             }
           },
         },
@@ -286,8 +280,6 @@ const PurchaseRequests = () => {
         return "#2ecc71"; // Green
       case "declined":
         return "#e74c3c"; // Red
-      case "cancelled":
-        return "#95a5a6"; // Gray
       default:
         return "#3498db"; // Blue (default)
     }
@@ -303,7 +295,14 @@ const PurchaseRequests = () => {
    * All requests include a "Remove" button to remove the request from the user's view.
    */
   const renderRequestItem = ({ item }: { item: PurchaseRequest }) => {
-    const formattedDate = new Date(item.created_at).toLocaleDateString();
+    const formattedDate = new Date(item.created_at).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }
+    );
     const statusColor = getStatusColor(item.status);
 
     return (
@@ -311,9 +310,10 @@ const PurchaseRequests = () => {
         <SingleItem item={item.listing} source="purchaseRequests" />
         <View style={styles.requestInfo}>
           <View style={styles.statusContainer}>
-            <Text style={styles.requestDate}>
-              Requested on: {new Date(item.created_at).toLocaleDateString()}
-            </Text>
+            <View style={styles.dateContainer}>
+              <Ionicons name="calendar-outline" size={16} color="#666" />
+              <Text style={styles.requestDate}>{formattedDate}</Text>
+            </View>
             <View
               style={[styles.statusBadge, { backgroundColor: statusColor }]}
             >
@@ -325,42 +325,44 @@ const PurchaseRequests = () => {
 
           {item.status === "pending" && (
             <View style={styles.actionButtonsContainer}>
-              {activeTab === "sent" && (
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => cancelRequest(item.id)}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              )}
-
               {activeTab === "received" && (
                 <>
                   <TouchableOpacity
                     style={styles.acceptButton}
                     onPress={() => acceptRequest(item.id)}
                   >
-                    <Text style={styles.acceptButtonText}>Accept</Text>
+                    <Ionicons name="checkmark" size={16} color="white" />
+                    <Text style={styles.buttonText}>Accept</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.declineButton}
                     onPress={() => declineRequest(item.id)}
                   >
-                    <Text style={styles.declineButtonText}>Decline</Text>
+                    <Ionicons name="close" size={16} color="white" />
+                    <Text style={styles.buttonText}>Decline</Text>
                   </TouchableOpacity>
                 </>
               )}
             </View>
           )}
-          <View style={styles.removeButtonContainer}>
-            <TouchableOpacity onPress={() => removeRequest(item.id)}>
-              <Text style={styles.removeButtonText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => removeRequest(item.id)}
+          >
+            <Ionicons name="trash-outline" size={16} color="white" />
+            <Text style={styles.buttonText}>Delete Request</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
   };
+
+  // Calculate the position for the animated tab indicator
+  const indicatorLeft = tabPosition.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "50%"],
+  });
+
   return (
     <>
       {/* Stack Screen configuration for the header */}
@@ -370,45 +372,63 @@ const PurchaseRequests = () => {
           headerTitleAlign: "center",
           headerShown: true,
           headerBackTitle: "Back",
+          headerStyle: {
+            backgroundColor: "#B45757",
+          },
+          headerTintColor: "#ffffff",
+          headerShadowVisible: false,
         }}
       />
       {/* Main container for the component */}
       <View style={styles.container}>
         {/* Tabs for switching between sent and received requests */}
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === "sent" && styles.activeTab]}
-            onPress={() => setActiveTab("sent")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "sent" && styles.activeTabText,
-              ]}
+        <View style={styles.tabsOuterContainer}>
+          <View style={styles.tabsContainer}>
+            <TouchableOpacity
+              style={styles.tab}
+              onPress={() => setActiveTab("sent")}
             >
-              Sent Requests
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === "received" && styles.activeTab]}
-            onPress={() => setActiveTab("received")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "received" && styles.activeTabText,
-              ]}
+              <Text
+                style={[
+                  styles.tabText,
+                  { color: colors.textSecondary },
+                  activeTab === "sent" && { color: colors.accent },
+                ]}
+              >
+                Sent Requests
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.tab}
+              onPress={() => setActiveTab("received")}
             >
-              Received Requests
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.tabText,
+                  { color: colors.textSecondary },
+                  activeTab === "received" && { color: colors.accent },
+                ]}
+              >
+                Received Requests
+              </Text>
+            </TouchableOpacity>
+            <Animated.View
+              style={[
+                styles.tabIndicator,
+                {
+                  backgroundColor: colors.background,
+                  left: indicatorLeft,
+                },
+              ]}
+            />
+          </View>
         </View>
         {/* Conditional rendering based on loading state */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="large"
-              color="blue"
+              color="#4285F4"
               testID="activity-indicator"
             />
           </View>
@@ -425,13 +445,20 @@ const PurchaseRequests = () => {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 colors={["#4285F4"]}
+                tintColor="#4285F4"
               />
             }
             /* Component to display when the list is empty */
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
+                <Ionicons name="document-text-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyTitle}>
+                  No {activeTab === "sent" ? "Sent" : "Received"} Requests
+                </Text>
                 <Text style={styles.emptyText}>
-                  No {activeTab === "sent" ? "sent" : "received"} requests
+                  {activeTab === "sent"
+                    ? "You haven't requested to purchase any items yet."
+                    : "You don't have any purchase requests for your items."}
                 </Text>
               </View>
             }
@@ -451,46 +478,67 @@ export default PurchaseRequests;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FFF9F0",
+  },
+  tabsOuterContainer: {
+    backgroundColor: "#B45757",
+    paddingBottom: 15,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   tabsContainer: {
     flexDirection: "row",
-    marginVertical: 10,
-    marginHorizontal: 10,
+    marginTop: 5,
+    marginHorizontal: 20,
+    marginBottom: 5,
     borderRadius: 10,
-    overflow: "hidden",
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    position: "relative",
+    height: 44,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
     alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
   },
-  statusContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  statusBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-  },
-  actionButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    gap: 10,
-  },
-  activeTab: {
-    backgroundColor: "#4285F4",
+  tabIndicator: {
+    position: "absolute",
+    width: "50%",
+    height: "100%",
+    borderRadius: 10,
+    zIndex: 0,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   tabText: {
-    fontWeight: "500",
-    color: "#555",
+    fontWeight: "600",
+    fontSize: 15,
   },
   activeTabText: {
-    color: "white",
+    color: "#4285F4",
+    fontWeight: "700",
   },
   loadingContainer: {
     flex: 1,
@@ -498,82 +546,112 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    padding: 10,
+    padding: 16,
+    paddingBottom: 30,
   },
   requestItem: {
     backgroundColor: "white",
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    borderRadius: 12,
+    marginBottom: 16,
+    padding: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   requestInfo: {
-    marginTop: 10,
-    paddingHorizontal: 5,
+    marginTop: 12,
+    paddingHorizontal: 4,
   },
-  requestStatus: {
-    fontSize: 15,
-    marginBottom: 5,
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
   },
-  statusText: {
-    fontWeight: "bold",
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   requestDate: {
     fontSize: 14,
     color: "#666",
+    marginLeft: 5,
+  },
+  statusBadge: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+  },
+  statusText: {
+    fontWeight: "600",
+    color: "white",
+    fontSize: 13,
+  },
+  actionButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: 10,
     marginBottom: 10,
-  },
-  cancelButton: {
-    backgroundColor: "#ff4757",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    alignSelf: "flex-start",
-  },
-  cancelButtonText: {
-    color: "black",
-    fontWeight: "500",
   },
   acceptButton: {
     backgroundColor: "#2ecc71",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  acceptButtonText: {
-    color: "white",
-    fontWeight: "500",
-  },
-  declineButton: {
-    backgroundColor: "#e74c3c",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  declineButtonText: {
-    color: "white",
-    fontWeight: "500",
-  },
-  removeButtonContainer: {
-    alignItems: "flex-end", // aligns child to the right
-    marginTop: 10,
-  },
-  removeButtonText: {
-    color: "black",
-    fontWeight: "500",
-  },
-  emptyContainer: {
-    padding: 20,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
+  declineButton: {
+    backgroundColor: "#e74c3c",
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  removeButton: {
+    backgroundColor: "#ff4757",
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "flex-end",
+    marginTop: 4,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+    marginLeft: 5,
+  },
+  emptyContainer: {
+    padding: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+    marginTop: 16,
+    marginBottom: 8,
+  },
   emptyText: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#666",
     textAlign: "center",
+    lineHeight: 22,
   },
 });

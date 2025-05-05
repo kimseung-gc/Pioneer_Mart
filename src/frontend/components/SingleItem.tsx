@@ -75,6 +75,11 @@ const SingleItem = ({ item, source }: Props) => {
           // isOwner && styles.myItemContainer,
         ]}
       >
+        {isOwner && (
+          <View style={styles.ownershipTag}>
+            <Text style={styles.ownershipTagText}>Your Item</Text>
+          </View>
+        )}
         <ReportModal
           isVisible={isReportModalVisible}
           onClose={() => setIsReportModalVisible(false)}
@@ -174,9 +179,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    borderColor: "#ffd700",
-    borderWidth: 4,
-    backgroundColor: "rgba(255, 215, 0, 0.05)",
+    borderColor: "#B91C1C",
+    borderWidth: 3,
+    backgroundColor: "#FFF5F5",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.07,
+    shadowRadius: 2,
+    elevation: 2,
   },
   buttonsContainer: {
     position: "absolute",
@@ -236,5 +246,20 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#ffd700",
     marginTop: 2,
+  },
+  ownershipTag: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    backgroundColor: "#B91C1C",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    zIndex: 10,
+  },
+  ownershipTagText: {
+    fontSize: 10,
+    color: "white",
+    fontWeight: "600",
   },
 });

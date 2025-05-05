@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { UserInfo } from "@/types/types";
 import axios from "axios";
-import { PaginatedResponse } from "@/types/api";
+import api, { PaginatedResponse } from "@/types/api";
 import Constants from "expo-constants";
 
 const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -25,7 +25,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ isLoading: true, error: null });
       const cleanToken = token?.trim();
       const URL = `${BASE_URL}/api/users/`;
-      const response = await axios.get<PaginatedResponse<UserInfo>>(URL, {
+      const response = await api.get<PaginatedResponse<UserInfo>>(URL, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
       const cleanToken = token?.trim();
       const URL = `${BASE_URL}/api/users/${userData.id}/`;
-      const response = await axios.patch(URL, updatedData, {
+      const response = await api.patch(URL, updatedData, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",

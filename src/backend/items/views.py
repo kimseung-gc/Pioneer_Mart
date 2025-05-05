@@ -50,7 +50,10 @@ class ItemViewSet(viewsets.ModelViewSet):
         request_purchase(request, pk=None): Creates a purchase request for a listing.
     """
 
-    queryset = Listing.objects.all()  # get all listing objects
+    # We aren't using default queryset cause we need to allow user to click on sold item on purchase request screen.
+    # if they're retrieving ONE item, they can retrieve even the sold items though the frontend wont show it unless
+    # for my items and purchase requests. For everything else, it won't return the sold item
+    # queryset = Listing.objects.filter(is_sold=False)  # get all listing objects
     serializer_class = ItemSerializer  # specify the serializer to use for converting Listing objects to and from JSON
     authentication_classes = [
         JWTAuthentication
@@ -69,6 +72,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "price", "title"]
     ordering = ["-created_at"]  # order by creation date in descending order
     parser_classes = [MultiPartParser, FormParser]  # media files are handled
+
+    def get_queryset(self):
+        if self.action == "retrieve":
+            return Listing.objects.all()  # allow sold items in detail view
+        return Listing.objects.filter(is_sold=False)  # hide sold items everywhere else
 
     def create(self, request, *args, **kwargs):
         """
@@ -266,7 +274,9 @@ class ItemViewSet(viewsets.ModelViewSet):
         """
         # get instance of currently logged in user
         user_profile = request.user.profile
-        favorites = user_profile.favorites.all()  # get all the user's favorites
+        favorites = user_profile.favorites.filter(
+            is_sold=False
+        )  # get all the user's favorites
 
         # Paginate stuff
         page = self.paginate_queryset(favorites)  # method provided by DRF
@@ -295,7 +305,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         """
         query = request.query_params.get("q", "")
         user_profile = request.user.profile
-        favorites = user_profile.favorites.all()
+        favorites = user_profile.favorites.filter(is_sold=False)
         if query:
             items = favorites.filter(
                 Q(title__icontains=query)
@@ -327,7 +337,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         """
         query = request.query_params.get("q", "")
         if query:
-            items = self.queryset.filter(
+            items = self.get_queryset.filter(
                 Q(title__icontains=query)
                 | Q(description__icontains=query)
                 | Q(
@@ -335,7 +345,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                 )  # search in title, description, and category name
             )
         else:
-            items = self.queryset
+            items = self.get_queryset()
         return self.get_paginated_response(
             self.get_serializer(self.paginate_queryset(items), many=True).data
         )
@@ -351,7 +361,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         Returns:
             Response: A response containing the user's listings.
         """
-        items = self.queryset.filter(seller=request.user)
+        items = Listing.objects.filter(seller=request.user)
         page = self.paginate_queryset(items)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -373,7 +383,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             Response: A response containing the search results.
         """
         query = request.query_params.get("q", "")
-        base_queryset = self.queryset.filter(seller=request.user)
+        base_queryset = self.get_queryset.filter(seller=request.user)
         if query:
             items = base_queryset.filter(
                 Q(title__icontains=query)
@@ -431,3 +441,24 @@ class ItemViewSet(viewsets.ModelViewSet):
 
         serializer = PurchaseRequestSerializer(purchase_request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["DELETE"], permission_classes=[IsAuthenticated])
+    def delete_item(self, request, pk=None):
+        """
+        Deletes the specified listing if the request user is the seller.
+        """
+        try:
+            listing = Listing.objects.get(pk=pk)
+        except Listing.DoesNotExist:
+            return Response(
+                {"error": "Listing not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if listing.seller != request.user:
+            return Response(
+                {"error": "You do not have permission to delete this listing."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        listing.delete()
+        return Response({"success": "Listing deleted."}, status=status.HTTP_200_OK)

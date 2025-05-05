@@ -4,10 +4,10 @@ import { useChatStore } from "@/stores/chatStore";
 import { useUserStore } from "@/stores/userStore";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import axios from "axios";
 import React from "react";
 import { router } from "expo-router";
 import { RefreshControl } from "react-native";
+import api from "@/types/api";
 
 jest.mock("@/app/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
@@ -86,13 +86,13 @@ describe("ChatRoomsScreen", () => {
     (useChatStore as unknown as jest.Mock).mockReturnValue({
       fetchUnreadCount: mockFetchUnreadCount,
     });
-    (axios.get as jest.Mock).mockResolvedValue({
+    (api.get as jest.Mock).mockResolvedValue({
       data: {
         rooms: mockRooms,
       },
     });
 
-    (axios.post as jest.Mock).mockResolvedValue({});
+    (api.post as jest.Mock).mockResolvedValue({});
   });
 
   afterEach(() => {
@@ -121,7 +121,7 @@ describe("ChatRoomsScreen", () => {
     );
     // theres an async func in the focus effect so use wait for
     await waitFor(() => {
-      expect(axios.get).toHaveBeenCalledWith(
+      expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining("/api/chat/rooms"),
         expect.any(Object) // get anything
       );
@@ -151,6 +151,8 @@ describe("ChatRoomsScreen", () => {
           id: "123",
           username: "OtherUser1",
           itemTitle: "Test Item 1",
+          receiver_id: 789,
+          user_id: 456,
         },
       });
     });
@@ -166,7 +168,7 @@ describe("ChatRoomsScreen", () => {
     fireEvent.press(roomItem);
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/api/chat/rooms/123/mark-read/"),
         {},
         expect.any(Object)
@@ -183,7 +185,7 @@ describe("ChatRoomsScreen", () => {
       </NavigationContainer>
     );
 
-    (axios.get as jest.Mock).mockClear(); //make sure
+    (api.get as jest.Mock).mockClear(); //make sure
 
     // get the refresh thingy
     const refreshControl = UNSAFE_getByType(RefreshControl);
@@ -193,7 +195,7 @@ describe("ChatRoomsScreen", () => {
     });
 
     await waitFor(() => {
-      expect(axios.get).toHaveBeenCalledWith(
+      expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining("/api/chat/rooms/"), //make the api call and test
         expect.any(Object)
       );

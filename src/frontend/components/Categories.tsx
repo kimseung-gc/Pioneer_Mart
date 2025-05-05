@@ -9,7 +9,7 @@ import {
   FlatList,
   Switch,
 } from "react-native";
-import Slider from "@react-native-community/slider";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { CategoryType, ScreenId } from "@/types/types";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -55,12 +55,15 @@ const Categories: React.FC<CategoriesProps> = ({
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [localFilterOptions, setLocalFilterOptions] =
     useState<FilterOptions>(filterOptions);
-
-  // // default filter values
-  // const [filterOptions, setFilterOptions] = useState<FilterOptions>(storeFilterOptions);
+  // memoisze price values to prevent excessive re-renders
+  const [sliderValues, setSliderValues] = useState<[number, number]>(
+    filterOptions.priceRange
+  );
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLocalFilterOptions(filterOptions);
+    setSliderValues(filterOptions.priceRange);
   }, [filterOptions]);
 
   const handleCategorySelect = (categoryId: string | null) => {
@@ -71,7 +74,11 @@ const Categories: React.FC<CategoriesProps> = ({
 
   const handleFilterApply = () => {
     // console.log("Applying filters:", filterOptions);
-    useItemsStore.getState().applyFilters(screenId, localFilterOptions);
+    const updatedFilterOptions = {
+      ...localFilterOptions,
+      priceRange: sliderValues,
+    };
+    useItemsStore.getState().applyFilters(screenId, updatedFilterOptions);
     setFilterModalVisible(false);
   };
 
@@ -83,7 +90,12 @@ const Categories: React.FC<CategoriesProps> = ({
       sortByPrice: null,
     };
     setLocalFilterOptions(defaultFilters);
+    setSliderValues([0, 1000]);
     useItemsStore.getState().resetFilters(screenId);
+  };
+
+  const handlePriceRangeChange = (values: number[]) => {
+    setSliderValues([values[0], values[1]]);
   };
 
   return (
@@ -246,24 +258,57 @@ const Categories: React.FC<CategoriesProps> = ({
                 <Text style={styles.filterSectionTitle}>Price Range</Text>
                 <View style={styles.priceRangeContainer}>
                   <Text style={styles.priceLabel}>
-                    ${localFilterOptions.priceRange[0]} - $
-                    {localFilterOptions.priceRange[1]}
+                    ${sliderValues[0]} - ${sliderValues[1]}
                   </Text>
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={0}
-                    maximumValue={1000}
-                    step={10}
-                    value={localFilterOptions.priceRange[1]}
-                    minimumTrackTintColor="#4285F4"
-                    maximumTrackTintColor="#ECECEC"
-                    onValueChange={(value) =>
-                      setLocalFilterOptions({
-                        ...localFilterOptions,
-                        priceRange: [localFilterOptions.priceRange[0], value],
-                      })
-                    }
-                  />
+                  <View style={styles.sliderContainer}>
+                    <MultiSlider
+                      values={[sliderValues[0], sliderValues[1]]}
+                      min={0}
+                      max={1000}
+                      step={10}
+                      sliderLength={280}
+                      onValuesChange={handlePriceRangeChange}
+                      allowOverlap={false}
+                      minMarkerOverlapDistance={10}
+                      snapped
+                      selectedStyle={{
+                        backgroundColor: "#A25E5E",
+                      }}
+                      unselectedStyle={{
+                        backgroundColor: "#EADFD2",
+                      }}
+                      containerStyle={{
+                        height: 40,
+                      }}
+                      markerStyle={{
+                        backgroundColor: "#A25E5E",
+                        height: 24,
+                        width: 24,
+                        borderRadius: 12,
+                        borderWidth: 2,
+                        borderColor: "#FFFFFF",
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1,
+                        elevation: 2,
+                      }}
+                      pressedMarkerStyle={{
+                        backgroundColor: "#8E4F4F",
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                      }}
+                      trackStyle={{
+                        height: 6,
+                        borderRadius: 3,
+                      }}
+                    />
+                  </View>
+                  <View style={styles.priceRangeLabels}>
+                    <Text style={styles.priceRangeLabel}>$0</Text>
+                    <Text style={styles.priceRangeLabel}>$1000</Text>
+                  </View>
                 </View>
               </View>
               {/* sort by price section */}
@@ -350,7 +395,7 @@ const Categories: React.FC<CategoriesProps> = ({
                     Has Active Purchase Requests
                   </Text>
                   <Switch
-                    trackColor={{ false: "#ECECEC", true: "#4285F4" }}
+                    trackColor={{ false: "#ECECEC", true: "#A25E5E" }}
                     thumbColor="#FFFFFF"
                     ios_backgroundColor="#ECECEC"
                     onValueChange={(value) =>
@@ -411,13 +456,13 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EFF4FE",
+    backgroundColor: "#F5E3DC",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
   },
   filterText: {
-    color: "#4285F4",
+    color: "#A25E5E",
     fontSize: 12,
     fontWeight: "500",
     marginLeft: 4,
@@ -440,17 +485,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginHorizontal: 5,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F5E3DC",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#EADFD2",
   },
   selectedCategory: {
-    backgroundColor: "#4285F4",
-    borderColor: "#4285F4",
+    backgroundColor: "#A25E5E",
+    borderColor: "#A25E5E",
   },
   categoryText: {
     fontSize: 14,
-    color: "#333",
+    color: "#4A4A4A",
   },
   selectedCategoryText: {
     color: "white",
@@ -473,7 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: "#FFF9F0",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 30,
@@ -490,6 +535,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#4A4A4A",
   },
   modalCategoryItem: {
     flexDirection: "row",
@@ -504,14 +550,15 @@ const styles = StyleSheet.create({
   },
   modalCategoryText: {
     fontSize: 16,
-    color: "#333",
+    color: "#4A4A4A",
   },
   modalSelectedCategoryText: {
-    color: "#4285F4",
+    color: "#A25E5E",
     fontWeight: "500",
   },
   filterScrollView: {
-    maxHeight: "60%",
+    // maxHeight: "60%",
+    // flex: 1,
   },
   filterSection: {
     paddingHorizontal: 16,
@@ -531,10 +578,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     marginBottom: 8,
+    textAlign: "center",
   },
-  slider: {
-    width: "100%",
-    height: 40,
+  sliderContainer: {
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  priceRangeLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginTop: 5,
+  },
+  priceRangeLabel: {
+    fontSize: 12,
+    color: "#888",
   },
   sortOptionsContainer: {
     flexDirection: "row",
@@ -547,17 +605,17 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
     borderRadius: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#F5E3DC",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#EADFD2",
   },
   selectedSortOption: {
-    backgroundColor: "#4285F4",
-    borderColor: "#4285F4",
+    backgroundColor: "#A25E5E",
+    borderColor: "#A25E5E",
   },
   sortOptionText: {
     fontSize: 14,
-    color: "#333",
+    color: "#4A4A4A",
   },
   selectedSortOptionText: {
     color: "white",
@@ -596,11 +654,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
-    backgroundColor: "#4285F4",
+    backgroundColor: "#A25E5E",
   },
   applyButtonText: {
-    fontSize: 14,
     color: "white",
     fontWeight: "500",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });

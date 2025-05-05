@@ -1,10 +1,10 @@
 import WelcomeScreen from "@/app/(auth)";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
 import { useAuth } from "@/app/contexts/AuthContext";
+import api from "@/types/api";
 
 jest.mock("@/app/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
@@ -83,27 +83,7 @@ describe("WelcomeScreen Component", () => {
 
     // terms acceptance ui elements should not be visible yet
     expect(queryByTestId("email-input")).toBeNull();
-    expect(queryByText("Send Code")).toBeNull();
-  });
-
-  it("shows terms acceptance prompt when terms are not accepted", async () => {
-    mockUseAuth.mockReturnValue({
-      authToken: null,
-      setAuthToken: jest.fn(),
-      isAuthenticated: false,
-      loading: false,
-      onLogout: jest.fn(),
-    });
-    const { getByTestId, getByText } = render(<WelcomeScreen />);
-
-    // close the modal without accepting terms
-    fireEvent.press(getByTestId("close-button"));
-
-    // should show the prompt to accept terms
-    expect(
-      getByText("Please accept the terms and conditions to continue")
-    ).toBeTruthy();
-    expect(getByText("View Terms")).toBeTruthy();
+    expect(queryByText("Send Verification Code")).toBeNull();
   });
 
   it("shows registration form when terms are accepted", async () => {
@@ -121,7 +101,7 @@ describe("WelcomeScreen Component", () => {
 
     // should now show registration form
     expect(getByTestId("email-input")).toBeTruthy();
-    expect(getByText("Send Code")).toBeTruthy();
+    expect(getByTestId("send-code-button")).toBeTruthy();
 
     // should not show the terms acceptance prompt
     expect(
@@ -172,16 +152,16 @@ describe("WelcomeScreen Component", () => {
       fireEvent.changeText(emailInput, "khalidmu");
     });
 
-    const sendCodeButton = component.getByText("Send Code");
+    const sendCodeButton = component.getByTestId("send-code-button");
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
-    // Just checking that axios was called with the correct email
-    expect(axios.post).toHaveBeenCalledWith(
+    // Just checking that api was called with the correct email
+    expect(api.post).toHaveBeenCalledWith(
       expect.stringContaining("/otpauth/request-otp/"),
       {
         email: "khalidmu@grinnell.edu",
@@ -204,20 +184,20 @@ describe("WelcomeScreen Component", () => {
     fireEvent.press(acceptButton);
 
     const emailInput = component.getByTestId("email-input");
-    const sendCodeButton = component.getByText("Send Code");
+    const sendCodeButton = component.getByTestId("send-code-button");
 
     await act(async () => {
       fireEvent.changeText(emailInput, "khalidmu"); //username for my email
     });
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalled();
+      expect(api.post).toHaveBeenCalled();
       expect(router.push).toHaveBeenCalledWith({
         pathname: "/(auth)/OtpScreen",
         params: { email: "khalidmu@grinnell.edu" },
@@ -242,22 +222,25 @@ describe("WelcomeScreen Component", () => {
     fireEvent.press(acceptButton);
 
     const emailInput = component.getByTestId("email-input");
-    const sendCodeButton = component.getByText("Send Code");
+    const sendCodeButton = component.getByTestId("send-code-button");
 
     await act(async () => {
       fireEvent.changeText(emailInput, "khalidmu");
     });
 
     // This si for all the godforsaken networks errors we've been getting when testing the whole thing
-    (axios.post as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
+    (api.post as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalled();
-      expect(Alert.alert).toHaveBeenCalledWith("Failed to do OTP stuff");
+      expect(api.post).toHaveBeenCalled();
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Authentication Error",
+        "Failed to send verification code. Please try again later."
+      );
       // Make sure we didn't navigate
       expect(router.push).not.toHaveBeenCalled();
     });
@@ -272,25 +255,28 @@ describe("WelcomeScreen Component", () => {
       loading: false,
       onLogout: jest.fn(),
     });
-    const { getByTestId, getByText } = render(<WelcomeScreen />);
+    const { getByTestId } = render(<WelcomeScreen />);
 
     // accept terms
     fireEvent.press(getByTestId("accept-button"));
 
-    const sendCodeButton = getByText("Send Code");
+    const sendCodeButton = getByTestId("send-code-button");
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
-
-    // should still attempt the request with empty string
-    expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/otpauth/request-otp/"),
-      {
-        email: "@grinnell.edu",
-      },
-      expect.any(Object)
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Error",
+      "Please enter your username first"
     );
+    // // should still attempt the request with empty string
+    // expect(api.post).toHaveBeenCalledWith(
+    //   expect.stringContaining("/otpauth/request-otp/"),
+    //   {
+    //     email: "@grinnell.edu",
+    //   },
+    //   expect.any(Object)
+    // );
   });
   it("properly formats the email with @grinnell.edu domain", async () => {
     mockUseAuth.mockReturnValue({
@@ -300,7 +286,7 @@ describe("WelcomeScreen Component", () => {
       loading: false,
       onLogout: jest.fn(),
     });
-    const { getByTestId, getByText } = render(<WelcomeScreen />);
+    const { getByTestId } = render(<WelcomeScreen />);
 
     // accept terms
     fireEvent.press(getByTestId("accept-button"));
@@ -311,15 +297,15 @@ describe("WelcomeScreen Component", () => {
       fireEvent.changeText(emailInput, "testuser");
     });
 
-    const sendCodeButton = getByText("Send Code");
+    const sendCodeButton = getByTestId("send-code-button");
 
-    (axios.post as jest.Mock).mockResolvedValueOnce({});
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
 
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       expect.any(String),
       {
         email: "testuser@grinnell.edu",

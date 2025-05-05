@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { Stack } from "expo-router";
 
@@ -7,13 +7,15 @@ import { useItemsStore } from "@/stores/useSearchStore";
 import ProductList from "@/components/ProductList";
 import Header from "@/components/Header";
 import Categories from "@/components/Categories";
-import axios from "axios";
 import { Alert, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { useUserStore } from "@/stores/userStore";
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
+import { useTheme } from "../contexts/ThemeContext";
+import api from "@/types/api";
 
 const FavoritesScreen = () => {
+  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
@@ -50,7 +52,7 @@ const FavoritesScreen = () => {
     try {
       for (const item of notRequestedItems) {
         try {
-          await axios.post(
+          await api.post(
             `${BASE_URL}/api/items/${item.id}/request_purchase/`,
             {},
             {
@@ -98,37 +100,39 @@ const FavoritesScreen = () => {
           header: () => <Header screenId={screenId} />,
         }}
       />
-      <Categories screenId={screenId} categories={categories} />
-      <ProductList
-        items={filteredItems}
-        isLoading={isLoading}
-        source={"favorites"}
-      />
-      {notRequestedItems.length > 0 && (
-        <View style={styles.floatingButtonContainer}>
-          {requestSuccess && (
-            <View style={styles.successMessageContainer}>
-              <Text style={styles.successMessage}>
-                Request sent successfully!
-              </Text>
-            </View>
-          )}
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Categories screenId={screenId} categories={categories} />
+        <ProductList
+          items={filteredItems}
+          isLoading={isLoading}
+          source={"favorites"}
+        />
+        {notRequestedItems.length > 0 && (
+          <View style={styles.floatingButtonContainer}>
+            {requestSuccess && (
+              <View style={styles.successMessageContainer}>
+                <Text style={styles.successMessage}>
+                  Request sent successfully!
+                </Text>
+              </View>
+            )}
 
-          <TouchableOpacity
-            style={[
-              styles.floatingButton,
-              isRequesting && styles.floatingButtonDisabled,
-            ]}
-            onPress={handleRequestAllItems}
-            // onPress={() => console.log("Hello")}
-            disabled={isRequesting}
-          >
-            <Text style={styles.floatingButtonText}>
-              {isRequesting ? "Requesting..." : "Request All"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            <TouchableOpacity
+              style={[
+                styles.floatingButton,
+                { backgroundColor: colors.accent },
+                isRequesting && styles.floatingButtonDisabled,
+              ]}
+              onPress={handleRequestAllItems}
+              disabled={isRequesting}
+            >
+              <Text style={styles.floatingButtonText}>
+                {isRequesting ? "Requesting..." : "Request All"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </>
   );
 };

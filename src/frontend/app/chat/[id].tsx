@@ -19,10 +19,15 @@ import { useUserStore } from "@/stores/userStore";
 import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const ChatScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
-  const { id, username, itemTitle } = useLocalSearchParams();
+  const { id, username, user_id, itemTitle, receiver_id } =
+    useLocalSearchParams();
+
+  const receiverId =
+    typeof receiver_id === "string" ? parseInt(receiver_id, 10) : undefined;
   const roomId = typeof id === "string" ? id : "";
   const roomName = typeof username === "string" ? username : "Chat Room";
   const item = typeof itemTitle === "string" ? itemTitle : "Item";
@@ -51,14 +56,15 @@ const ChatScreen = () => {
     };
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data) as WebSocketMessage;
-      console.log("Received message:", data); // debug the incoming data
       // update state for messages when user receives a message
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: Math.random().toString(),
           content: data.message,
-          userId: data.user_id ? data.user_id.toString() : "",
+          userId: String(data.user_id),
+          receiverId:
+            data.receiver_id !== undefined ? String(data.receiver_id) : null,
           username: data.username || "Unknown",
           timestamp: new Date().toISOString(),
         },
@@ -91,7 +97,7 @@ const ChatScreen = () => {
   const markRoomAsRead = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
         {},
         {
@@ -109,7 +115,7 @@ const ChatScreen = () => {
   const fetchChatHistory = async (): Promise<void> => {
     try {
       const cleanToken = authToken.authToken?.trim();
-      const response = await axios.get(
+      const response = await api.get(
         `${BASE_URL}/api/chat/history/${roomId}/`,
         {
           headers: {
@@ -123,8 +129,8 @@ const ChatScreen = () => {
       const transformedMessages = response.data.messages.map((msg: any) => ({
         id: msg.id.toString(),
         content: msg.content,
-        userId: msg.user?.id?.toString() || "",
-        username: msg.user?.username || "Unknown",
+        userId: msg.sender?.id?.toString() || "",
+        username: msg.sender?.username || "Unknown",
         timestamp: msg.timestamp,
       }));
       setMessages(transformedMessages);
@@ -135,10 +141,10 @@ const ChatScreen = () => {
 
   const sendMessage = (): void => {
     if (messageText.trim() === "" || !connected || !ws.current) return;
-
     const messageData: WebSocketMessage = {
       message: messageText,
       user_id: userData?.id,
+      receiver_id: receiverId,
     };
 
     // send a message

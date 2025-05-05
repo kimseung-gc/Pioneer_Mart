@@ -1,8 +1,10 @@
 import { AuthContextType } from "@/app/contexts/AuthContext";
-import { PaginatedResponse } from "@/types/api";
+import api, { PaginatedResponse } from "@/types/api";
 import { CategoryType, ItemType, ScreenId } from "@/types/types";
+import { getErrorMessage } from "@/utils/errorUtils";
 import axios from "axios";
 import Constants from "expo-constants";
+import Toast from "react-native-toast-message";
 import { create } from "zustand";
 
 // interface for filters
@@ -35,6 +37,8 @@ interface ItemsStoreState {
   categories: Array<{ id: number; name: string }>;
   refreshItems: (screenId: ScreenId, authToken: string) => Promise<void>; // New function to force refresh
   updateItem: (updatedItem: ItemType) => void;
+  isConnected: boolean;
+  setIsConnected: (status: boolean) => void;
 
   //actions
   setIsReturningFromDetails: (value: boolean) => void;
@@ -93,12 +97,14 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
     favorites: { ...initialScreenState },
     reported: { ...initialScreenState },
     myItems: { ...initialScreenState },
-    notifications: { ...initialScreenState }, 
+    notifications: { ...initialScreenState },
   },
   activeScreen: "home",
   categories: [],
   isReturningFromDetails: false,
   setIsReturningFromDetails: (value) => set({ isReturningFromDetails: value }),
+  isConnected: true,
+  setIsConnected: (status: boolean) => set({ isConnected: status }),
 
   //set active screen
   setActiveScreen: (screenId) => set({ activeScreen: screenId }),
@@ -190,6 +196,15 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
    *  await refreshItems('home', authToken (from useAuth Context))
    */
   refreshItems: async (screenId: ScreenId, authToken: string) => {
+    const { isConnected } = get();
+    if (!isConnected) {
+      Toast.show({
+        type: "error",
+        text1: "You're offline",
+        text2: "Please check your internet connection",
+      });
+      return;
+    }
     const currentScreen = get().screens[screenId]; //get the current using screenId
     const now = Date.now(); //get current time
 
@@ -226,7 +241,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }
 
       const cleanToken = authToken?.trim(); //trim to ensure token is correct
-      const response = await axios.get<PaginatedResponse<ItemType>>(
+      const response = await api.get<PaginatedResponse<ItemType>>(
         `${BASE_URL}/${endpoint}`,
         {
           //api call
@@ -263,6 +278,14 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error(`Error refreshing items for ${screenId}:`, error);
+
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Refresh failed",
+        text2: message as string,
+      });
 
       // Set loading to false on error
       set((state) => ({
@@ -317,7 +340,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }
 
       const cleanToken = authToken?.trim();
-      const response = await axios.get<PaginatedResponse<ItemType>>(
+      const response = await api.get<PaginatedResponse<ItemType>>(
         `${BASE_URL}/${endpoint}`,
         {
           headers: {
@@ -341,6 +364,14 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error(`Error loading items for ${screenId}:`, error);
+
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Loading items failed",
+        text2: message as string,
+      });
 
       //clear items and set loading to false on error
       set((state) => ({
@@ -379,7 +410,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
     }));
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get<PaginatedResponse<ItemType>>(
+      const response = await api.get<PaginatedResponse<ItemType>>(
         `${currentScreen.nextPage}`,
         {
           headers: {
@@ -417,6 +448,13 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error(`Error loading more items for ${screenId}:`, error);
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Loading more items failed",
+        text2: message as string,
+      });
       set((state) => ({
         screens: {
           ...state.screens,
@@ -438,7 +476,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
   loadCategories: async (authToken: string) => {
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get<CategoryType[]>(
+      const response = await api.get<CategoryType[]>(
         `${BASE_URL}/api/categories/`,
         {
           headers: {
@@ -449,6 +487,13 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       );
       set({ categories: response.data });
     } catch (error) {
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Error getting categories",
+        text2: message as string,
+      });
       set({ categories: [] });
     }
   },
@@ -492,7 +537,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else if (screenId === "reported") {
         endpoint = `api/items/search_reported_items/?${query}`; // TODO
       }
-      const response = await axios.get<PaginatedResponse<ItemType>>(
+      const response = await api.get<PaginatedResponse<ItemType>>(
         `${BASE_URL}/${endpoint}`,
         {
           headers: {
@@ -530,6 +575,13 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error(`Error searching items for ${screenId}:`, error);
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Error while searching",
+        text2: message as string,
+      });
       // Clear items and set loading to false on error
       set((state) => ({
         screens: {
@@ -588,35 +640,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         },
       };
     });
-
-    // //apply category filter
-    // if (categoryId === null) {
-    //   // Show all items if no category selected
-    //   set((state) => ({
-    //     screens: {
-    //       ...state.screens,
-    //       [screenId]: {
-    //         ...state.screens[screenId],
-    //         filteredItems: screenState.items,
-    //       },
-    //     },
-    //   }));
-    // } else {
-    //   //filter items by category
-    //   const filtered = screenState.items.filter(
-    //     (item) => Number(item.category) === categoryId
-    //   );
-
-    //   set((state) => ({
-    //     screens: {
-    //       ...state.screens,
-    //       [screenId]: {
-    //         ...state.screens[screenId],
-    //         filteredItems: filtered,
-    //       },
-    //     },
-    //   }));
-    // }
   },
 
   /**
@@ -685,7 +708,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       const newFavoriteStatus = !currentFavoriteStatus;
 
       // Make the API call
-      await axios.post(
+      await api.post(
         URL,
         {},
         {
@@ -702,75 +725,88 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
-          (screenKey) => {
-            const screen = updatedScreens[screenKey];
+        (
+          [
+            "home",
+            "favorites",
+            "myItems",
+            "reported",
+            "notifications",
+          ] as ScreenId[]
+        ).forEach((screenKey) => {
+          const screen = updatedScreens[screenKey];
 
-            // Update items array with the new status
-            const updatedItems = screen.items.map((item) =>
-              item.id === itemId
-                ? { ...item, is_favorited: newFavoriteStatus }
-                : item
-            );
+          // Update items array with the new status
+          const updatedItems = screen.items.map((item) =>
+            item.id === itemId
+              ? { ...item, is_favorited: newFavoriteStatus }
+              : item
+          );
 
-            // Update filtered items array with the new status
-            const updatedFilteredItems = screen.filteredItems.map((item) =>
-              item.id === itemId
-                ? { ...item, is_favorited: newFavoriteStatus }
-                : item
-            );
+          // Update filtered items array with the new status
+          const updatedFilteredItems = screen.filteredItems.map((item) =>
+            item.id === itemId
+              ? { ...item, is_favorited: newFavoriteStatus }
+              : item
+          );
 
-            // Handle special cases for the favorites screen
-            if (screenKey === "favorites") {
-              if (!newFavoriteStatus) {
-                // If unfavoriting, remove from favorites screen
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems.filter((item) => item.id !== itemId),
-                  filteredItems: updatedFilteredItems.filter(
-                    (item) => item.id !== itemId
-                  ),
-                };
-              } else if (
-                newFavoriteStatus &&
-                !screen.items.some((item) => item.id === itemId)
-              ) {
-                // If favoriting AND the item isn't already in favorites screen, add it
-                // This is the key part that was missing
-                const itemToAdd = { ...currentItem!, is_favorited: true };
+          // Handle special cases for the favorites screen
+          if (screenKey === "favorites") {
+            if (!newFavoriteStatus) {
+              // If unfavoriting, remove from favorites screen
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems.filter((item) => item.id !== itemId),
+                filteredItems: updatedFilteredItems.filter(
+                  (item) => item.id !== itemId
+                ),
+              };
+            } else if (
+              newFavoriteStatus &&
+              !screen.items.some((item) => item.id === itemId)
+            ) {
+              // If favoriting AND the item isn't already in favorites screen, add it
+              // This is the key part that was missing
+              const itemToAdd = { ...currentItem!, is_favorited: true };
 
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: [itemToAdd, ...screen.items],
-                  filteredItems:
-                    screen.selectedCategory === null ||
-                    Number(itemToAdd.category) === screen.selectedCategory
-                      ? [itemToAdd, ...screen.filteredItems]
-                      : screen.filteredItems,
-                };
-              } else {
-                // Just update status
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems,
-                  filteredItems: updatedFilteredItems,
-                };
-              }
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: [itemToAdd, ...screen.items],
+                filteredItems:
+                  screen.selectedCategory === null ||
+                  Number(itemToAdd.category) === screen.selectedCategory
+                    ? [itemToAdd, ...screen.filteredItems]
+                    : screen.filteredItems,
+              };
             } else {
-              // For non-favorites screens, just update the items
+              // Just update status
               updatedScreens[screenKey] = {
                 ...screen,
                 items: updatedItems,
                 filteredItems: updatedFilteredItems,
               };
             }
+          } else {
+            // For non-favorites screens, just update the items
+            updatedScreens[screenKey] = {
+              ...screen,
+              items: updatedItems,
+              filteredItems: updatedFilteredItems,
+            };
           }
-        );
+        });
 
         return { screens: updatedScreens };
       });
     } catch (error) {
       console.log("Error toggling favorite:", error);
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Error favoriting your item",
+        text2: message as string,
+      });
     }
   },
   /**
@@ -820,7 +856,7 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       // Toggle the status - calculate new status ahead of time
       const newReportedStatus = !currentReportedStatus;
       // Make the API call
-      await axios.post(URL, payload, {
+      await api.post(URL, payload, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",
@@ -836,69 +872,75 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         const updatedScreens = { ...state.screens };
 
         // Update existing items in each screen
-        (["home", "favorites", "myItems", "reported", "notifications"] as ScreenId[]).forEach(
-          (screenKey) => {
-            const screen = updatedScreens[screenKey];
+        (
+          [
+            "home",
+            "favorites",
+            "myItems",
+            "reported",
+            "notifications",
+          ] as ScreenId[]
+        ).forEach((screenKey) => {
+          const screen = updatedScreens[screenKey];
 
-            // Update items array with the new status
-            const updatedItems = screen.items.map((item) =>
-              item.id === itemId
-                ? { ...item, is_reported: newReportedStatus }
-                : item
-            );
+          // Update items array with the new status
+          const updatedItems = screen.items.map((item) =>
+            item.id === itemId
+              ? { ...item, is_reported: newReportedStatus }
+              : item
+          );
 
-            // Update filtered items array with the new status
-            const updatedFilteredItems = screen.filteredItems.map((item) =>
-              item.id === itemId
-                ? { ...item, is_reported: newReportedStatus }
-                : item
-            );
+          // Update filtered items array with the new status
+          const updatedFilteredItems = screen.filteredItems.map((item) =>
+            item.id === itemId
+              ? { ...item, is_reported: newReportedStatus }
+              : item
+          );
 
-            // Handle special cases for the favorites screen
-            if (screenKey === "reported") {
-              if (!newReportedStatus) {
-                // If unreporting, remove from reported screen
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems.filter((item) => item.id !== itemId),
-                  filteredItems: updatedFilteredItems.filter(
-                    (item) => item.id !== itemId
-                  ),
-                };
-              } else if (
-                newReportedStatus &&
-                !screen.items.some((item) => item.id === itemId)
-              ) {
-                // If reporting AND the item isn't already in reported screen, add it
-                const itemToAdd = { ...currentItem!, is_reported: true };
+          // Handle special cases for the favorites screen
+          if (screenKey === "reported") {
+            if (!newReportedStatus) {
+              // If unreporting, remove from reported screen
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: updatedItems.filter((item) => item.id !== itemId),
+                filteredItems: updatedFilteredItems.filter(
+                  (item) => item.id !== itemId
+                ),
+              };
+            } else if (
+              newReportedStatus &&
+              !screen.items.some((item) => item.id === itemId)
+            ) {
+              // If reporting AND the item isn't already in reported screen, add it
+              const itemToAdd = { ...currentItem!, is_reported: true };
 
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: [itemToAdd, ...screen.items],
-                  filteredItems:
-                    screen.selectedCategory === null ||
-                    Number(itemToAdd.category) === screen.selectedCategory
-                      ? [itemToAdd, ...screen.filteredItems]
-                      : screen.filteredItems,
-                };
-              } else {
-                // Just update status
-                updatedScreens[screenKey] = {
-                  ...screen,
-                  items: updatedItems,
-                  filteredItems: updatedFilteredItems,
-                };
-              }
+              updatedScreens[screenKey] = {
+                ...screen,
+                items: [itemToAdd, ...screen.items],
+                filteredItems:
+                  screen.selectedCategory === null ||
+                  Number(itemToAdd.category) === screen.selectedCategory
+                    ? [itemToAdd, ...screen.filteredItems]
+                    : screen.filteredItems,
+              };
             } else {
-              // For non-favorites screens, just update the items
+              // Just update status
               updatedScreens[screenKey] = {
                 ...screen,
                 items: updatedItems,
                 filteredItems: updatedFilteredItems,
               };
             }
+          } else {
+            // For non-favorites screens, just update the items
+            updatedScreens[screenKey] = {
+              ...screen,
+              items: updatedItems,
+              filteredItems: updatedFilteredItems,
+            };
           }
-        );
+        });
 
         return { screens: updatedScreens };
       });
@@ -908,6 +950,13 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
       } else {
         console.log("Error reporting item:", error.message);
       }
+      const message = getErrorMessage(error);
+
+      Toast.show({
+        type: "error",
+        text1: "Error reporting item",
+        text2: message as string,
+      });
     }
   },
 }));

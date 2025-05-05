@@ -1,23 +1,21 @@
 import OtpScreen from "@/app/(auth)/OtpScreen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@/app/contexts/AuthContext";
+import api from "@/types/api";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import axios from "axios";
 import { router } from "expo-router";
 import React from "react";
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
-
-jest.mock("frontend/app/contexts/AuthContext.tsx", () => ({
-  useAuth: jest.fn().mockReturnValue({
-    setAuthToken: jest.fn(),
-  }),
-}));
 
 jest.mock("react-native/Libraries/Alert/Alert", () => ({
   alert: jest.fn(),
   Alert: {
     alert: jest.fn(),
   },
+}));
+
+jest.mock("@/app/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 // Mock the OtpInput component
@@ -40,27 +38,29 @@ describe("OtpScreen Component", () => {
     jest.clearAllMocks();
   });
   it("renders correctly with email from params", () => {
+    (useAuth as jest.Mock).mockReturnValue({
+      setTokens: jest.fn(),
+    });
     const { getByText, getByTestId } = render(<OtpScreen />);
 
-    expect(getByText("Enter Your Verification Code")).toBeTruthy();
-    expect(getByText("We sent it to")).toBeTruthy();
-    expect(getByText("your Grinnell email!")).toBeTruthy();
+    expect(getByTestId("verify-code-button")).toBeTruthy();
+    expect(
+      getByText("Please enter the 6-digit code we sent to your Grinnell email")
+    ).toBeTruthy();
     expect(getByTestId("otp-input")).toBeTruthy();
     expect(getByText("Verify")).toBeTruthy();
   });
 
-  it("updated OTP state when input changes", async () => {
-    const { getByTestId } = render(<OtpScreen />);
-    const otpInput = getByTestId("otp-input");
-    await act(async () => {
-      fireEvent.changeText(otpInput, "123456");
-    });
-    // since this state is internal I'll do the API stuff later
-  });
-
   it("handles successful OTP verification", async () => {
     const mockAuthToken = "test-access-token";
-    (axios.post as jest.Mock).mockResolvedValueOnce({
+    const mockRefreshToken = "test-refresh-token";
+    const mockSetTokens = jest.fn();
+
+    (useAuth as jest.Mock).mockReturnValue({
+      setTokens: mockSetTokens,
+    });
+
+    (api.post as jest.Mock).mockResolvedValueOnce({
       data: {
         access: mockAuthToken,
         refresh: "test-refresh-token",
@@ -78,16 +78,16 @@ describe("OtpScreen Component", () => {
     });
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/otpauth/verify-otp/"),
         {
           email: "test@example.com",
           otp: "123456",
         }
       );
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        "authToken",
-        mockAuthToken
+      expect(mockSetTokens).toHaveBeenCalledWith(
+        mockAuthToken,
+        mockRefreshToken
       );
       expect(Toast.show).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -101,7 +101,7 @@ describe("OtpScreen Component", () => {
 
   it("handles failed OTP verification", async () => {
     const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    (axios.post as jest.Mock).mockRejectedValueOnce(new Error("Invalid OTP"));
+    (api.post as jest.Mock).mockRejectedValueOnce(new Error("Invalid OTP"));
     const { getByText, getByTestId } = render(<OtpScreen />);
     const otpInput = getByTestId("otp-input");
     const verifyButton = getByText("Verify");
@@ -112,7 +112,7 @@ describe("OtpScreen Component", () => {
       fireEvent.press(verifyButton);
     });
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(api.post).toHaveBeenCalledWith(
         //send to the correct endpoint
         expect.stringContaining("/otpauth/verify-otp/"),
         {
@@ -130,12 +130,18 @@ describe("OtpScreen Component", () => {
   });
 
   //test for pressing Resend and going back to the request code screen
-  it("navigates back when resend is pressed", () => {
-    const { getByText } = render(<OtpScreen />);
-    const resendButton = getByText("Resend");
+  it("sends new code when resend is pressed", () => {
+    const { getByTestId } = render(<OtpScreen />);
+    const resendButton = getByTestId("resend-button");
     act(() => {
       fireEvent.press(resendButton);
     });
-    expect(router.back).toHaveBeenCalled();
+    expect(api.post).toHaveBeenCalledWith(
+      expect.stringContaining("/otpauth/request-otp/"),
+      {
+        email: "test@example.com",
+      },
+      expect.any(Object)
+    );
   });
 });

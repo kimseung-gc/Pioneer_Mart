@@ -12,41 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from datetime import timedelta
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
 from pathlib import Path
-
-# from AUTHKEY.config import (
-#     DB_NAME,
-#     DB_USER,
-#     HOST,
-#     PASSWORD,
-#     PORT,
-#     AWS_ACCESS_KEY_ID,
-#     AWS_S3_CUSTOM_DOMAIN,
-#     AWS_S3_REGION_NAME,
-#     AWS_SECRET_ACCESS_KEY,
-#     AWS_STORAGE_BUCKET_NAME,
-#     EMAIL_BACKEND,
-#     EMAIL_HOST_USER,
-#     EMAIL_HOST,
-#     EMAIL_HOST_PASSWORD,
-#     EMAIL_PORT,
-#     EMAIL_USE_TLS,
-#     DEFAULT_FROM_EMAIL,
-# )
-
-# import secret keys. This distinction is required due to different secret keys for github and project.
-# try:
-#     from AUTHKEY import config
-# except:
-#     from AUTHKEY import config_github
-
-#     config = config_github
-from AUTHKEY import config_github
-
-config = config_github
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +35,15 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    try:
+        from AUTHKEY import config_github
+
+        SECRET_KEY = config_github.SECRET_KEY
+    except ImportError:
+        raise RuntimeError(
+            "SECRET_KEY not set and config_github.py could not be imported."
+        )
 
 # security settings for https
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -99,6 +78,7 @@ INSTALLED_APPS = [
     "chat",
     "report",
     "storages",
+    "notifications",
 ]
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
@@ -189,20 +169,27 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.sqlite3",
-    #     "NAME": BASE_DIR / "db.sqlite3",
-    # }
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("PASSWORD"),
-        "HOST": os.getenv("HOST"),
-        "PORT": os.getenv("PORT"),
+# check if ENV in environment varialbe is development or running `python manage.py test``
+USE_SQLITE = os.environ.get("ENV") == "development" or "test" in sys.argv
+
+if USE_SQLITE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("PASSWORD"),
+            "HOST": os.getenv("HOST"),
+            "PORT": os.getenv("PORT"),
+        }
+    }
 
 
 # Password validation
@@ -242,7 +229,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # MEDIA_URL = "media/"
-MEDIA_URL = f"https://{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.{os.getenv("AWS_S3_REGION_NAME")}.amazonaws.com/"
+MEDIA_URL = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.{os.getenv('AWS_S3_REGION_NAME')}.amazonaws.com/"
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type

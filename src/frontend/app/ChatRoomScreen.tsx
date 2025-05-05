@@ -2,7 +2,6 @@ import { useUserStore } from "@/stores/userStore";
 import { ChatRoom, ChatRoomsScreenRouteParams } from "@/types/chat";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import axios from "axios";
 import {
   Alert,
   Text,
@@ -20,6 +19,7 @@ import { useChatStore } from "@/stores/chatStore";
 import { useAuth } from "./contexts/AuthContext";
 import Toast from "react-native-toast-message";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
@@ -58,7 +58,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const fetchRooms = async (): Promise<void> => {
     try {
       const cleanToken = authToken?.trim();
-      const response = await axios.get(`${BASE_URL}/api/chat/rooms/`, {
+      const response = await api.get(`${BASE_URL}/api/chat/rooms/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const markRoomAsRead = async (roomId: number): Promise<void> => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.post(
+      await api.post(
         `${BASE_URL}/api/chat/rooms/${roomId}/mark-read/`,
         {},
         {
@@ -130,12 +130,13 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
     if (room.unread_count && room.unread_count > 0) {
       markRoomAsRead(Number(room.id));
     }
-
     // navigate to the chat room
     router.push({
       pathname: "/chat/[id]",
       params: {
         id: room.id.toString(),
+        receiver_id: otherUser.id,
+        user_id: userData.id,
         username: otherUser.username,
         itemTitle: room.item_title || "No item",
       },
@@ -145,7 +146,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const handleDeleteRoom = async (roomId: number) => {
     try {
       const cleanToken = authToken?.trim();
-      await axios.delete(`${BASE_URL}/api/chat/rooms/${roomId}/delete/`, {
+      await api.delete(`${BASE_URL}/api/chat/rooms/${roomId}/delete/`, {
         headers: {
           Authorization: `Bearer ${cleanToken}`,
           "Content-Type": "application/json",

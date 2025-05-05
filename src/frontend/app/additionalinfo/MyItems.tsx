@@ -3,13 +3,20 @@ import Header from "@/components/Header";
 import ProductList from "@/components/ProductList";
 import { router, Stack } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { Entypo } from "@expo/vector-icons";
 import React from "react";
+import { useTheme } from "../contexts/ThemeContext";
 
 const MyItems = () => {
+  const { colors } = useTheme();
   const { authToken } = useAuth(); //auth context
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
@@ -42,15 +49,23 @@ const MyItems = () => {
         }}
       />
       {isLoading ? (
-        <ActivityIndicator size="large" color="#007AFF" testID="loading-indicator"/>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="large"
+            color="#A25E5E"
+            testID="loading-indicator"
+          />
+        </View>
       ) : (
         <>
-          <Categories screenId={screenId} categories={categories} />
-          <ProductList
-            items={filteredItems}
-            isLoading={isLoading}
-            source="myItems"
-          />
+          <View style={{ flex: 1, backgroundColor: colors.background }}>
+            <Categories screenId={screenId} categories={categories} />
+            <ProductList
+              items={filteredItems}
+              isLoading={isLoading}
+              source="myItems"
+            />
+          </View>
         </>
       )}
     </>
@@ -58,3 +73,12 @@ const MyItems = () => {
 };
 
 export default MyItems;
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF9F0", // 👈 soft cream background
+  },
+});

@@ -24,6 +24,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import Constants from "expo-constants";
+import api from "@/types/api";
 
 const EditItem = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
@@ -99,7 +100,6 @@ const EditItem = () => {
       setModifiedImages(true);
     }
   };
-  console.log(originalItem.category_name);
   // Function to handle this image
   const handleCapturedImage = (imageUri: string) => {
     setImages((prevImages) => [...prevImages, imageUri]);
@@ -212,7 +212,7 @@ const EditItem = () => {
             }
           );
           // Make API call to SightEngine
-          const sightEngineResponse = await axios.post(
+          const sightEngineResponse = await api.post(
             "https://api.sightengine.com/1.0/check-workflow.json",
             sightEngineFormData,
             {
@@ -259,7 +259,7 @@ const EditItem = () => {
           Accept: "application/json",
         },
       };
-      const response = await axios.put(
+      const response = await api.put(
         `${BASE_URL}/api/items/${originalItem.id}/`,
         formData,
         config

@@ -5,23 +5,32 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Dimensions,
 } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import InputField from "@/components/InputField";
 import TCModal from "@/components/TCModal";
 import { useAuth } from "../contexts/AuthContext";
 import Constants from "expo-constants";
+import { useTheme } from "../contexts/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
+import api from "@/types/api";
 
 type Props = {};
+
+const { width } = Dimensions.get("window");
 
 const WelcomeScreen = (props: Props) => {
   const [email, setEmail] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [modalVisible, setModalVisible] = useState(true); // this needs to show the modal on first load
   const { isAuthenticated, loading } = useAuth();
+  const { colors } = useTheme();
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -31,20 +40,29 @@ const WelcomeScreen = (props: Props) => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: "center" }]}>
-        <ActivityIndicator size="large" color="#4b0082" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
 
   const requestOTP = async () => {
+    if (!email || email.trim() === "") {
+      Alert.alert("Error", "Please enter your username first");
+      return;
+    }
+
     try {
       const OTP_URL = `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
-      const fullEmail = email + "@grinnell.edu";
-      await axios.post(
+      const fullEmail = email.trim() + "@grinnell.edu";
+      await api.post(
         OTP_URL,
         {
-          // response for future error checking
           email: fullEmail,
         },
         {
@@ -60,7 +78,10 @@ const WelcomeScreen = (props: Props) => {
       });
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Failed to do OTP stuff");
+      Alert.alert(
+        "Authentication Error",
+        "Failed to send verification code. Please try again later."
+      );
     }
   };
 
@@ -72,17 +93,12 @@ const WelcomeScreen = (props: Props) => {
   const handleCloseModal = () => {
     setModalVisible(false);
   };
+
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerTitle: "Sign Up",
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerBackVisible: false,
-          gestureEnabled: false, //remove gesture
-        }}
-      />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <Stack.Screen />
 
       <TCModal
         isVisible={modalVisible}
@@ -90,125 +106,243 @@ const WelcomeScreen = (props: Props) => {
         onAccept={handleAcceptTerms}
         onClose={handleCloseModal}
       />
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Create an Account</Text>
-          <Text style={{ textAlign: "center", color: "gray" }}>
-            We'll send a code to your Grinnell email account!
-          </Text>
-        </View>
-        {termsAccepted ? (
-          <>
-            <View style={styles.inputContainer}>
-              <InputField
-                placeholder="Username"
-                placeholderTextColor={Colors.gray}
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-              <Text style={styles.emailDomain}>@grinnell.edu</Text>
-            </View>
-            <TouchableOpacity style={styles.btn} onPress={requestOTP}>
-              <Text style={styles.btnTxt}>Send Code</Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Text style={styles.termsLink}>View Terms and Conditions</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <View style={styles.acceptTermsContainer}>
-            <Text style={styles.acceptTermsText}>
-              Please accept the terms and conditions to continue
-            </Text>
-            <TouchableOpacity
-              style={styles.btn}
-              onPress={() => setModalVisible(true)}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.content}>
+          {/* Logo or welcome image */}
+          <View style={styles.logoContainer}>
+            <View
+              style={[
+                styles.logoPlaceholder,
+                { backgroundColor: colors.accent + "20" },
+              ]}
             >
-              <Text style={styles.btnTxt}>View Terms</Text>
-            </TouchableOpacity>
+              <Ionicons
+                name="person-circle-outline"
+                size={64}
+                color={colors.accent}
+              />
+            </View>
           </View>
-        )}
 
-        <View style={styles.divider} />
+          <View style={styles.titleContainer}>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
+              Welcome to PioneerMart
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              Join our community to buy, sell, and trade items with fellow
+              students, faculty, and staff
+            </Text>
+          </View>
+
+          {termsAccepted ? (
+            <View style={styles.formContainer}>
+              <Text style={[styles.inputLabel, { color: colors.textPrimary }]}>
+                Enter your Grinnell username
+              </Text>
+              <View
+                style={[styles.inputContainer, { borderColor: colors.border }]}
+              >
+                <InputField
+                  placeholder="Username"
+                  placeholderTextColor={colors.textSecondary}
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                  style={styles.input}
+                />
+                <Text
+                  style={[styles.emailDomain, { color: colors.textSecondary }]}
+                >
+                  @grinnell.edu
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: colors.accent }]}
+                onPress={requestOTP}
+                testID="send-code-button"
+              >
+                <Text style={styles.buttonText}>Send Verification Code</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.termsLinkContainer}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text
+                  testID="tc-modal-link"
+                  style={[styles.termsLink, { color: colors.accent }]}
+                >
+                  View Terms and Conditions
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.acceptTermsContainer}>
+              <View style={styles.messageBox}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={24}
+                  color={colors.accent}
+                />
+                <Text
+                  style={[
+                    styles.acceptTermsText,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  Please accept the terms and conditions to continue
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: colors.accent }]}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={styles.buttonText}>View Terms & Conditions</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+
+      <View style={[styles.footer, { borderTopColor: colors.border }]}>
+        <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+          PioneerMart - Built by Grinnellians
+        </Text>
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
 export default WelcomeScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 30,
-    backgroundColor: Colors.background,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logoPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleContainer: {
     marginBottom: 30,
-    justifyContent: "center",
-    alignSelf: "stretch",
+    width: "100%",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "600",
+    fontSize: 26,
+    fontWeight: "700",
     textAlign: "center",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  formContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
+  inputLabel: {
+    alignSelf: "flex-start",
+    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "500",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "stretch",
-    justifyContent: "center",
+    width: "100%",
+    borderWidth: 1,
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
   },
   emailDomain: {
-    paddingVertical: 8,
-    paddingLeft: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
-    color: "gray",
+    fontWeight: "500",
   },
-  btn: {
-    backgroundColor: "#4b0082",
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 5,
-    marginTop: 15,
+  button: {
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  btnTxt: {
+  buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
   },
-  loginTxt: {
-    marginTop: 20,
-    fontSize: 14,
-    color: Colors.black,
-    lineHeight: 24,
-  },
-  loginTxtSpan: {
-    fontWeight: "600",
-    color: Colors.primary,
+  termsLinkContainer: {
+    paddingVertical: 10,
   },
   termsLink: {
-    marginTop: 15,
-    color: "#4b0082",
+    fontSize: 14,
     textDecorationLine: "underline",
   },
   acceptTermsContainer: {
+    width: "100%",
     alignItems: "center",
-    marginTop: 20,
+  },
+  messageBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(180, 87, 87, 0.1)",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 20,
+    width: "100%",
   },
   acceptTermsText: {
-    textAlign: "center",
-    marginBottom: 10,
-    color: "gray",
+    marginLeft: 8,
+    fontSize: 15,
+    flex: 1,
   },
-  divider: {
-    borderTopColor: Colors.gray,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    width: "30%",
-    marginBottom: 30,
+  footer: {
+    borderTopWidth: 1,
+    paddingVertical: 15,
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 13,
   },
 });
