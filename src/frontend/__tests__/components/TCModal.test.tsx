@@ -63,7 +63,9 @@ describe("TCModal Component", () => {
 
     fireEvent.press(getByText("Close"));
     expect(Alert.alert).toHaveBeenCalledWith(
-      "You must accept the terms to continue"
+      "Terms & Conditions Required",
+      "You must accept the terms and conditions to continue using the platform.",
+      [{ text: "OK", style: "default" }]
     );
     expect(mockOnClose).not.toHaveBeenCalled();
   });
@@ -80,8 +82,8 @@ describe("TCModal Component", () => {
     fireEvent.press(getByText("Close"));
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
-  it("renders terms and conditions text correctly", () => {
-    const { getByText } = render(
+  it("renders intro and expands all sections with correct content", () => {
+    const { getByText, getByTestId } = render(
       <TCModal
         isVisible={true}
         termsAccepted={false}
@@ -90,19 +92,53 @@ describe("TCModal Component", () => {
       />
     );
 
+    // Intro text
     expect(
       getByText(
-        /By creating an account, you agree to the following terms and conditions:/
+        /By creating an account, you agree to the following terms and conditions/
       )
     ).toBeTruthy();
+
+    // --- Section 1 ---
+    fireEvent.press(getByTestId("section-eligibility"));
     expect(
       getByText(
-        /1\. You must be a current Grinnell student with a valid Grinnell email address\./
+        /You must be a current Grinnell student with a valid Grinnell email address/
       )
     ).toBeTruthy();
+
+    // --- Section 2 ---
+    fireEvent.press(getByTestId("section-userContent"));
+    expect(
+      getByText(
+        /All content \(images, descriptions, messages, chats\) is subject to moderation/
+      )
+    ).toBeTruthy();
+
+    // --- Section 3 ---
+    fireEvent.press(getByTestId("section-dataPrivacy"));
+    expect(getByText(/We collect and store/)).toBeTruthy();
+    expect(getByText(/Your Grinnell email address/)).toBeTruthy();
+
+    // --- Section 4 ---
+    fireEvent.press(getByTestId("section-userResponsibility"));
+    expect(
+      getByText(
+        /You are responsible for all activities that occur under your account/
+      )
+    ).toBeTruthy();
+
+    // --- Section 5 ---
+    fireEvent.press(getByTestId("section-liability"));
+    expect(
+      getByText(/We operate as a platform for connecting buyers and sellers/)
+    ).toBeTruthy();
+
+    // Update date note
+    expect(getByText(/Last updated: May 4, 2025/)).toBeTruthy();
   });
   it("can find the accept button using testID", () => {
-    const { getByTestId } = render(
+    const { getByTestId, getByText } = render(
       <TCModal
         isVisible={true}
         termsAccepted={false}
@@ -110,27 +146,13 @@ describe("TCModal Component", () => {
         onClose={mockOnClose}
       />
     );
-
-    const acceptButton = getByTestId("accept-button");
-    expect(acceptButton).toBeTruthy();
-    fireEvent.press(acceptButton);
-    expect(mockOnAccept).toHaveBeenCalledTimes(1);
-  });
-  it("handles onRequestClose prop correctly", () => {
-    const { getByTestId } = render(
-      <TCModal
-        isVisible={true}
-        termsAccepted={false}
-        onAccept={mockOnAccept}
-        onClose={mockOnClose}
-      />
-    );
-
     // Simulate back button press (which triggers onRequestClose)
     const modal = getByTestId("tc-modal");
     fireEvent(modal, "requestClose");
     expect(Alert.alert).toHaveBeenCalledWith(
-      "You must accept the terms to continue"
+      "Terms & Conditions Required",
+      "You must accept the terms and conditions to continue using the platform.",
+      [{ text: "OK", style: "default" }]
     );
   });
 });

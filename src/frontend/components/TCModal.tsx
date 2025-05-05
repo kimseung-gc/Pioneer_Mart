@@ -58,6 +58,7 @@ const TCModal: React.FC<TCModalProps> = ({
     section: keyof typeof sections;
   }) => (
     <TouchableOpacity
+      testID={`section-${section}`}
       style={styles.sectionHeader}
       onPress={() => toggleSection(section)}
       activeOpacity={0.7}
@@ -73,6 +74,7 @@ const TCModal: React.FC<TCModalProps> = ({
       transparent={true}
       visible={isVisible}
       onRequestClose={handleClose}
+      testID="tc-modal"
     >
       <SafeAreaView style={styles.centeredView}>
         <View style={styles.modalView}>
@@ -195,6 +197,7 @@ const TCModal: React.FC<TCModalProps> = ({
             <TouchableOpacity
               style={[styles.button, styles.buttonAccept]}
               onPress={onAccept}
+              testID="tc-accept-button"
             >
               <Text style={styles.buttonTextAccept}>Accept</Text>
             </TouchableOpacity>

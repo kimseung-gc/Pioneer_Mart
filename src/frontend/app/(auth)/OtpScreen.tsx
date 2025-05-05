@@ -175,7 +175,11 @@ const OtpScreen = () => {
               <Text style={{ color: colors.textSecondary }}>
                 Didn't receive the code?
               </Text>
-              <TouchableOpacity onPress={resendCode} disabled={isLoading}>
+              <TouchableOpacity
+                onPress={resendCode}
+                disabled={isLoading}
+                testID="resend-button"
+              >
                 <Text style={[styles.resendText, { color: colors.accent }]}>
                   {" "}
                   Resend
@@ -191,6 +195,7 @@ const OtpScreen = () => {
               ]}
               onPress={verifyOtp}
               disabled={isLoading}
+              testID="verify-code-button"
             >
               {isLoading ? (
                 <ActivityIndicator color="white" size="small" />

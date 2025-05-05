@@ -43,9 +43,10 @@ describe("OtpScreen Component", () => {
     });
     const { getByText, getByTestId } = render(<OtpScreen />);
 
-    expect(getByText("Enter Your Verification Code")).toBeTruthy();
-    expect(getByText("We sent it to")).toBeTruthy();
-    expect(getByText("your Grinnell email!")).toBeTruthy();
+    expect(getByTestId("verify-code-button")).toBeTruthy();
+    expect(
+      getByText("Please enter the 6-digit code we sent to your Grinnell email")
+    ).toBeTruthy();
     expect(getByTestId("otp-input")).toBeTruthy();
     expect(getByText("Verify")).toBeTruthy();
   });
@@ -129,12 +130,18 @@ describe("OtpScreen Component", () => {
   });
 
   //test for pressing Resend and going back to the request code screen
-  it("navigates back when resend is pressed", () => {
-    const { getByText } = render(<OtpScreen />);
-    const resendButton = getByText("Resend");
+  it("sends new code when resend is pressed", () => {
+    const { getByTestId } = render(<OtpScreen />);
+    const resendButton = getByTestId("resend-button");
     act(() => {
       fireEvent.press(resendButton);
     });
-    expect(router.back).toHaveBeenCalled();
+    expect(api.post).toHaveBeenCalledWith(
+      expect.stringContaining("/otpauth/request-otp/"),
+      {
+        email: "test@example.com",
+      },
+      expect.any(Object)
+    );
   });
 });

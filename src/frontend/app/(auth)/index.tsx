@@ -164,6 +164,7 @@ const WelcomeScreen = (props: Props) => {
               <TouchableOpacity
                 style={[styles.button, { backgroundColor: colors.accent }]}
                 onPress={requestOTP}
+                testID="send-code-button"
               >
                 <Text style={styles.buttonText}>Send Verification Code</Text>
               </TouchableOpacity>
@@ -172,7 +173,10 @@ const WelcomeScreen = (props: Props) => {
                 style={styles.termsLinkContainer}
                 onPress={() => setModalVisible(true)}
               >
-                <Text style={[styles.termsLink, { color: colors.accent }]}>
+                <Text
+                  testID="tc-modal-link"
+                  style={[styles.termsLink, { color: colors.accent }]}
+                >
                   View Terms and Conditions
                 </Text>
               </TouchableOpacity>
