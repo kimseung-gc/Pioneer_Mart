@@ -214,59 +214,6 @@ describe("EditItem Component", () => {
     // should now show 2 images
     await findByText("Images * (2 selected)");
   });
-  // it("submits form with edited data and navigates back on success", async () => {
-  //   console.log("Mocking axios.post for SightEngine");
-  //   (axios.post as jest.Mock).mockResolvedValue({
-  //     data: {
-  //       status: "success",
-  //       summary: {
-  //         action: "accept", // make sure image is not rejected
-  //       },
-  //     },
-  //   });
-  //   jest.spyOn(axios, "put").mockResolvedValue({
-  //     data: { ...mockOriginalItem, title: "Updated Title" },
-  //   });
-  //   const { getByText, getByDisplayValue } = render(<EditItem />);
-
-  //   // edit the title
-  //   const titleInput = getByDisplayValue("Test Item");
-  //   fireEvent.changeText(titleInput, "Updated Title");
-
-  //   // submit the form
-  //   const saveButton = getByText("Save Item");
-  //   await act(async () => {
-  //     fireEvent.press(saveButton);
-  //   });
-  //   expect(axios.put).toHaveBeenCalled();
-  //   expect(axios.put).toHaveBeenCalledWith(
-  //     expect.any(String),
-  //     expect.any(FormData),
-  //     expect.objectContaining({
-  //       headers: expect.objectContaining({
-  //         Authorization: "Bearer test-token",
-  //       }),
-  //     })
-  //   );
-
-  //   await waitFor(() => {
-  //     expect(Alert.alert).toHaveBeenCalledWith(
-  //       "Success",
-  //       "Item edited successfully",
-  //       expect.any(Array)
-  //     );
-  //   });
-
-  //   // check if navigation happened
-  //   expect(router.back).toHaveBeenCalled();
-  //   expect(router.setParams).toHaveBeenCalledWith({
-  //     item: expect.any(String),
-  //     refreshKey: expect.any(String),
-  //   });
-
-  //   // check if store was updated
-  //   expect(useItemsStore.getState().updateItem).toHaveBeenCalled();
-  // });
   it("shows validation error when required fields are missing", async () => {
     const { getByText, getByDisplayValue } = render(<EditItem />);
 

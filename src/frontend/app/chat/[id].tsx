@@ -74,7 +74,6 @@ const ChatScreen = () => {
       console.error("WebSocket error:", e);
     };
     ws.current.onclose = () => {
-      console.log("WebSocket disconnected");
       setConnected(false);
     };
 

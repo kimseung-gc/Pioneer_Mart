@@ -230,15 +230,6 @@ const EditItem = () => {
           }
           // Check if image should be rejected
           if (output.summary && output.summary.action === "reject") {
-            console.log(
-              "Image rejected with probability:",
-              output.summary.reject_prob
-            );
-            console.log(
-              "Rejection reasons:",
-              output.summary.reject_reason[0].text
-            );
-
             Alert.alert(
               "NOT ALLOWED",
               `${output.summary.reject_reason[0].text}`

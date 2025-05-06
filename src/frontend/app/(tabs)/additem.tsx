@@ -284,10 +284,6 @@ const AddItemScreen = () => {
         (textModerationResult.violence.matches[0] &&
           textModerationResult.violence.matches[0].intensity === "high")
       ) {
-        console.log(
-          "Text rejected:",
-          "Please make sure all text is free of profanity, illegal content, extremism, and violence"
-        );
         Alert.alert(
           "NOT ALLOWED",
           "Please make sure all text is free of profanity, illegal content, extremism, and violence"
@@ -326,10 +322,6 @@ const AddItemScreen = () => {
             }
           );
           // Make API call to SightEngine
-          console.log(BASE_URL);
-          console.log(SE_API_USER);
-          console.log(SE_WORKFLOW);
-          console.log(SE_SECRET_KEY);
           const sightEngineResponse = await api.post(
             "https://api.sightengine.com/1.0/check-workflow.json",
             sightEngineFormData,
@@ -340,7 +332,6 @@ const AddItemScreen = () => {
             }
           );
           const output = sightEngineResponse.data;
-          console.log(output);
           if (output.status === "failure") {
             console.error("SightEngine API error:", output.error);
             Alert.alert("Error", "Image validation failed. Please try again.");
@@ -360,7 +351,6 @@ const AddItemScreen = () => {
       }
       const formDataObj = createFormData();
       const cleanToken = authToken?.trim();
-      console.log(BASE_URL);
       const response = await api.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
           "Content-Type": "multipart/form-data",

@@ -10,6 +10,7 @@ import {
   Platform,
   SafeAreaView,
   Dimensions,
+  Linking,
 } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -212,8 +213,26 @@ const WelcomeScreen = (props: Props) => {
 
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-          PioneerMart - Built by Grinnellians
+          PioneerMart – Built by Grinnellians
         </Text>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL("https://muhammad-khalid.vercel.app/privacy-policy")
+          }
+        >
+          <Text
+            style={[
+              styles.footerText,
+              {
+                color: colors.accent || "#007AFF",
+                marginTop: 4,
+                textDecorationLine: "underline",
+              },
+            ]}
+          >
+            Privacy Policy
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

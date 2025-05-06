@@ -74,7 +74,6 @@ const Categories: React.FC<CategoriesProps> = ({
   };
 
   const handleFilterApply = () => {
-    // console.log("Applying filters:", filterOptions);
     const updatedFilterOptions = {
       ...localFilterOptions,
       priceRange: sliderValues,

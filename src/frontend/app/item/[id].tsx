@@ -81,7 +81,6 @@ const ItemDetails = () => {
   // fetch the latest item data from the API
   const fetchItemDetails = async () => {
     if (!id) {
-      console.log("No item Id provided");
       setIsLoading(false);
       return;
     }
@@ -145,7 +144,6 @@ const ItemDetails = () => {
 
   const handleDelete = async () => {
     if (!id) {
-      console.log("No item Id provided");
       setIsLoading(false);
       return;
     }

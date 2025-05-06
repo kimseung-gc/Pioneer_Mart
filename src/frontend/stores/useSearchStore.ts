@@ -801,7 +801,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         return { screens: updatedScreens };
       });
     } catch (error) {
-      console.log("Error toggling favorite:", error);
       const message = getErrorMessage(error);
 
       Toast.show({
@@ -865,9 +864,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
           Accept: "application/json",
         },
       });
-      console.log(
-        `Item ${itemId} reported from toggleReport with ${reason} reason`
-      );
 
       // Now update all screens with the known new status
       set((state) => {
@@ -947,11 +943,6 @@ export const useItemsStore = create<ItemsStoreState>((set, get) => ({
         return { screens: updatedScreens };
       });
     } catch (error: any) {
-      if (error.response) {
-        console.log("Error reporting item:", error.response.data);
-      } else {
-        console.log("Error reporting item:", error.message);
-      }
       const message = getErrorMessage(error);
 
       Toast.show({

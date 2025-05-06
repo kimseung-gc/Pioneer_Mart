@@ -18,7 +18,7 @@ export type CameraModalProps = {
 
 const CameraModal = ({ visible, onClose, onCapture }: CameraModalProps) => {
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<CameraType>("front");
+  const [facing, setFacing] = useState<CameraType>("back");
   const camera = useRef<CameraView>(null);
 
   // request permission if not granted
@@ -31,22 +31,16 @@ const CameraModal = ({ visible, onClose, onCapture }: CameraModalProps) => {
   const takePicture = async () => {
     if (camera.current) {
       try {
-        console.log("taking picture...");
         const photo = await camera.current.takePictureAsync();
-        console.log("Picture taken...", photo?.uri);
         if (photo) onCapture(photo?.uri);
-        console.log(photo);
       } catch (error) {
         console.error("Failed to take picture:", error);
       }
-    } else {
-      console.log("Caerma ref is null");
     }
   };
 
   const toggleCameraFacing = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
-    console.log("Turning camera...");
   };
 
   return (

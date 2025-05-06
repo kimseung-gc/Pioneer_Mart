@@ -46,7 +46,6 @@ try {
 
         try {
           const refreshToken = await AsyncStorage.getItem("refreshToken");
-          console.log("Current refresh token:", refreshToken);
           if (!refreshToken) {
             // no refresh token so redirect to login
             return Promise.reject(error);
@@ -79,15 +78,6 @@ try {
           return Promise.reject(refreshError);
         }
       }
-
-      // Fro errors that aren't handled by token refresh
-      // 1. we log the error for dev debugging
-      console.log("API error:", {
-        url: originalRequest?.url,
-        method: originalRequest?.method,
-        status: originalRequest?.status,
-        data: originalRequest?.data,
-      });
 
       // 2. show a user-friendly message for unhandled error
       //    but don't show toast for 401 errors we're already handling
