@@ -48,13 +48,17 @@ if not SECRET_KEY:
 # security settings for https
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
-# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud"]
 CSRF_TRUSTED_ORIGINS = ["https://env-2325023.us.reclaim.cloud"]
 # Application definition
@@ -85,11 +89,6 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
-# AWS_S3_CUSTOM_DOMAIN = AWS_S3_CUSTOM_DOMAIN
-
-# AWS_S3_URL_PROTOCOL = 'https'
-# AWS_S3_USE_SSL = True
-# AWS_S3_VERIFY = True
 
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
@@ -99,6 +98,7 @@ DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),  # Set long expiry for "forever" login
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=150),
     "AUTH_HEADER_TYPES": ("Bearer",),  # Explicitly define 'Bearer'
 }
 
@@ -155,16 +155,19 @@ WSGI_APPLICATION = "backend.wsgi.application"
 ASGI_APPLICATION = "backend.asgi.application"
 
 # Channel layers con`figuration for Redis
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # ONLY FOR DEVELOPMENTTT
-        # "BACKEND": "channels_redis.core.RedisChannelLayer",
-        # "CONFIG": {
-        #     "hosts": [("127.0.0.1", 6379)],
-        # },
-    },
-}
-
+if DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",  # ONLY FOR DEVELOPMENTTT
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.getenv("REDIS_HOST"), 6379)],
+        },
+    }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
