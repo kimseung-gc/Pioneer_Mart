@@ -43,13 +43,13 @@ class RequestOTPView(APIView):
             # Create new OTP
             OTP.objects.filter(email=email).delete()
             otp = OTP.objects.create(email=email)
-            print(f"\n\n{otp.otp}\n\n")  # TODO: comment this to send email
+            # print(f"\n\n{otp.otp}\n\n")  # TODO: comment this to send email
             # Send email with OTP
             subject = "Your OTP for authentication"
             message = f"Your OTP is {otp.otp}. It will expire in 10 minutes."
-            # send_mail(
-            #     subject, message, settings.DEFAULT_FROM_EMAIL, [email]
-            # )  # TODO: uncomment this to send email
+            send_mail(
+                subject, message, settings.DEFAULT_FROM_EMAIL, [email]
+            )  # TODO: uncomment this to send email
 
             return Response(
                 {"detail": "OTP sent to your email"}, status=status.HTTP_200_OK
