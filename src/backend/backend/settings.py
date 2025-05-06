@@ -166,7 +166,13 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(os.getenv("REDIS_HOST"), 6379)],
+                "hosts": [
+                    {
+                        "host": os.getenv("REDIS_HOST"),
+                        "port": 6379,
+                        "password": os.getenv("REDIS_PASSWORD"),
+                    }
+                ],
             },
         },
     }
