@@ -25,8 +25,10 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 const EditItem = () => {
+  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const SE_API_USER = Constants?.expoConfig?.extra?.SE_API_USER;
   const SE_SECRET_KEY = Constants?.expoConfig?.extra?.SE_SECRET_KEY;
@@ -440,7 +442,7 @@ const EditItem = () => {
                   <MaterialIcons
                     name="photo-library"
                     size={24}
-                    color="#007BFF"
+                    color={colors.accent}
                   />
                   <Text style={styles.imageButtonText}>Gallery</Text>
                 </TouchableOpacity>
@@ -448,7 +450,11 @@ const EditItem = () => {
                   style={styles.imageButton}
                   onPress={openCamera}
                 >
-                  <MaterialIcons name="camera-alt" size={24} color="#007BFF" />
+                  <MaterialIcons
+                    name="camera-alt"
+                    size={24}
+                    color={colors.accent}
+                  />
                   <Text style={styles.imageButtonText}>Camera</Text>
                 </TouchableOpacity>
               </View>
@@ -532,7 +538,7 @@ const styles = StyleSheet.create({
   },
   imageButtonText: {
     marginLeft: 8,
-    color: "#007BFF",
+    // color: "#007BFF",
     fontWeight: "500",
   },
   imagePicker: {
@@ -566,7 +572,7 @@ const styles = StyleSheet.create({
     color: "#777",
   },
   button: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#B45757",
     borderRadius: 8,
     padding: 16,
     alignItems: "center",
@@ -644,7 +650,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 123, 255, 0.8)",
+    backgroundColor: "#B45757",
     padding: 4,
     alignItems: "center",
   },
