@@ -163,9 +163,11 @@ if DEBUG:
     }
 else:
     CHANNEL_LAYERS = {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.getenv("REDIS_HOST"), 6379)],
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(os.getenv("REDIS_HOST"), 6379)],
+            },
         },
     }
 
