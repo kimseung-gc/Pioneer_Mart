@@ -94,8 +94,10 @@ class PurchaseRequestSerializerTestCase(TestCase):
             {
                 "id": self.testPurchaseReq1.id,
                 "listing": list_serial.data,
-                "requester": 1,
+                "requester": self.user1.id,
                 "requester_name": "testuser",
+                "seller": self.user1.id,
+                "seller_name": "testuser",
                 "created_at": serializer.data["created_at"],
                 "is_active": True,
                 "status": "pending",
