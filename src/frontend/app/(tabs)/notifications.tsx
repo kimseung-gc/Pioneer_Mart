@@ -26,9 +26,11 @@ export type AppNotification = {
 };
 
 const NotificationIcon = ({ type }: { type: AppNotification["type"] }) => {
+  const { colors } = useTheme();
+
   const iconProps = {
-    purchase: { name: "shopping-cart", color: "#4CAF50" },
-    chat: { name: "chat", color: "#2196F3" },
+    purchase: { name: "shopping-cart", color: colors.accent },
+    chat: { name: "chat", color: colors.accent },
   }[type];
 
   return (
