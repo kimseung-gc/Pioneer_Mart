@@ -337,7 +337,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         """
         query = request.query_params.get("q", "")
         if query:
-            items = self.get_queryset.filter(
+            items = self.get_queryset().filter(
                 Q(title__icontains=query)
                 | Q(description__icontains=query)
                 | Q(
@@ -383,7 +383,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             Response: A response containing the search results.
         """
         query = request.query_params.get("q", "")
-        base_queryset = self.get_queryset.filter(seller=request.user)
+        base_queryset = self.get_queryset().filter(seller=request.user)
         if query:
             items = base_queryset.filter(
                 Q(title__icontains=query)
