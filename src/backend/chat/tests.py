@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from chat.models import ChatRoom, Message
-
+from django.urls import reverse
 
 class ChatRoomTestCase(APITestCase):
     def setUp(self):
