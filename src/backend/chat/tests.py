@@ -19,15 +19,17 @@ class ChatRoomTestCase(APITestCase):
         self.assertEqual(self.room.item_id, 1)
 
     def test_get_room_list(self):
-        response = self.client.get("/chat/room_list/")
+        url = reverse("room_list")  # now matches your urls.py
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("rooms", response.data)
 
     def test_get_or_create_room(self):
-        response = self.client.get(f"/chat/get_or_create_room/?user_id={self.user2.id}&item_id=1")
+        # First, make sure this view has a `name=` in urls.py!
+        url = reverse("get_or_create_room")
+        response = self.client.get(url, {"user_id": self.user2.id, "item_id": 1})
         self.assertEqual(response.status_code, 200)
         self.assertIn("room", response.data)
-
 
 class MessageTestCase(APITestCase):
     def setUp(self):
