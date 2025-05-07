@@ -309,6 +309,22 @@ const PurchaseRequests = () => {
       <View style={styles.requestItem}>
         <SingleItem item={item.listing} source="purchaseRequests" />
         <View style={styles.requestInfo}>
+          {activeTab === "sent" && (
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ fontSize: 14, color: "#555" }}>
+                Seller:{" "}
+                <Text style={{ fontWeight: "600" }}>{item.seller_name}</Text>
+              </Text>
+            </View>
+          )}
+          {activeTab === "received" && (
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ fontSize: 14, color: "#555" }}>
+                Requester:{" "}
+                <Text style={{ fontWeight: "600" }}>{item.requester_name}</Text>
+              </Text>
+            </View>
+          )}
           <View style={styles.statusContainer}>
             <View style={styles.dateContainer}>
               <Ionicons name="calendar-outline" size={16} color="#666" />
@@ -346,8 +362,15 @@ const PurchaseRequests = () => {
             </View>
           )}
           <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => removeRequest(item.id)}
+            style={[
+              styles.removeButton,
+              { backgroundColor: "red", zIndex: 999 },
+            ]}
+            onPress={(e) => {
+              e.stopPropagation();
+              console.log("Delete clicked for", item.id);
+              removeRequest(item.id);
+            }}
           >
             <Ionicons name="trash-outline" size={16} color="white" />
             <Text style={styles.buttonText}>Delete Request</Text>

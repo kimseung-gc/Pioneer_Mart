@@ -22,6 +22,7 @@ export interface PurchaseRequest {
   listing: ItemType;
   requester: number;
   requester_name: string;
+  seller_name: string;
   status: "pending" | "accepted" | "declined" | "cancelled";
   created_at: string;
   is_active: boolean;

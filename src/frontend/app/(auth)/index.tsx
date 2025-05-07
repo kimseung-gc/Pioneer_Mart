@@ -59,7 +59,7 @@ const WelcomeScreen = (props: Props) => {
     }
 
     try {
-      const OTP_URL = `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
+      const OTP_URL = `${Constants.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
       const fullEmail = email.trim() + "@grinnell.edu";
       await api.post(
         OTP_URL,

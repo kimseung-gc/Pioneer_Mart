@@ -139,6 +139,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
         user_id: userData.id,
         username: otherUser.username,
         itemTitle: room.item_title || "No item",
+        item_id: room.item_id,
       },
     });
   };

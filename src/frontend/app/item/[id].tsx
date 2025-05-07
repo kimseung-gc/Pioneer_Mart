@@ -273,6 +273,7 @@ const ItemDetails = () => {
           username: item.seller_name, // CAUTION: variable names are a bit weird here
           receiver_id: item.seller.toString(),
           itemTitle: item.title || "No item",
+          item_id: item.id.toString(),
         }, // Assuming item.seller_name is the seller's name
       });
     } catch (error) {

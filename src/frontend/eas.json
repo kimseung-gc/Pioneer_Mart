@@ -6,16 +6,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "ENVFILE": ".env.development"
-      }
+      "distribution": "internal"
+    },
+    "preview": {
+      "autoIncrement": true,
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
       "distribution": "store",
-      "env": {
-        "ENVFILE": ".env.production"
+      "ios": {
+        "simulator": false
       }
     }
   },

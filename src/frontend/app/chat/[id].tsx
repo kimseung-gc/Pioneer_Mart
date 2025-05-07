@@ -23,8 +23,9 @@ import api from "@/types/api";
 
 const ChatScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
-  const { id, username, user_id, itemTitle, receiver_id } =
+  const { id, username, user_id, itemTitle, receiver_id, item_id } =
     useLocalSearchParams();
+  const itemId = typeof item_id === "string" ? item_id : "";
 
   const receiverId =
     typeof receiver_id === "string" ? parseInt(receiver_id, 10) : undefined;
@@ -181,6 +182,25 @@ const ChatScreen = () => {
       </View>
     );
   };
+  if (Platform.OS === "android") {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Stack.Screen
+          options={{
+            headerTitle: "Chat Unavailable",
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerBackTitle: "Back",
+          }}
+        />
+        <View style={styles.unavailableContainer}>
+          <Text style={styles.unavailableText}>
+            Chat is currently unavailable on Android devices.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <>
@@ -191,7 +211,7 @@ const ChatScreen = () => {
               onPress={() =>
                 router.push({
                   pathname: `/item/[id]`,
-                  params: { id: id.toString() },
+                  params: { id: itemId },
                 })
               }
             >
@@ -353,5 +373,17 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  unavailableContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  unavailableText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#444",
+    lineHeight: 24,
   },
 });
