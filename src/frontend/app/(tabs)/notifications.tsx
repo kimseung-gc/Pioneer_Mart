@@ -16,68 +16,21 @@ import Toast from "react-native-toast-message";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 import { useNotification } from "../contexts/NotificationContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 export type AppNotification = {
   id: number;
-  // type: "purchase" | "favorite" | "report";
   type: "purchase" | "chat";
   message: string;
   time: string;
 };
 
-// const mockNotifications: Notification[] = [
-//   {
-//     id: 1,
-//     type: "purchase",
-//     message: "Alex requested to buy your item 'Bike'",
-//     time: "2h ago",
-//   },
-//   {
-//     id: 2,
-//     type: "favorite",
-//     message: "Lily favorited your item 'Desk Lamp'",
-//     time: "4h ago",
-//   },
-//   {
-//     id: 3,
-//     type: "report",
-//     message: "Your item 'Microwave' was reported",
-//     time: "1d ago",
-//   },
-//   {
-//     id: 4,
-//     type: "purchase",
-//     message: "Ben sent a purchase request for 'Bookshelf'",
-//     time: "1d ago",
-//   },
-// ];
-
-const mockNotifications: AppNotification[] = [
-  {
-    id: 1,
-    type: "purchase",
-    message: "Alex requested to buy your item 'Bike'",
-    time: "2h ago",
-  },
-  {
-    id: 2,
-    type: "chat",
-    message: "Lily sent a message about 'Desk Lamp'",
-    time: "1h ago",
-  },
-  {
-    id: 3,
-    type: "purchase",
-    message: "Ben sent a purchase request for 'Bookshelf'",
-    time: "1d ago",
-  },
-];
 const NotificationIcon = ({ type }: { type: AppNotification["type"] }) => {
+  const { colors } = useTheme();
+
   const iconProps = {
-    purchase: { name: "shopping-cart", color: "#4CAF50" },
-    // favorite: { name: "favorite", color: "#E91E63" },
-    // report: { name: "report-problem", color: "#F44336" },
-    chat: { name: "chat", color: "#2196F3" },
+    purchase: { name: "shopping-cart", color: colors.accent },
+    chat: { name: "chat", color: colors.accent },
   }[type];
 
   return (
@@ -90,12 +43,12 @@ const NotificationIcon = ({ type }: { type: AppNotification["type"] }) => {
   );
 };
 
-const NotificationCard = ({ item }: { item: AppNotification }) => (
-  <View style={styles.card}>
+const NotificationCard = ({ item, colors }: { item: AppNotification; colors: any }) => (
+  <View style={[styles.card, { borderBottomColor: colors.border }]}>
     <NotificationIcon type={item.type} />
     <View style={styles.messageContainer}>
-      <Text style={styles.message}>{item.message}</Text>
-      <Text style={styles.time}>{item.time}</Text>
+      <Text style={[styles.message, { color: colors.textPrimary }]}>{item.message}</Text>
+      <Text style={[styles.time, { color: colors.textSecondary }]}>{item.time}</Text>
     </View>
   </View>
 );
@@ -107,7 +60,8 @@ export default function NotificationsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { authToken } = useAuth();
-  const { resetUnreadCount, refreshUnreadCount } = useNotification();
+  const { resetUnreadCount } = useNotification();
+  const { colors } = useTheme();
 
   const fetchNotifications = async (type = filterType) => {
     try {
@@ -163,20 +117,22 @@ export default function NotificationsScreen() {
         }}
       />
 
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         {["all", "purchase", "chat"].map((type) => (
           <TouchableOpacity
             key={type}
             onPress={() => handleFilterChange(type)}
             style={[
               styles.filterButton,
-              filterType === type && styles.activeFilterButton,
+              { backgroundColor: colors.background },
+              filterType === type && { backgroundColor: colors.accent },
             ]}
           >
             <Text
               style={[
                 styles.filterText,
-                filterType === type && styles.activeFilterText,
+                { color: colors.textPrimary },
+                filterType === type && { color: "#fff", fontWeight: "600" },
               ]}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -185,29 +141,33 @@ export default function NotificationsScreen() {
         ))}
       </View>
 
-      {loading && !refreshing ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="007BFF" />
-        </View>
-      ) : (
-        <FlatList
-          data={filteredNotifications}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <NotificationCard item={item} />}
-          ListEmptyComponent={
-            <Text style={styles.empty}>No notifications to show.</Text>
-          }
-          contentContainerStyle={styles.listContent}
-          scrollIndicatorInsets={{ top: 0, bottom: 0 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={["#007BFF"]}
-            />
-          }
-        />
-      )}
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : (
+          <FlatList
+            data={filteredNotifications}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => <NotificationCard item={item} colors={colors} />}
+            ListEmptyComponent={
+              <Text style={[styles.empty, { color: colors.textSecondary }]}>
+                No notifications to show.
+              </Text>
+            }
+            contentContainerStyle={styles.listContent}
+            scrollIndicatorInsets={{ top: 0, bottom: 0 }}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[colors.accent]}
+              />
+            }
+          />
+        )}
+      </View>
     </>
   );
 }
@@ -223,7 +183,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
   icon: {
     marginRight: 12,
@@ -234,16 +193,13 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 15,
-    color: "#333",
   },
   time: {
     fontSize: 12,
-    color: "#888",
     marginTop: 4,
   },
   empty: {
     textAlign: "center",
-    color: "#999",
     marginTop: 60,
     fontSize: 16,
   },
@@ -257,25 +213,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderColor: "#eee",
   },
   filterButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
-  },
-  activeFilterButton: {
-    backgroundColor: "#007BFF",
   },
   filterText: {
     fontSize: 14,
-    color: "#333",
-  },
-  activeFilterText: {
-    color: "#fff",
-    fontWeight: "600",
   },
 });
