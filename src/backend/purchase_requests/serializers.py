@@ -73,6 +73,8 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
     Serializes PurchaseRequest instances including nested listing and requester's name.
     """
 
+    seller_name = serializers.SerializerMethodField()
+
     requester_name = serializers.SerializerMethodField()
     listing = ListingDetailSerializer(read_only=True)
 
@@ -83,6 +85,8 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
             "listing",
             "requester",
             "requester_name",
+            "seller",
+            "seller_name",
             "created_at",
             "is_active",
             "status",
@@ -100,3 +104,6 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
             str: Username of the requester.
         """
         return obj.requester.username
+
+    def get_seller_name(self, obj):
+        return obj.seller.username if obj.seller else None

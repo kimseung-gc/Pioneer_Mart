@@ -38,12 +38,20 @@ class PurchaseRequest(models.Model):
     requester = models.ForeignKey(
         User, related_name="sent_purchase_requests", on_delete=models.CASCADE
     )
+    seller = models.ForeignKey(
+        User,
+        related_name="received_purchase_requests",
+        on_delete=models.CASCADE,
+        null=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        if not self.seller:
+            self.seller = self.listing.seller
         super().save(*args, **kwargs)
 
         # create a notification for the purchase request
