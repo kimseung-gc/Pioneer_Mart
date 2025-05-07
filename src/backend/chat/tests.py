@@ -26,7 +26,7 @@ class ChatRoomTestCase(APITestCase):
 
     def test_get_or_create_room(self):
         # First, make sure this view has a `name=` in urls.py!
-        url = reverse("get_or_create_room")
+        url = reverse("get-or-create-room")
         response = self.client.get(url, {"user_id": self.user2.id, "item_id": 1})
         self.assertEqual(response.status_code, 200)
         self.assertIn("room", response.data)
