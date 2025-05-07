@@ -100,16 +100,29 @@ export default function RootLayout() {
         <NotificationProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <StatusBar barStyle="dark-content" backgroundColor="#FFF9F0" />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen
-                name="(tabs)"
-                options={{ gestureEnabled: false, headerBackVisible: false }}
-              />
-              <Stack.Screen
-                name="(auth)"
-                options={{ gestureEnabled: false, headerShown: false }}
-              />
-            </Stack>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                backgroundColor: "#FFF9F0",
+              }}
+            >
+              <View style={{ flex: 1, width: "100%", maxWidth: 500 }}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{
+                      gestureEnabled: false,
+                      headerBackVisible: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ gestureEnabled: false, headerShown: false }}
+                  />
+                </Stack>
+              </View>
+            </View>
           </GestureHandlerRootView>
           <Toast />
         </NotificationProvider>

@@ -51,7 +51,7 @@ SECURE_SSL_REDIRECT = False
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 if DEBUG:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
@@ -59,7 +59,7 @@ else:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud"]
+ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ["https://env-2325023.us.reclaim.cloud"]
 # Application definition
 
@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "report",
     "storages",
     "notifications",
+    "corsheaders",
 ]
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
@@ -119,6 +120,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -127,6 +129,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:19006", "http://localhost:8081"]
+# CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "backend.urls"
 

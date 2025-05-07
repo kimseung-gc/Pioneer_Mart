@@ -251,8 +251,8 @@ const AddItemScreen = () => {
   };
 
   const handleSubmit = async () => {
+    console.log("Hello");
     if (!validateForm()) return;
-
     try {
       setLoading(true);
       if (!userData) {

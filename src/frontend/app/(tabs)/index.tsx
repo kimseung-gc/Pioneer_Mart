@@ -5,7 +5,7 @@ import { useItemsStore } from "@/stores/useSearchStore";
 import Header from "@/components/Header";
 import Categories from "@/components/Categories";
 import ProductList from "@/components/ProductList";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 
 const HomeScreen = () => {
@@ -37,12 +37,20 @@ const HomeScreen = () => {
         }}
       />
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <Categories screenId={screenId} categories={categories} />
-        <ProductList
-          items={filteredItems}
-          isLoading={isLoading}
-          source={"home"}
-        />
+        <View
+          style={{
+            width: "100%",
+            maxWidth: Platform.OS === "web" ? 600 : "100%", // 2 columns will fit nicely here
+            flex: 1,
+          }}
+        >
+          <Categories screenId={screenId} categories={categories} />
+          <ProductList
+            items={filteredItems}
+            isLoading={isLoading}
+            source={"home"}
+          />
+        </View>
       </View>
     </>
   );

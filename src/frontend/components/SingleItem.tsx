@@ -162,7 +162,8 @@ export default React.memo(SingleItem);
 
 const styles = StyleSheet.create({
   container: {
-    width: (width - 10) / 2,
+    // width: (width - 10) / 2,
+    width: 200,
     marginHorizontal: 5,
     position: "relative",
   },
