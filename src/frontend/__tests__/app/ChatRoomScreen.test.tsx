@@ -151,6 +151,7 @@ describe("ChatRoomsScreen", () => {
           id: "123",
           username: "OtherUser1",
           itemTitle: "Test Item 1",
+          item_id: 789,
           receiver_id: 789,
           user_id: 456,
         },
