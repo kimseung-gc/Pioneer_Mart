@@ -445,12 +445,12 @@ const AddItemScreen = () => {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>Payment Methods & Additional Info</Text>
             <TextInput
               style={[styles.input, styles.textarea]}
               value={formData.description}
               onChangeText={(text) => updateFormField("description", text)}
-              placeholder="Item Description"
+              placeholder="Payment Method Accepted & Additional Info"
               multiline
               numberOfLines={4}
             />

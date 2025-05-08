@@ -420,7 +420,7 @@ const ItemDetails = () => {
             </View>
 
             <View style={styles.descriptionContainer}>
-              <Text style={styles.sectionTitle}>Description</Text>
+              <Text style={styles.sectionTitle}>Payment Methods & Additional Info</Text>
               <Text style={styles.descriptionText}>{item.description}</Text>
             </View>
 

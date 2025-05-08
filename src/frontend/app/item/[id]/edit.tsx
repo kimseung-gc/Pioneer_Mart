@@ -352,12 +352,12 @@ const EditItem = () => {
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Description</Text>
+              <Text style={styles.label}>Payment Methods & Additional Info</Text>
               <TextInput
                 style={[styles.input, styles.textarea]}
                 value={description}
                 onChangeText={setDescription}
-                placeholder="Item Description"
+                placeholder="Payment Methods Accepted & Additional Info"
                 multiline
                 numberOfLines={4}
               />
