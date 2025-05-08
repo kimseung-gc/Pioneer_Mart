@@ -17,7 +17,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { useUserStore } from "@/stores/userStore";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
+const { colors } = useTheme();
 const ContactUs = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { authToken } = useAuth();
@@ -72,6 +74,7 @@ const ContactUs = () => {
           headerTitleAlign: "center",
           headerBackTitle: "Back",
           headerShown: true,
+          headerTintColor: colors.accent,
         }}
       />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -104,7 +107,7 @@ const ContactUs = () => {
               disabled={isSubmitting || !description.trim()}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="white" />
+                <ActivityIndicator size="small" color={colors.card} />
               ) : (
                 <Text style={styles.submitButtonText}>Submit</Text>
               )}
@@ -116,7 +119,7 @@ const ContactUs = () => {
               You can also reach us directly at:
             </Text>
             <View style={styles.emailContainer}>
-              <Entypo name="mail" size={16} color="#4a4a4a" />
+              <Entypo name="mail" size={16} color={colors.textSecondary} />
               <Text style={styles.emailText}>email@gmail.com</Text>
             </View>
           </View>
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   formContainer: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: colors.card,
     borderRadius: 10,
     padding: 16,
     marginBottom: 20,
@@ -166,12 +169,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#333",
+    color: colors.textPrimary,
   },
   textArea: {
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
     minHeight: 120,
     padding: 12,
@@ -179,17 +182,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   submitButton: {
-    backgroundColor: "#4285F4",
+    backgroundColor: colors.accent,
     borderRadius: 8,
     padding: 14,
     alignItems: "center",
     justifyContent: "center",
   },
   disabledButton: {
-    backgroundColor: "#a0a0a0",
+    backgroundColor: colors.border,
   },
   submitButtonText: {
-    color: "white",
+    color: colors.card,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
   },
   contactInfoText: {
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   emailContainer: {
@@ -208,7 +211,7 @@ const styles = StyleSheet.create({
   },
   emailText: {
     fontSize: 14,
-    color: "#4285F4",
+    color: colors.accent,
     marginLeft: 6,
   },
 });

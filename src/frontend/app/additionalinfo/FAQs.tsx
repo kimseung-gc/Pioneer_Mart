@@ -10,6 +10,9 @@ import {
 import { useState } from "react";
 import { faqItem } from "@/types/types";
 import React from "react";
+import { useTheme } from "../contexts/ThemeContext";
+
+const { colors } = useTheme();
 
 const FAQs = () => {
   const router = useRouter();
@@ -76,6 +79,7 @@ const FAQs = () => {
           headerTitleAlign: "center",
           headerShown: true,
           headerBackTitle: "Back",
+          headerTintColor: colors.accent
         }}
       />
 
@@ -91,7 +95,7 @@ const FAQs = () => {
               <Entypo
                 name={expandedItems[faq.id] ? "chevron-up" : "chevron-down"}
                 size={20}
-                color="black"
+                color={colors.textPrimary}
               />
             </TouchableOpacity>
 
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   faqItem: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: colors.card,
     borderRadius: 10,
     marginBottom: 15,
     overflow: "hidden",
@@ -162,7 +166,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: colors.border,
     marginHorizontal: 16,
   },
   answerContainer: {
@@ -170,7 +174,7 @@ const styles = StyleSheet.create({
   },
   answerText: {
     fontSize: 15,
-    color: "#555",
+    color: colors.textSecondary,
     padding: 16,
     paddingTop: 12,
   },

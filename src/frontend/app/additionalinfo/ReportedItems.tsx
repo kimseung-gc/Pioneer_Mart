@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
-
 import { router, Stack } from "expo-router";
-
 import { useAuth } from "../contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import ProductList from "@/components/ProductList";
@@ -16,8 +14,9 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
 
+const { colors } = useTheme();
+
 const ReportedItemsScreen = () => {
-  const { colors } = useTheme();
   const { authToken } = useAuth();
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
@@ -40,7 +39,8 @@ const ReportedItemsScreen = () => {
 
   return (
     <>
-      <Stack.Screen
+      {/* TODO: need to fix the header so that the width of header fits for smaller screen */}
+      {/* <Stack.Screen
         options={{
           headerShown: true,
           headerLeft: () => (
@@ -48,17 +48,26 @@ const ReportedItemsScreen = () => {
               style={{ padding: 8 }}
               onPress={() => router.back()}
             >
-              <Entypo name="chevron-left" size={24} color="black" />
+              <Entypo name="chevron-left" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
           ),
           header: () => <Header screenId={screenId} />,
         }}
-      />
+      /> */}
+      <Stack.Screen
+        options={{
+          headerTitle: "Reported Items",
+          headerTitleAlign: "center",
+          headerShown: true,
+          headerBackTitle: "Back",
+          headerTintColor: colors.accent
+        }}
+      />       
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color="#A25E5E"
+            color={colors.accent}
             testID="loading-indicator"
           />
         </View>
@@ -83,6 +92,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFF9F0",
+    backgroundColor: colors.background,
   },
 });

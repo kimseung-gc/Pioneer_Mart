@@ -51,8 +51,9 @@ import Constants from "expo-constants";
 import api from "@/types/api";
 import { useTheme } from "../contexts/ThemeContext";
 
+const { colors } = useTheme();
+
 const PurchaseRequests = () => {
-  const { colors } = useTheme();
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // States for PurchaseRequest screen
   const [activeTab, setActiveTab] = useState("sent");
@@ -275,13 +276,13 @@ const PurchaseRequests = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "#f39c12"; // Amber
+        return colors.accentSecondary; // Amber
       case "accepted":
-        return "#2ecc71"; // Green
+        return colors.success; // Green
       case "declined":
-        return "#e74c3c"; // Red
+        return colors.danger; // Red
       default:
-        return "#3498db"; // Blue (default)
+        return colors.accentSecondary; // Blue (default)
     }
   };
 
@@ -311,7 +312,7 @@ const PurchaseRequests = () => {
         <View style={styles.requestInfo}>
           {activeTab === "sent" && (
             <View style={{ marginBottom: 8 }}>
-              <Text style={{ fontSize: 14, color: "#555" }}>
+              <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                 Seller:{" "}
                 <Text style={{ fontWeight: "600" }}>{item.seller_name}</Text>
               </Text>
@@ -319,7 +320,7 @@ const PurchaseRequests = () => {
           )}
           {activeTab === "received" && (
             <View style={{ marginBottom: 8 }}>
-              <Text style={{ fontSize: 14, color: "#555" }}>
+              <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                 Requester:{" "}
                 <Text style={{ fontWeight: "600" }}>{item.requester_name}</Text>
               </Text>
@@ -327,7 +328,7 @@ const PurchaseRequests = () => {
           )}
           <View style={styles.statusContainer}>
             <View style={styles.dateContainer}>
-              <Ionicons name="calendar-outline" size={16} color="#666" />
+              <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
               <Text style={styles.requestDate}>{formattedDate}</Text>
             </View>
             <View
@@ -347,14 +348,14 @@ const PurchaseRequests = () => {
                     style={styles.acceptButton}
                     onPress={() => acceptRequest(item.id)}
                   >
-                    <Ionicons name="checkmark" size={16} color="white" />
+                    <Ionicons name="checkmark" size={16} color={colors.card} />
                     <Text style={styles.buttonText}>Accept</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.declineButton}
                     onPress={() => declineRequest(item.id)}
                   >
-                    <Ionicons name="close" size={16} color="white" />
+                    <Ionicons name="close" size={16} color={colors.card} />
                     <Text style={styles.buttonText}>Decline</Text>
                   </TouchableOpacity>
                 </>
@@ -372,7 +373,7 @@ const PurchaseRequests = () => {
               removeRequest(item.id);
             }}
           >
-            <Ionicons name="trash-outline" size={16} color="white" />
+            <Ionicons name="trash-outline" size={16} color={colors.card} />
             <Text style={styles.buttonText}>Delete Request</Text>
           </TouchableOpacity>
         </View>
@@ -396,9 +397,9 @@ const PurchaseRequests = () => {
           headerShown: true,
           headerBackTitle: "Back",
           headerStyle: {
-            backgroundColor: "#B45757",
+            backgroundColor: colors.accent,
           },
-          headerTintColor: "#ffffff",
+          headerTintColor: colors.card,
           headerShadowVisible: false,
         }}
       />
@@ -451,7 +452,7 @@ const PurchaseRequests = () => {
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="large"
-              color="#4285F4"
+              color={colors.accentSecondary}
               testID="activity-indicator"
             />
           </View>
@@ -467,14 +468,14 @@ const PurchaseRequests = () => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={["#4285F4"]}
-                tintColor="#4285F4"
+                colors={[colors.accentSecondary]}
+                tintColor={colors.accentSecondary}
               />
             }
             /* Component to display when the list is empty */
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
-                <Ionicons name="document-text-outline" size={64} color="#ccc" />
+                <Ionicons name="document-text-outline" size={64} color={colors.border} />
                 <Text style={styles.emptyTitle}>
                   No {activeTab === "sent" ? "Sent" : "Received"} Requests
                 </Text>
@@ -501,10 +502,10 @@ export default PurchaseRequests;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF9F0",
+    backgroundColor: colors.background,
   },
   tabsOuterContainer: {
-    backgroundColor: "#B45757",
+    backgroundColor: colors.accent,
     paddingBottom: 15,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -560,7 +561,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   activeTabText: {
-    color: "#4285F4",
+    color: colors.accentSecondary,
     fontWeight: "700",
   },
   loadingContainer: {
@@ -573,7 +574,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   requestItem: {
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 12,
     marginBottom: 16,
     padding: 14,
@@ -605,7 +606,7 @@ const styles = StyleSheet.create({
   },
   requestDate: {
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
     marginLeft: 5,
   },
   statusBadge: {
@@ -615,7 +616,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontWeight: "600",
-    color: "white",
+    color: colors.card,
     fontSize: 13,
   },
   actionButtonsContainer: {
@@ -625,7 +626,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   acceptButton: {
-    backgroundColor: "#2ecc71",
+    backgroundColor: colors.success,
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -634,7 +635,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   declineButton: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: colors.danger,
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -643,7 +644,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   removeButton: {
-    backgroundColor: "#ff4757",
+    backgroundColor: colors.danger,
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -654,7 +655,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonText: {
-    color: "white",
+    color: colors.card,
     fontWeight: "600",
     marginLeft: 5,
   },
@@ -667,13 +668,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#333",
+    color: colors.textPrimary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 15,
-    color: "#666",
+    color: colors.textSecondary,
     textAlign: "center",
     lineHeight: 22,
   },
