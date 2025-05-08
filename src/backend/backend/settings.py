@@ -62,7 +62,7 @@ else:
 ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud", "pioneer-mart.vercel.app"]
 CSRF_TRUSTED_ORIGINS = [
     "https://env-2325023.us.reclaim.cloud",
-    "pioneer-mart.vercel.app",
+    "https://pioneer-mart.vercel.app",
 ]
 # Application definition
 
