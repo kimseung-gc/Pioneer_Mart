@@ -427,13 +427,16 @@ const ItemDetails = () => {
                   <TouchableOpacity
                     style={styles.editButton}
                     onPress={() => {
-                      router.push({
-                        pathname: "/item/[id]/edit",
-                        params: {
-                          id: item.id.toString(),
-                          item: JSON.stringify(item),
-                        },
-                      });
+                      // router.push({
+                      //   pathname: "/item/[id]/edit",
+                      //   params: {
+                      //     id: item.id.toString(),
+                      //     item: JSON.stringify(item),
+                      //   },
+                      // });
+                      window.alert(
+                        "Editing an item is not available right now on the web version.\n\nYou can delete your item and add it again.\n\nThe PioneerMart team is working to get this feature out soon!"
+                      );
                     }}
                   >
                     <FontAwesome
@@ -574,14 +577,11 @@ const styles = StyleSheet.create({
   },
   itemImage: {
     width: 500,
-    // width: 200,
-    // height: "100%",
     height: height * 0.4,
   },
   paginationContainer: {
     position: "absolute",
     bottom: 20,
-    // width: "100%",
     width: 600,
     flexDirection: "row",
     justifyContent: "center",

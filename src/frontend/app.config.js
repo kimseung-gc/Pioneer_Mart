@@ -5,7 +5,7 @@ module.exports = {
   expo: {
     name: "PioneerMart",
     slug: "frontend",
-    version: "1.0.1",
+    version: "1.0.2",
     orientation: "portrait",
     icon: "./assets/images/PioneerMartLogo-01.png",
     scheme: "myapp",
@@ -19,7 +19,7 @@ module.exports = {
     ios: {
       bundleIdentifier: "com.khalidmu.pioneermart",
       supportsTablet: false,
-      buildNumber: "1.0.9",
+      buildNumber: "1.0.0",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
         NSAppTransportSecurity: {
@@ -35,7 +35,7 @@ module.exports = {
     },
     android: {
       package: "com.khalidmu.pioneermart",
-      versionCode: 2,
+      versionCode: 3,
       adaptiveIcon: {
         foregroundImage: "./assets/images/PioneerMartLogo-01.png",
         backgroundColor: "#FFF9F0",
@@ -44,7 +44,7 @@ module.exports = {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png"
+      favicon: "./assets/images/PioneerMartLogo-01.png"
     },
     plugins: [
       "expo-router",
@@ -64,7 +64,7 @@ module.exports = {
       router: {
         origin: false
       },
-      apiUrl: process.env.BASE_URL,
+      apiUrl: `http://127.0.0.1:8000`,
       SE_API_USER: process.env.SE_API_USER,
       SE_SECRET_KEY: process.env.SE_SECRET_KEY,
       SE_WORKFLOW: process.env.SE_WORKFLOW,
