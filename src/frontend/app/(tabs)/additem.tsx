@@ -51,6 +51,43 @@ const sightEngineTextModeration = async (text: string) => {
   return response.data;
 };
 
+// Updated getImageFileForFormData function
+const getImageFileForFormData = async (
+  uri: string,
+  name: string,
+  type: string
+) => {
+  if (Platform.OS === "web") {
+    try {
+      if (uri.startsWith("data:")) {
+        // Convert base64 to binary correctly
+        const res = await fetch(uri);
+        const blob = await res.blob();
+        const fixedName =
+          name.endsWith(".png") ||
+          name.endsWith(".jpg") ||
+          name.endsWith(".jpeg")
+            ? name
+            : name + (type === "image/png" ? ".png" : ".jpg");
+        return new File([blob], fixedName, { type });
+      } else {
+        const res = await fetch(uri);
+        const blob = await res.blob();
+        return new File([blob], name, { type });
+      }
+    } catch (error) {
+      console.error("Failed to prepare image for form data:", error);
+      throw error;
+    }
+  } else {
+    return {
+      uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
+      name,
+      type,
+    } as unknown as Blob;
+  }
+};
+
 const AddItemScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   // initial form state w/ everything empty...we'll use this when submitting the form to reset for user
@@ -99,7 +136,7 @@ const AddItemScreen = () => {
   const getProfile = async () => {
     if (!authToken) {
       // check if authenticated
-      Alert.alert("Error", "You must be logged in to add items.");
+      window.alert("Error\n\nYou must be logged in to add items.");
       router.back();
       return;
     }
@@ -111,7 +148,7 @@ const AddItemScreen = () => {
         {
           headers: {
             Authorization: `Bearer ${cleanToken}`,
-            "Content-Type": "application/json",
+            // "Content-Type": "application/json",
             Accept: "application/json",
           },
         }
@@ -120,11 +157,11 @@ const AddItemScreen = () => {
       if (response.data.results) {
         setUserData(response.data.results[0]);
       } else {
-        Alert.alert("Error", "No user data found.");
+        window.alert("Error\n\nNo user data found.");
       }
     } catch (error) {
       console.error("Error getting user profile:", error);
-      Alert.alert("Error", "Failed to load profile. Please try again.");
+      window.alert("Error\n\nFailed to load profile. Please try again.");
     }
   };
 
@@ -146,13 +183,11 @@ const AddItemScreen = () => {
 
     if (permissionResult.status !== "granted") {
       if (!permissionResult.canAskAgain) {
-        Alert.alert(
-          "Permission required",
+        window.alert(
           "You've previously denied access to your photo library. Please enable it from your phone's settings to continue."
         );
       } else {
-        Alert.alert(
-          "Permission needed",
+        window.alert(
           "Please allow access to your photo library to select an image."
         );
       }
@@ -178,72 +213,67 @@ const AddItemScreen = () => {
   const validateForm = () => {
     const { name, price } = formData;
     if (!name || !price || images.length === 0) {
-      Alert.alert(
-        "Missing information",
-        "Please fill out all required fields and add an image"
-      );
+      window.alert("Please fill out all required fields and add an image");
       return false;
     }
     return true;
   };
 
-  const createFormData = () => {
+  // Updated createFormData function
+  const createFormData = async () => {
     const { name, description, price, category } = formData;
     const formDataObj = new FormData();
 
     formDataObj.append("title", name);
     formDataObj.append("description", description);
     formDataObj.append("price", price);
-    // Find the matching category object and send its ID instead of string value
+
+    // Find the matching category object and send its ID
     const selectedCategory = categories.find((cat) => cat.name === category);
     formDataObj.append(
       "category",
       selectedCategory ? selectedCategory.id.toString() : "7"
     ); // Default to "Other" (7) if not found
+
     if (userData !== undefined) {
       formDataObj.append("seller", userData.id.toString());
     }
 
     if (images.length > 0) {
+      // Primary image (first one)
       const primaryImage = images[0];
       const imageFileName = primaryImage.split("/").pop() || "image.jpg";
       const imageType = imageFileName.endsWith("png")
         ? "image/png"
         : "image/jpeg";
-      // const fileUri =
-      //   Platform.OS === "android"
-      //     ? image
-      //     : image.startsWith("file://")
-      //     ? image
-      //     : `file://${image}`;
 
-      formDataObj.append("image", {
-        uri:
-          Platform.OS === "android"
-            ? primaryImage
-            : primaryImage.replace("file://", ""),
-        name: imageFileName,
-        type: imageType,
-      } as unknown as Blob);
-    }
+      // Process the image file
+      const imageFile = await getImageFileForFormData(
+        primaryImage,
+        imageFileName,
+        imageType
+      );
+      formDataObj.append("image", imageFile);
 
-    if (images.length > 1) {
-      // skip the first image since it's already added as the primary image
-      for (let i = 1; i < images.length; i++) {
-        const additionalImage = images[i];
-        const imageFileName =
-          additionalImage.split("/").pop() || `image_${i}.jpg`;
-        const imageType = imageFileName.endsWith("png")
-          ? "image/png"
-          : "image/jpeg";
-        formDataObj.append("additional_images", {
-          uri:
-            Platform.OS === "android"
-              ? additionalImage
-              : additionalImage.replace("file://", ""),
-          name: imageFileName,
-          type: imageType,
-        } as unknown as Blob);
+      // Additional images
+      if (images.length > 1) {
+        // Process each additional image
+        for (let i = 1; i < images.length; i++) {
+          const additionalImage = images[i];
+          const additionalImageFileName =
+            additionalImage.split("/").pop() || `image_${i}.jpg`;
+          const additionalImageType = additionalImageFileName.endsWith("png")
+            ? "image/png"
+            : "image/jpeg";
+
+          const additionalImageFile = await getImageFileForFormData(
+            additionalImage,
+            additionalImageFileName,
+            additionalImageType
+          );
+
+          formDataObj.append("additional_images", additionalImageFile);
+        }
       }
     }
 
@@ -251,7 +281,6 @@ const AddItemScreen = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Hello");
     if (!validateForm()) return;
     try {
       setLoading(true);
@@ -259,8 +288,8 @@ const AddItemScreen = () => {
         await getProfile();
       }
 
-      // TODO: Uncomment for sightengine stuff
-      const combinedText = `${formData.name}\n${formData.description}`; //combine all the text
+      // Text moderation
+      const combinedText = `${formData.name}\n${formData.description}`;
       const textModerationResult = await sightEngineTextModeration(
         combinedText
       );
@@ -270,10 +299,12 @@ const AddItemScreen = () => {
           "SightEngine text moderation error:",
           textModerationResult.error
         );
-        Alert.alert("Error", "Text validation failed. Please try again");
+        window.alert("Text validation failed. Please try again");
         setLoading(false);
         return;
       }
+
+      // Check text moderation results
       if (
         (textModerationResult.profanity.matches[0] &&
           textModerationResult.profanity.matches[0].intensity === "high") ||
@@ -284,43 +315,32 @@ const AddItemScreen = () => {
         (textModerationResult.violence.matches[0] &&
           textModerationResult.violence.matches[0].intensity === "high")
       ) {
-        Alert.alert(
-          "NOT ALLOWED",
-          "Please make sure all text is free of profanity, illegal content, extremism, and violence"
+        window.alert(
+          "NOT ALLOWED\n\nPlease make sure all text is free of profanity, illegal content, extremism, and violence"
         );
         setLoading(false);
         return;
       }
+
+      // Image moderation
       for (const image of images) {
         if (image) {
-          const sightEngineFormData = new FormData();
           const imageFileName = image.split("/").pop() || "image.jpg";
           const imageType = imageFileName.endsWith("png")
             ? "image/png"
             : "image/jpeg";
-          sightEngineFormData.append("media", {
-            uri: image,
-            name: imageFileName,
-            type: imageType,
-          } as unknown as Blob);
-          //TODO: append image to form data
-          type SightEngineParams = {
-            workflow: string;
-            api_user: string;
-            api_secret: string;
-          };
-
-          const params: SightEngineParams = {
-            workflow: SE_WORKFLOW,
-            api_user: SE_API_USER,
-            api_secret: SE_SECRET_KEY,
-          };
-
-          (Object.keys(params) as (keyof SightEngineParams)[]).forEach(
-            (key) => {
-              sightEngineFormData.append(key, params[key]);
-            }
+          const imageFile = await getImageFileForFormData(
+            image,
+            imageFileName,
+            imageType
           );
+
+          const sightEngineFormData = new FormData();
+          sightEngineFormData.append("media", imageFile);
+          sightEngineFormData.append("workflow", SE_WORKFLOW);
+          sightEngineFormData.append("api_user", SE_API_USER);
+          sightEngineFormData.append("api_secret", SE_SECRET_KEY);
+
           // Make API call to SightEngine
           const sightEngineResponse = await api.post(
             "https://api.sightengine.com/1.0/check-workflow.json",
@@ -331,46 +351,54 @@ const AddItemScreen = () => {
               },
             }
           );
+
           const output = sightEngineResponse.data;
           if (output.status === "failure") {
             console.error("SightEngine API error:", output.error);
-            Alert.alert("Error", "Image validation failed. Please try again.");
+            window.alert("Image validation failed. Please try again.");
             setLoading(false);
             return;
           }
+
           // Check if image should be rejected
           if (output.summary && output.summary.action === "reject") {
-            Alert.alert(
-              "NOT ALLOWED",
-              `${output.summary.reject_reason[0].text}`
+            window.alert(
+              `NOT ALLOWED\n\n${output.summary.reject_reason[0].text}`
             );
             setLoading(false);
             return;
           }
         }
       }
-      const formDataObj = createFormData();
+
+      // Create and submit form data to backend
+      const formDataObj = await createFormData();
       const cleanToken = authToken?.trim();
+      formDataObj.forEach((value, key) => {
+        console.log(key, value);
+      });
       const response = await api.post(`${BASE_URL}/api/items/`, formDataObj, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          // "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${cleanToken}`,
           Accept: "application/json",
         },
-        transformRequest: (data) => {
-          return data;
-        },
       });
-      resetForm(); //reset the form after submitting
+
+      resetForm();
       Toast.show({
         type: "success",
         text1: "Added",
         text2: "Item uploaded successfully",
       });
       router.back();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting item:", error);
-      Alert.alert("Error", "Could not add item. Please try again later.");
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      window.alert("Error\n\nCould not add item. Please try again later.");
     } finally {
       setLoading(false);
     }

@@ -111,9 +111,8 @@ const ItemDetails = () => {
       setHasReportedItem(fetchedItem.is_reported || false);
     } catch (error) {
       console.error("Error fetching item details:", error);
-      Alert.alert(
-        "Error",
-        "Unable to load item details. Please try again later."
+      window.alert(
+        "Error\n\nUnable to load item details. Please try again later."
       );
     } finally {
       setIsLoading(false);
@@ -278,7 +277,7 @@ const ItemDetails = () => {
       });
     } catch (error) {
       console.error("Error starting chat:", error);
-      Alert.alert("Error", "Failed to start a chat. Please try again.");
+      window.alert("Error\n\nFailed to start a chat. Please try again.");
     } finally {
       setChatLoading(false);
     }
@@ -523,9 +522,8 @@ const ItemDetails = () => {
                           }
                         } catch (error) {
                           console.error("Error toggling report:", error);
-                          Alert.alert(
-                            "Error",
-                            "Failed to report item. Please try again"
+                          window.alert(
+                            "Error\n\nFailed to report item. Please try again"
                           );
                         }
                       }}
@@ -569,13 +567,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   carouselContainer: {
-    width: width * 0.35,
+    width: 500,
     height: height * 0.4,
     position: "relative",
     backgroundColor: "#f0f0f0",
   },
   itemImage: {
-    width: width * 0.35,
+    width: 500,
     // width: 200,
     // height: "100%",
     height: height * 0.4,

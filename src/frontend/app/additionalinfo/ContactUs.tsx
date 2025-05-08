@@ -27,7 +27,7 @@ const ContactUs = () => {
 
   const handleSubmit = async () => {
     if (!description.trim()) {
-      Alert.alert("Error", "Please enter a description");
+      window.alert("Error\n\nPlease enter a description");
       return;
     }
     setIsSubmitting(true);
@@ -45,16 +45,13 @@ const ContactUs = () => {
         }
       );
       setDescription("");
-      Alert.alert(
-        "Thank You!",
-        "Your message has been sent successfully. We'll get back to you soon.",
-        [{ text: "OK" }]
+      window.alert(
+        "Thank You!\n\nYour message has been sent successfully. We'll get back to you soon."
       );
     } catch (error) {
       console.error("Error sending contact form:", error);
-      Alert.alert(
-        "Error",
-        "Failed to send your message. Please try again later."
+      window.alert(
+        "Error\n\nFailed to send your message. Please try again later."
       );
     } finally {
       setIsSubmitting(false);

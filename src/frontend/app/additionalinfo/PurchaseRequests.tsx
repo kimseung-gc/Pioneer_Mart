@@ -112,10 +112,8 @@ const PurchaseRequests = () => {
       setReceivedRequests(receivedResponse.data);
     } catch (error) {
       console.error("Error fetching purchase requests:", error);
-      Alert.alert(
-        "Error",
-        "Failed to load purchase requests. Please try again later.",
-        [{ text: "OK" }]
+      window.alert(
+        "Error\n\nFailed to load purchase requests. Please try again later."
       );
     } finally {
       setIsLoading(false);
@@ -155,15 +153,11 @@ const PurchaseRequests = () => {
       );
       // update all requests related to this listing
       fetchRequests(); // we need to re-fetch everything since multiple listings might be affected?
-      Alert.alert("Success", "Purchase request accepted successfully", [
-        { text: "OK" },
-      ]);
+      window.alert("Success\n\nPurchase request accepted successfully");
     } catch (error) {
       console.error("Error accepting request:", error);
-      Alert.alert(
-        "Error",
-        "Failed to accept purchase request. Please try again later.",
-        [{ text: "OK" }]
+      window.alert(
+        "Error\n\nFailed to accept purchase request. Please try again later."
       );
     }
   };
@@ -198,15 +192,11 @@ const PurchaseRequests = () => {
             : request
         )
       );
-      Alert.alert("Success", "Purchase request declined successfully", [
-        { text: "OK" },
-      ]);
+      window.alert("Success\n\nPurchase request declined successfully");
     } catch (error) {
       console.error("Error declining request:", error);
-      Alert.alert(
-        "Error",
-        "Failed to decline purchase request. Please try again later.",
-        [{ text: "OK" }]
+      window.alert(
+        "Error\n\nFailed to decline purchase request. Please try again later."
       );
     }
   };
@@ -219,51 +209,48 @@ const PurchaseRequests = () => {
    * Upon successful removal, it updates the local state to remove the item from the view.
    */
   const removeRequest = async (requestId: number) => {
-    Alert.alert(
-      "Remove Request",
-      "Are you sure you want to delete this request? This will also cancel the request.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const cleanToken = authToken?.trim();
-              await api.delete(
-                `${BASE_URL}/api/requests/${requestId}/remove/`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${cleanToken}`,
-                  },
-                }
-              );
-
-              //remove the request from the appropriate list
-              if (activeTab === "sent") {
-                setSentRequests((prevRequests) =>
-                  prevRequests.filter((request) => request.id !== requestId)
-                );
-              } else {
-                setReceivedRequests((prevRequests) =>
-                  prevRequests.filter((request) => request.id !== requestId)
-                );
-              }
-              Alert.alert("Success", "Request cancelled & deleted", [
-                { text: "OK" },
-              ]);
-            } catch (error) {
-              console.error("Error removing request:", error);
-              Alert.alert(
-                "Error",
-                "Failed to remove request. Please try again later.",
-                [{ text: "OK" }]
-              );
-            }
+    const confirmDelete = async () => {
+      try {
+        const cleanToken = authToken?.trim();
+        await api.delete(`${BASE_URL}/api/requests/${requestId}/remove/`, {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
           },
-        },
-      ]
+        });
+
+        if (activeTab === "sent") {
+          setSentRequests((prevRequests) =>
+            prevRequests.filter((request) => request.id !== requestId)
+          );
+        } else {
+          setReceivedRequests((prevRequests) =>
+            prevRequests.filter((request) => request.id !== requestId)
+          );
+        }
+
+        if (Platform.OS === "web") {
+          window.alert("Request cancelled & deleted");
+        } else {
+          window.alert("Success\n\nRequest cancelled & deleted");
+        }
+      } catch (error) {
+        console.error("Error removing request:", error);
+        if (Platform.OS === "web") {
+          window.alert("Failed to remove request. Please try again later.");
+        } else {
+          window.alert(
+            "Error\n\nFailed to remove request. Please try again later."
+          );
+        }
+      }
+    };
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this request? This will also cancel the request."
     );
+    if (confirmed) {
+      confirmDelete();
+    }
   };
 
   /**
@@ -367,7 +354,7 @@ const PurchaseRequests = () => {
               { backgroundColor: "red", zIndex: 999 },
             ]}
             onPress={(e) => {
-              e.stopPropagation();
+              // e.stopPropagation();
               console.log("Delete clicked for", item.id);
               removeRequest(item.id);
             }}

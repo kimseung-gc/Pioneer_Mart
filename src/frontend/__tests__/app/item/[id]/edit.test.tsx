@@ -196,9 +196,8 @@ describe("EditItem Component", () => {
     });
 
     // alert should be called with permission message
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Permission needed",
-      "Please allow access to your photo library"
+    expect(window.alert).toHaveBeenCalledWith(
+      "Permission needed\n\nPlease allow access to your photo library"
     );
   });
   it("removes an image when remove icon is pressed", async () => {
@@ -228,9 +227,8 @@ describe("EditItem Component", () => {
     });
 
     // check if validation alert was shown
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Validation Error",
-      "Please fill in all required fields."
+    expect(window.alert).toHaveBeenCalledWith(
+      "Validation Error\n\nPlease fill in all required fields."
     );
 
     // API should not have been called
@@ -249,9 +247,8 @@ describe("EditItem Component", () => {
     });
 
     // check if error alert was shown
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Error",
-      "Could not edit item. Please try again later."
+    expect(window.alert).toHaveBeenCalledWith(
+      "Error\n\nCould not edit item. Please try again later."
     );
   });
 });

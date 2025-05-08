@@ -62,10 +62,8 @@ describe("TCModal Component", () => {
     );
 
     fireEvent.press(getByText("Close"));
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Terms & Conditions Required",
-      "You must accept the terms and conditions to continue using the platform.",
-      [{ text: "OK", style: "default" }]
+    expect(window.alert).toHaveBeenCalledWith(
+      "You must accept the terms and conditions to continue using the platform."
     );
     expect(mockOnClose).not.toHaveBeenCalled();
   });
@@ -149,10 +147,8 @@ describe("TCModal Component", () => {
     // Simulate back button press (which triggers onRequestClose)
     const modal = getByTestId("tc-modal");
     fireEvent(modal, "requestClose");
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Terms & Conditions Required",
-      "You must accept the terms and conditions to continue using the platform.",
-      [{ text: "OK", style: "default" }]
+    expect(window.alert).toHaveBeenCalledWith(
+      "You must accept the terms and conditions to continue using the platform."
     );
   });
 });

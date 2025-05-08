@@ -8,6 +8,8 @@ import {
   Modal,
   FlatList,
   Switch,
+  Dimensions,
+  TextInput,
 } from "react-native";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { CategoryType, ScreenId } from "@/types/types";
@@ -35,6 +37,8 @@ type FilterOptions = {
   sortByPrice: "asc" | "desc" | null;
   sortByDatePosted: "recent" | "older" | null;
 };
+
+const { width, height } = Dimensions.get("window");
 
 /**
  * A horizontal scrollable list of category filters used in different screens (Home, Favorites, MyItems).
@@ -84,14 +88,14 @@ const Categories: React.FC<CategoriesProps> = ({
 
   const resetFilters = () => {
     const defaultFilters = {
-      priceRange: [0, 1000] as [number, number],
+      priceRange: [0, 5000] as [number, number],
       hasActivePurchaseRequest: false,
       isSold: false,
       sortByPrice: null,
       sortByDatePosted: null,
     };
     setLocalFilterOptions(defaultFilters);
-    setSliderValues([0, 1000]);
+    setSliderValues([0, 5000]);
     useItemsStore.getState().resetFilters(screenId);
   };
 
@@ -258,14 +262,35 @@ const Categories: React.FC<CategoriesProps> = ({
               <View style={styles.filterSection}>
                 <Text style={styles.filterSectionTitle}>Price Range</Text>
                 <View style={styles.priceRangeContainer}>
-                  <Text style={styles.priceLabel}>
-                    ${sliderValues[0]} - ${sliderValues[1]}
-                  </Text>
+                  <View style={styles.customPriceInputs}>
+                    <TextInput
+                      style={styles.priceInput}
+                      keyboardType="numeric"
+                      value={sliderValues[0].toString()}
+                      onChangeText={(text) => {
+                        const val = parseInt(text) || 0;
+                        setSliderValues([val, sliderValues[1]]);
+                      }}
+                      placeholder="Min"
+                    />
+                    <Text style={{ marginHorizontal: 8 }}>-</Text>
+                    <TextInput
+                      style={styles.priceInput}
+                      keyboardType="numeric"
+                      value={sliderValues[1].toString()}
+                      onChangeText={(text) => {
+                        const val = parseInt(text) || 0;
+                        setSliderValues([sliderValues[0], val]);
+                      }}
+                      placeholder="Max"
+                    />
+                  </View>
+
                   <View style={styles.sliderContainer}>
                     <MultiSlider
                       values={[sliderValues[0], sliderValues[1]]}
                       min={0}
-                      max={1000}
+                      max={5000}
                       step={10}
                       sliderLength={280}
                       onValuesChange={handlePriceRangeChange}
@@ -308,7 +333,7 @@ const Categories: React.FC<CategoriesProps> = ({
                   </View>
                   <View style={styles.priceRangeLabels}>
                     <Text style={styles.priceRangeLabel}>$0</Text>
-                    <Text style={styles.priceRangeLabel}>$1000</Text>
+                    <Text style={styles.priceRangeLabel}>$5000</Text>
                   </View>
                 </View>
               </View>
@@ -592,7 +617,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   modalContent: {
@@ -601,6 +625,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingBottom: 30,
     maxHeight: "80%",
+    width: 450,
+    alignSelf: "center",
   },
   modalHeader: {
     flexDirection: "row",
@@ -672,6 +698,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888",
   },
+  customPriceInputs: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  priceInput: {
+    width: 70,
+    padding: 8,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 6,
+    fontSize: 14,
+    textAlign: "center",
+  },
+
   sortOptionsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",

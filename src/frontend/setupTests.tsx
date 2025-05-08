@@ -3,6 +3,8 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: jest.fn(),
   removeItem: jest.fn(),
 }));
+global.window.alert = jest.fn();
+global.window.confirm = jest.fn(() => true);
 
 jest.mock("@expo/vector-icons/AntDesign", () => {
   return {

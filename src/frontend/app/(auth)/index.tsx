@@ -54,7 +54,7 @@ const WelcomeScreen = (props: Props) => {
 
   const requestOTP = async () => {
     if (!email || email.trim() === "") {
-      Alert.alert("Error", "Please enter your username first");
+      window.alert("Error\n\nPlease enter your username first");
       return;
     }
 
@@ -79,9 +79,8 @@ const WelcomeScreen = (props: Props) => {
       });
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert(
-        "Authentication Error",
-        "Failed to send verification code. Please try again later."
+      window.alert(
+        "Authentication Error\n\nFailed to send verification code. Please try again later."
       );
     }
   };

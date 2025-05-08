@@ -35,7 +35,7 @@ const ProfileScreen = () => {
     try {
       await fetchUserData(authToken || "");
     } catch (error) {
-      Alert.alert("Error", "Failed to load profile. Please try again");
+      window.alert("Error\n\nFailed to load profile. Please try again");
     }
   };
 

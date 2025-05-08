@@ -114,9 +114,8 @@ describe("ProfileScreen", () => {
     mockFetchUserData.mockRejectedValue(new Error("Failed to fetch"));
     render(<ProfileScreen />);
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Error",
-        "Failed to load profile. Please try again"
+      expect(window.alert).toHaveBeenCalledWith(
+        "Error\n\nFailed to load profile. Please try again"
       );
     });
   });

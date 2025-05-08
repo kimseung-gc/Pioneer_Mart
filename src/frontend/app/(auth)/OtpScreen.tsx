@@ -62,7 +62,7 @@ const OtpScreen = () => {
           router.setParams({});
         }, 100);
       } else {
-        Alert.alert("Error", "Token not received from server.");
+        window.alert("Error\n\nToken not received from server.");
       }
     } catch (error) {
       Toast.show({

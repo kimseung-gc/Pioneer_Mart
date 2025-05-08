@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 
 interface DangerModalProps {
   isVisible: boolean;
@@ -8,6 +15,8 @@ interface DangerModalProps {
   dangerMessage: string;
   dangerOption1: string;
 }
+
+const { width, height } = Dimensions.get("window");
 
 const DangerModal: React.FC<DangerModalProps> = ({
   isVisible,
@@ -58,7 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 25,
     alignItems: "center",
-    width: "85%",
+    width: width * 0.25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

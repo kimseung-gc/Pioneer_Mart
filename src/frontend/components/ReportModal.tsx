@@ -36,7 +36,7 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
 
   const handleSubmit = async () => {
     if (!selectedReason) {
-      Alert.alert("Error", "Please select a reason for reporting");
+      window.alert("Error\n\nPlease select a reason for reporting");
       return;
     }
     setIsSubmitting(true);
@@ -46,7 +46,7 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
       onClose();
     } catch (error) {
       console.error("Error reporting item:", error);
-      Alert.alert("Error", "Failed to report item. Please try again.");
+      window.alert("Error\n\nFailed to report item. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

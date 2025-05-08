@@ -202,9 +202,8 @@ describe("ReportModal", () => {
         "Error reporting item:",
         expect.any(Error)
       );
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Error",
-        "Failed to report item. Please try again."
+      expect(window.alert).toHaveBeenCalledWith(
+        "Error\n\nFailed to report item. Please try again."
       );
     });
 

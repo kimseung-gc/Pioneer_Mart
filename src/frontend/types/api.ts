@@ -9,13 +9,12 @@ import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // putting this api service so that we don't need another api file
 import axios from "axios";
-import Constants from "expo-constants";
 import { getErrorMessage } from "@/utils/errorUtils";
 
 const api = axios.create({
-  baseURL: Constants?.expoConfig?.extra?.apiUrl,
+  baseURL: `http://localhost:8081`,
   headers: {
-    "Content-Type": "application/json",
+    // "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
@@ -53,7 +52,7 @@ try {
 
           // attempt to refreesh token
           const response = await axios.post(
-            `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/refresh/`,
+            `${`http://localhost:8081`}/otpauth/refresh/`,
             { refresh: refreshToken },
             {
               headers: {

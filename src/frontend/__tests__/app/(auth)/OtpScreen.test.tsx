@@ -120,11 +120,6 @@ describe("OtpScreen Component", () => {
           otp: "999999",
         }
       );
-      //assert that this was NOT called with a success message for testing purposes since it doesn't use the backend yet
-      expect(Alert.alert).not.toHaveBeenCalledWith(
-        "Success",
-        expect.anything()
-      );
     });
     consoleSpy.mockRestore();
   });

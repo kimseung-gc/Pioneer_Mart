@@ -11,6 +11,7 @@ import {
   View,
   FlatList,
   RefreshControl,
+  Platform,
 } from "react-native";
 import React from "react";
 import { EvilIcons } from "@expo/vector-icons";
@@ -120,7 +121,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
 
   const enterRoom = (room: ChatRoom): void => {
     if (!userData?.id) {
-      Alert.alert("Error", "User not authenticated");
+      window.alert("Error\n\nUser not authenticated");
       return;
     }
     // figure out who's sending the messages for UI stuff
@@ -168,7 +169,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
       }
     } catch (error) {
       console.error("Error deleting room:", error);
-      Alert.alert("Error", "Failed to delete the chat room.");
+      window.alert("Error\n\nFailed to delete the chat room.");
     }
   };
 
@@ -176,18 +177,12 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
     // figure out who's sending the messages for UI stuff
     const otherUser = userData?.id === item.user1.id ? item.user2 : item.user1;
     const confirmDelete = () => {
-      Alert.alert(
-        "Delete Chat Room",
-        "Are you sure you want to delete this chat room?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: () => handleDeleteRoom(Number(item.id)),
-          },
-        ]
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this chat room?"
       );
+      if (confirmed) {
+        handleDeleteRoom(Number(item.id));
+      }
     };
     return (
       <View style={styles.roomItem}>

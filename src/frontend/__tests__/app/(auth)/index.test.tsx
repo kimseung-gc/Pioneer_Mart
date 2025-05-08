@@ -237,9 +237,8 @@ describe("WelcomeScreen Component", () => {
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalled();
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Authentication Error",
-        "Failed to send verification code. Please try again later."
+      expect(window.alert).toHaveBeenCalledWith(
+        "Authentication Error\n\nFailed to send verification code. Please try again later."
       );
       // Make sure we didn't navigate
       expect(router.push).not.toHaveBeenCalled();
@@ -265,18 +264,9 @@ describe("WelcomeScreen Component", () => {
     await act(async () => {
       fireEvent.press(sendCodeButton);
     });
-    expect(Alert.alert).toHaveBeenCalledWith(
-      "Error",
-      "Please enter your username first"
+    expect(window.alert).toHaveBeenCalledWith(
+      "Error\n\nPlease enter your username first"
     );
-    // // should still attempt the request with empty string
-    // expect(api.post).toHaveBeenCalledWith(
-    //   expect.stringContaining("/otpauth/request-otp/"),
-    //   {
-    //     email: "@grinnell.edu",
-    //   },
-    //   expect.any(Object)
-    // );
   });
   it("properly formats the email with @grinnell.edu domain", async () => {
     mockUseAuth.mockReturnValue({

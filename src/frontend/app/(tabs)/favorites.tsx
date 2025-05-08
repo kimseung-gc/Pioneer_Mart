@@ -83,12 +83,11 @@ const FavoritesScreen = () => {
       setRefreshTrigger((prev) => !prev);
       // send alert with the summary
       if (failCount > 0) {
-        Alert.alert(
-          "Error:",
-          `Requested ${successCount} items successfully. ${failCount} items failed.`
+        window.alert(
+          `Error:\n\nRequested ${successCount} items successfully. ${failCount} items failed.`
         );
       } else if (successCount > 0) {
-        Alert.alert(`${successCount} items were requested successfully!`);
+        window.alert(`${successCount} items were requested successfully!`);
       }
     }
   };
