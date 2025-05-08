@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
     route.name === "additionalinfo/ReportedItems";
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.header }]}>
       {showBackButton ? (
         <View style={styles.row}>
           <TouchableOpacity
@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
             onPress={() => router.back()}
             testID="back-button"
           >
-            <Entypo name="chevron-left" size={24} color="black" />
+            <Entypo name="chevron-left" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.row}>
             {!isNotificationScreen && (
@@ -71,9 +71,9 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
               onPress={handleChatPress}
               style={styles.chatWrapper}
             >
-              <Entypo name="chat" size={24} color="black" />
+              <Entypo name="chat" size={24} color={colors.accent} />
               {unreadCount > 0 && (
-                <Badge style={styles.badge} size={18}>
+                <Badge style={[styles.badge, { backgroundColor: colors.danger }] } size={18}>
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Badge>
               )}
@@ -83,14 +83,14 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
       ) : isNotificationScreen ? (
         <View style={styles.titleRow}>
           <View style={{ width: 24 }} />
-          <Text style={styles.titleText}>Notifications</Text>
+          <Text style={[styles.titleText, { color: colors.textPrimary }]}>Notifications</Text>
           <TouchableOpacity
             onPress={handleChatPress}
             style={styles.chatWrapper}
           >
-            <Entypo name="chat" size={24} color="black" />
+            <Entypo name="chat" size={24} color={colors.accent} />
             {unreadCount > 0 && (
-              <Badge style={styles.badge} size={18}>
+              <Badge style={[styles.badge, { backgroundColor: colors.danger }] } size={18}>
                 {unreadCount > 99 ? "99+" : unreadCount.toString()}
               </Badge>
             )}
@@ -105,9 +105,9 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
             onPress={handleChatPress}
             style={styles.chatWrapper}
           >
-            <Entypo name="chat" size={24} color="black" />
+            <Entypo name="chat" size={24} color={colors.accent} />
             {unreadCount > 0 && (
-              <Badge style={styles.badge} size={18}>
+              <Badge style={[styles.badge, { backgroundColor: colors.danger }] } size={18}>
                 {unreadCount > 99 ? "99+" : unreadCount}
               </Badge>
             )}
@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: "#FFF9F0",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -147,7 +146,6 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#333",
     textAlign: "center",
     flex: 1,
   },
@@ -161,7 +159,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: "red",
     color: "white",
     fontSize: 10,
   },
