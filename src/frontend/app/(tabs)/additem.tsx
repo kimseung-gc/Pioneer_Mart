@@ -483,7 +483,7 @@ const AddItemScreen = () => {
               <MaterialIcons
                 name={dropdownOpen ? "arrow-drop-up" : "arrow-drop-down"}
                 size={24}
-                color="#007BFF"
+                color={colors.accent}
               />
             </TouchableOpacity>
           </View>
@@ -511,7 +511,7 @@ const AddItemScreen = () => {
                         style={styles.removeIcon}
                         onPress={() => removeImage(index)}
                       >
-                        <MaterialIcons name="close" size={24} color="#fff" />
+                        <MaterialIcons name="close" size={24} color={colors.card} />
                       </TouchableOpacity>
                       {index === 0 && (
                         <View
@@ -563,7 +563,7 @@ const AddItemScreen = () => {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.card} />
             ) : (
               <Text style={styles.saveButtonText}>Save Item</Text>
             )}
@@ -577,6 +577,7 @@ const AddItemScreen = () => {
   );
 };
 
+const { colors } = useTheme();
 const styles = StyleSheet.create({
   title: {
     fontSize: 24,
@@ -598,20 +599,20 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
   },
   textarea: {
     height: 100,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     textAlignVertical: "top",
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
   },
   imageActions: {
@@ -626,9 +627,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: colors.card,
   },
   imageButtonText: {
     marginLeft: 8,
@@ -637,11 +638,11 @@ const styles = StyleSheet.create({
   imagePicker: {
     height: 200,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: colors.card,
     overflow: "hidden",
     position: "relative",
   },
@@ -671,7 +672,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   primaryBadgeText: {
-    color: "#fff",
+    color: colors.card,
     fontSize: 12,
     fontWeight: "bold",
   },
@@ -681,13 +682,13 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   imagePickerText: {
-    color: "#777",
+    color: colors.textSecondary,
   },
   saveButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#B45757",
+    backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 30,
     marginTop: 30,
@@ -701,16 +702,16 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FFF9F0",
+    color: colors.background,
   },
   dropdownStyle: {
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
   },
   dropdownContainerStyle: {
-    borderColor: "#ddd",
-    backgroundColor: "#fff",
+    borderColor: colors.border,
+    backgroundColor: colors.card,
   },
   dropdownItemStyle: {
     justifyContent: "flex-start",
@@ -720,14 +721,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
   },
   dropdownTriggerText: {
     fontSize: 16,
-    color: "#333",
+    color: colors.textPrimary,
   },
   dropdownOverlay: {
     position: "absolute",
@@ -743,7 +744,7 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     width: "85%",
     height: "70%",
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderRadius: 8,
     padding: 10,
     zIndex: 1001,
@@ -751,17 +752,17 @@ const styles = StyleSheet.create({
   dropdownItem: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: colors.border,
   },
   dropdownItemText: {
     fontSize: 16,
-    color: "#333",
+    color: colors.textPrimary,
   },
   dropdownItemSelected: {
-    backgroundColor: "#f0f8ff",
+    backgroundColor: colors.accentSecondary + "22",
   },
   dropdownItemTextSelected: {
-    color: "#007BFF",
+    color: colors.accent,
     fontWeight: "bold",
   },
   removeIcon: {

@@ -6,7 +6,7 @@ import React from "react";
 import { StatusBar, View, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
@@ -14,6 +14,7 @@ import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync().catch(console.warn);
 
 export default function RootLayout() {
+  const { colors } = useTheme();
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -80,7 +81,7 @@ export default function RootLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#FFF9F0",
+          backgroundColor: colors.background,
         }}
       >
         <Text style={{ fontSize: 18 }}>
@@ -91,7 +92,7 @@ export default function RootLayout() {
   }
 
   if (!loaded || !splashHidden) {
-    return <View style={{ flex: 1, backgroundColor: "#FFF9F0" }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
   return (
@@ -99,7 +100,7 @@ export default function RootLayout() {
       <AuthProvider>
         <NotificationProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#FFF9F0" />
+            <StatusBar barStyle="dark-content" backgroundColor={colors.background }/>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen
                 name="(tabs)"

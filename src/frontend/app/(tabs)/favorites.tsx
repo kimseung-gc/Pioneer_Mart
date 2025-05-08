@@ -110,7 +110,7 @@ const FavoritesScreen = () => {
         {notRequestedItems.length > 0 && (
           <View style={styles.floatingButtonContainer}>
             {requestSuccess && (
-              <View style={styles.successMessageContainer}>
+              <View style={[styles.successMessageContainer, { backgroundColor: colors.success }] }>
                 <Text style={styles.successMessage}>
                   Request sent successfully!
                 </Text>
@@ -139,10 +139,6 @@ const FavoritesScreen = () => {
 export default FavoritesScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: "relative",
-  },
   floatingButtonContainer: {
     position: "absolute",
     right: 20,
@@ -150,7 +146,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   floatingButton: {
-    backgroundColor: "#2196F3",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25, // More rounded corners
@@ -161,7 +156,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   floatingButtonDisabled: {
-    backgroundColor: "#88c4f8",
+    opacity: 0.6,
   },
   floatingButtonText: {
     color: "white",
@@ -169,7 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   successMessageContainer: {
-    backgroundColor: "rgba(76, 175, 80, 0.9)",
     padding: 8,
     borderRadius: 15,
     marginBottom: 10,

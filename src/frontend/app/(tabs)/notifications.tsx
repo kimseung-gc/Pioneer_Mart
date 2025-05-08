@@ -132,7 +132,7 @@ export default function NotificationsScreen() {
               style={[
                 styles.filterText,
                 { color: colors.textPrimary },
-                filterType === type && { color: "#fff", fontWeight: "600" },
+                filterType === type && { color: colors.card, fontWeight: "600" },
               ]}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
