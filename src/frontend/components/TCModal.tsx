@@ -40,11 +40,9 @@ const TCModal: React.FC<TCModalProps> = ({
 
   const handleClose = () => {
     if (!termsAccepted) {
-      Alert.alert(
-        "Terms & Conditions Required",
-        "You must accept the terms and conditions to continue using the platform.",
-        [{ text: "OK", style: "default" }]
-      );
+      const message =
+        "You must accept the terms and conditions to continue using the platform.";
+      window.alert(message);
     } else {
       onClose();
     }
@@ -222,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 24,
-    width: "90%",
+    width: 450,
     maxHeight: "85%",
     shadowColor: "#000",
     shadowOffset: {
