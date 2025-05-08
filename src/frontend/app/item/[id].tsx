@@ -28,9 +28,11 @@ import ReportModal from "@/components/ReportModal";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
 import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
 const { width, height } = Dimensions.get("window");
 
+const { colors } = useTheme();
 const ItemDetails = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const router = useRouter();
@@ -300,7 +302,7 @@ const ItemDetails = () => {
         <ActivityIndicator
           testID="activity-indicator"
           size="large"
-          color="#3498db"
+          color={colors.accent}
         />
       </View>
     );
@@ -314,6 +316,7 @@ const ItemDetails = () => {
           headerTitleAlign: "center",
           headerShown: true,
           headerBackTitle: "Back",
+          headerTintColor: colors.accent
         }}
       />
       <SafeAreaView
@@ -388,7 +391,7 @@ const ItemDetails = () => {
                 <FontAwesome
                   name="user"
                   size={16}
-                  color="#888"
+                  color={colors.textSecondary}
                   style={styles.infoIcon}
                 />
                 <Text style={styles.infoText}>{item.seller_name}</Text>
@@ -397,7 +400,7 @@ const ItemDetails = () => {
                 <FontAwesome
                   name="calendar"
                   size={16}
-                  color="#888"
+                  color={colors.textSecondary}
                   style={styles.infoIcon}
                 />
                 <Text style={styles.infoText}>
@@ -410,7 +413,7 @@ const ItemDetails = () => {
               <FontAwesome
                 name="tag"
                 size={16}
-                color="#888"
+                color={colors.textSecondary}
                 style={styles.infoIcon}
               />
               <Text style={styles.categoryText}>{item.category_name}</Text>
@@ -557,13 +560,13 @@ export default ItemDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
   },
   scrollView: {
     flex: 1,
@@ -572,7 +575,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.4,
     position: "relative",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.border,
   },
   itemImage: {
     width: width,
@@ -594,7 +597,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.6)",
   },
   paginationDotActive: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     width: 12,
     height: 12,
     borderRadius: 6,
@@ -615,7 +618,7 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -20,
@@ -635,13 +638,13 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#333",
+    color: colors.textPrimary,
     flex: 1,
   },
   price: {
     fontSize: 24,
     fontWeight: "800",
-    color: "#22a45d",
+    color: colors.success,
   },
   infoRow: {
     flexDirection: "row",
@@ -657,12 +660,12 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 15,
-    color: "#666",
+    color: colors.textSecondary,
   },
   categoryContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: colors.accentSecondary + "22",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -671,7 +674,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 14,
-    color: "#3498db",
+    color: colors.accent,
     fontWeight: "600",
     marginLeft: 6,
   },
@@ -681,19 +684,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#333",
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   descriptionText: {
     fontSize: 16,
-    color: "#555",
+    color: colors.textSecondary,
     lineHeight: 24,
   },
   actionsContainer: {
     gap: 12,
   },
   editButton: {
-    backgroundColor: "#3498db",
+    backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
@@ -706,7 +709,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   deleteButton: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: colors.danger,
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
@@ -719,7 +722,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   purchaseRequestButton: {
-    backgroundColor: "#3498db",
+    backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
@@ -732,7 +735,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   reportItemButton: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: colors.danger,
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
@@ -745,10 +748,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   disabledButton: {
-    backgroundColor: "#95a5a6",
+    backgroundColor: colors.border,
   },
   chatButton: {
-    backgroundColor: "#22a45d",
+    backgroundColor: colors.success,
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
