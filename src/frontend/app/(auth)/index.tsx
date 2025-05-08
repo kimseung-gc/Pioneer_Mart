@@ -170,15 +170,6 @@ const WelcomeScreen = (props: Props) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-  style={[styles.skipButton, { borderColor: colors.border }]}
-  onPress={() => router.replace("/(tabs)")}
->
-  <Text style={[styles.skipButtonText, { color: colors.textPrimary }]}>
-    Skip for Now
-  </Text>
-</TouchableOpacity>
-
-              <TouchableOpacity
                 style={styles.termsLinkContainer}
                 onPress={() => setModalVisible(true)}
               >
