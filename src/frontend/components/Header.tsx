@@ -42,10 +42,10 @@ const Header: React.FC<HeaderProps> = ({ screenId }) => {
   }, [authToken]);
 
   const handleChatPress = () => {
-    router.push("/ChatRoomScreen");
-    // window.alert(
-    //   "The chat feature is only available on IOS right now, not the web version. If you would like to chat, you can send the seller an email.\n\nThe PioneerMart team is working to get this feature out soon!"
-    // );
+    // router.push("/ChatRoomScreen");
+    window.alert(
+      "The chat feature is only available on IOS right now, not the web version. If you would like to chat, you can send the seller an email.\n\nThe PioneerMart team is working to get this feature out soon!"
+    );
   };
 
   const isNotificationScreen = screenId === "notifications";

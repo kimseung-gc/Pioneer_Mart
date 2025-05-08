@@ -38,7 +38,18 @@ type FilterOptions = {
   sortByDatePosted: "recent" | "older" | null;
 };
 
-const { width, height } = Dimensions.get("window");
+// function to differentiate between laptop and phone
+const isProbablyLaptop = () => {
+  if (typeof window !== "undefined") {
+    const width = window.innerWidth;
+    return (
+      width > 768 && !/Mobile|Android|iPhone|iPad/.test(navigator.userAgent)
+    );
+  }
+  return false;
+};
+
+const width = Dimensions.get("window").width;
 
 /**
  * A horizontal scrollable list of category filters used in different screens (Home, Favorites, MyItems).
@@ -625,7 +636,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingBottom: 30,
     maxHeight: "80%",
-    width: 450,
+    width: isProbablyLaptop() ? 400 : width,
     alignSelf: "center",
   },
   modalHeader: {
