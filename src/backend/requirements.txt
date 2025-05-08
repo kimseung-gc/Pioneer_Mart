@@ -17,4 +17,4 @@ psycopg2-binary>=2.9.9
 django-storages==1.14.6
 boto3==1.37.38
 python-dotenv==1.0.1
-django-cors-headers==4.7.0
+django-cors-headers==4.4.0
