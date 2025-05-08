@@ -1,4 +1,5 @@
 import React from "react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
 
 interface DangerModalProps {
@@ -8,6 +9,8 @@ interface DangerModalProps {
   dangerMessage: string;
   dangerOption1: string;
 }
+
+const { colors } = useTheme();
 
 const DangerModal: React.FC<DangerModalProps> = ({
   isVisible,
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: "#FFFFFF", // soft muted rose-beige
+    backgroundColor: colors.card, 
     borderRadius: 20,
     paddingVertical: 30,
     paddingHorizontal: 25,
@@ -69,17 +72,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
-    color: "#3A2E2E", // soft dark brown for readability
+    color: colors.textPrimary, 
     marginBottom: 15,
   },
   divider: {
     width: "100%",
     height: 1,
-    backgroundColor: "#DABEB5", // warm neutral line
+    backgroundColor: colors.border, 
     marginVertical: 12,
   },
   logoutButton: {
-    backgroundColor: "#B45757", // soft clay red
+    backgroundColor: colors.danger, 
     borderRadius: 30,
     paddingVertical: 12,
     width: "85%",
@@ -87,12 +90,12 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   logoutText: {
-    color: "#FFF9F0",
+    color: colors.background,
     fontSize: 16,
     fontWeight: "600",
   },
   cancelButton: {
-    backgroundColor: "#E6D2C3", // soft beige tone
+    backgroundColor: colors.accentSecondary,
     borderRadius: 30,
     paddingVertical: 12,
     width: "85%",
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   cancelButtonText: {
-    color: "#3A2E2E",
+    color: colors.textPrimary,
     fontWeight: "600",
     fontSize: 15,
   },

@@ -1,6 +1,8 @@
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useTheme } from "@/app/contexts/ThemeContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import React from "react";
+
 import { useState } from "react";
 import {
   Alert,
@@ -18,6 +20,9 @@ interface ReportModalProps {
   onClose: () => void;
   itemId: number;
 }
+
+const { colors } = useTheme();
+
 const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,7 +108,7 @@ const ReportModal = ({ isVisible, onClose, itemId }: ReportModalProps) => {
                 <ActivityIndicator
                   testID="activity-indicator"
                   size="small"
-                  color="white"
+                  color={colors.card}
                 />
               ) : (
                 <Text style={styles.buttonText}>Submit</Text>
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: "80%",
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 20,
     padding: 20,
     alignItems: "center",
@@ -156,11 +161,11 @@ const styles = StyleSheet.create({
   reasonItem: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: colors.border,
     width: "100%",
   },
   selectedReason: {
-    backgroundColor: "#e6f7ff",
+    backgroundColor: colors.accentSecondary + "22",
   },
   reasonText: {
     fontSize: 16,
@@ -178,16 +183,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#ddd",
+    backgroundColor: colors.border,
   },
   submitButton: {
-    backgroundColor: "#FF5252",
+    backgroundColor: colors.danger,
   },
   disabledButton: {
-    backgroundColor: "#ffb8b8",
+    backgroundColor: colors.danger + "77",
   },
   buttonText: {
-    color: "white",
+    color: colors.card,
     fontWeight: "600",
   },
 });

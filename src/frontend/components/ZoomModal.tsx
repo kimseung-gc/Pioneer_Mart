@@ -1,3 +1,4 @@
+import { useTheme } from "@/app/contexts/ThemeContext";
 import { ItemType } from "@/types/types";
 import { AntDesign } from "@expo/vector-icons";
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
@@ -19,13 +20,15 @@ interface ZoomModalProps {
 
 const { width, height } = Dimensions.get("window");
 
+const { colors } = useTheme();
+
 const ZoomModal: React.FC<ZoomModalProps> = ({ isVisible, onClose, item }) => {
   return (
     <Modal visible={isVisible} transparent={true} animationType="fade">
       <View style={styles.modalContainer}>
         {/* Close Button */}
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <AntDesign name="close" size={30} color="white" />
+          <AntDesign name="close" size={30} color={colors.card} />
         </TouchableOpacity>
 
         {/* Zoomable Image */}

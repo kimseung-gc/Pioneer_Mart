@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
 
 interface ItemPurchaseModalProps {
@@ -6,6 +7,8 @@ interface ItemPurchaseModalProps {
   onClose: () => void;
   email: string;
 }
+
+const { colors } = useTheme();
 
 const ItemPurchaseModal: React.FC<ItemPurchaseModalProps> = ({
   isVisible,
@@ -39,12 +42,12 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
     elevation: 5,
-    width: "80%", // Adjust width as needed
+    width: "80%", 
   },
   modalText: {
     marginBottom: 15,
@@ -52,21 +55,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   closeButton: {
-    backgroundColor: "#2196F3",
+    backgroundColor: colors.accent,
     borderRadius: 20,
     padding: 10,
     elevation: 2,
     marginTop: 20,
   },
   closeButtonText: {
-    color: "white",
+    color: colors.card,
     fontWeight: "bold",
     textAlign: "center",
   },
   divider: {
     width: "100%",
     height: 1,
-    backgroundColor: "#ccc",
+    backgroundColor: colors.border,
     marginVertical: 10,
   },
 });

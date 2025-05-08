@@ -20,12 +20,14 @@ import React from "react";
 import ReportModal from "./ReportModal";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLatestItem } from "@/hooks/useLatestItem";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 type Props = {
   item: ItemType;
   source?: string;
 };
 
+const { colors } = useTheme();
 const width = Dimensions.get("window").width - 40;
 
 const SingleItem = ({ item, source }: Props) => {
@@ -117,7 +119,7 @@ const SingleItem = ({ item, source }: Props) => {
                   }
                   name={latestItem.is_reported ? "flag" : "outlined-flag"}
                   size={24}
-                  color="black"
+                  color={colors.textPrimary}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -130,7 +132,7 @@ const SingleItem = ({ item, source }: Props) => {
                   }
                   name={latestItem.is_favorited ? "heart" : "hearto"}
                   size={22}
-                  color="black"
+                  color={colors.textPrimary}
                 />
               </TouchableOpacity>
             </>
@@ -179,9 +181,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    borderColor: "#B91C1C",
+    borderColor: colors.accent,
     borderWidth: 3,
-    backgroundColor: "#FFF5F5",
+    backgroundColor: colors.background,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.07,
@@ -213,16 +215,16 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "black",
+    color: colors.textPrimary,
   },
   requestersCount: {
     fontSize: 12,
-    color: "black",
+    color: colors.textPrimary,
   },
   title: {
     fontSize: 14,
     fontWeight: "600",
-    color: "black",
+    color: colors.textPrimary,
   },
   soldTagContainer: {
     position: "absolute",
@@ -232,7 +234,7 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -15 }],
   },
   soldTagText: {
-    color: "white",
+    color: colors.card,
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 16,
@@ -244,14 +246,14 @@ const styles = StyleSheet.create({
   ownerLabel: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#ffd700",
+    color: colors.accentSecondary,
     marginTop: 2,
   },
   ownershipTag: {
     position: "absolute",
     top: 12,
     left: 12,
-    backgroundColor: "#B91C1C",
+    backgroundColor: colors.accent,
     paddingVertical: 2,
     paddingHorizontal: 6,
     borderRadius: 4,
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
   },
   ownershipTagText: {
     fontSize: 10,
-    color: "white",
+    color: colors.card,
     fontWeight: "600",
   },
 });

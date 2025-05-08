@@ -1,3 +1,4 @@
+import { useTheme } from "@/app/contexts/ThemeContext";
 import React, { useState } from "react";
 import {
   Alert,
@@ -16,6 +17,8 @@ interface TCModalProps {
   onAccept: () => void;
   onClose: () => void;
 }
+
+const { colors } = useTheme();
 
 const TCModal: React.FC<TCModalProps> = ({
   isVisible,
@@ -219,7 +222,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 24,
     width: "90%",
@@ -232,7 +235,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
-    borderColor: "#FFE0B2",
+    borderColor: colors.border,
     borderWidth: 1,
   },
   modalTitle: {
@@ -240,13 +243,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
-    color: "#B45757",
+    color: colors.accent,
   },
   introText: {
     fontSize: 14,
     marginBottom: 16,
     lineHeight: 20,
-    color: "#333333",
+    color: colors.textPrimary,
   },
   termsScrollView: {
     maxHeight: 400,
@@ -256,7 +259,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFE0B2",
+    backgroundColor: colors.border,
     padding: 12,
     marginVertical: 6,
     borderRadius: 6,
@@ -264,31 +267,31 @@ const styles = StyleSheet.create({
   sectionHeaderText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#B45757",
+    color: colors.accent,
     flex: 1,
   },
   expandIcon: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#B45757",
+    color: colors.accent,
   },
   sectionContent: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "#FFF9F0",
+    backgroundColor: colors.background,
     borderRadius: 6,
     marginBottom: 10,
-    borderColor: "#FFE0B2",
+    borderColor: colors.border,
     borderWidth: 1,
   },
   termsText: {
     fontSize: 14,
     lineHeight: 20,
-    color: "#333333",
+    color: colors.textPrimary,
   },
   updateNote: {
     fontSize: 12,
-    color: "#777777",
+    color: colors.textSecondary,
     fontStyle: "italic",
     marginTop: 8,
     marginBottom: 8,
@@ -307,21 +310,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
   },
   buttonAccept: {
-    backgroundColor: "#B45757",
+    backgroundColor: colors.accent,
   },
   buttonDeny: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
   },
   buttonTextAccept: {
-    color: "white",
+    color: colors.card,
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 16,
   },
   buttonTextDeny: {
-    color: "#777777",
+    color: colors.textSecondary,
     fontWeight: "600",
     textAlign: "center",
     fontSize: 16,

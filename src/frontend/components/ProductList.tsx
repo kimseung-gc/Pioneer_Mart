@@ -12,12 +12,15 @@ import SingleItem from "./SingleItem";
 import { useRoute } from "@react-navigation/native";
 import { useItemsStore } from "@/stores/useSearchStore";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 type ProductListProps = {
   items: ItemType[] | null;
   isLoading?: boolean;
   source: ScreenId; //tracks which page is rendering this list for favorite icon purpose
 };
+
+const { colors } = useTheme();
 
 const ProductList = ({
   items,
@@ -42,7 +45,7 @@ const ProductList = ({
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#4285F4" />
+        <ActivityIndicator size="large" color={colors.accent} />
         <Text style={styles.loadingText}>Loading items...</Text>
       </View>
     );
@@ -60,7 +63,7 @@ const ProductList = ({
     if (!isLoadingMore) return null;
     return (
       <View style={styles.footerContainer}>
-        <ActivityIndicator size="small" color="#4285F4" />
+        <ActivityIndicator size="small" color={colors.accent} />
         <Text style={styles.loadingMoreText}>Loading more items...</Text>
       </View>
     );
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
-    backgroundColor: "#FFF9F0",
+    backgroundColor: colors.background,
   },
   titleContainer: {
     flexDirection: "row",
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
   myItemTag: {
     width: 10,
     height: 10,
-    backgroundColor: "#ffd700",
+    backgroundColor: colors.accentSecondary,
     borderRadius: 100 / 2,
     marginRight: 5, // Add spacing between the tag and text
   },
@@ -151,10 +154,10 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: "#666",
+    color: colors.textSecondary,
   },
   footerContainer: {
-    backgroundColor: "#FFF9F0",
+    backgroundColor: colors.background,
     paddingVertical: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -163,11 +166,11 @@ const styles = StyleSheet.create({
   loadingMoreText: {
     marginLeft: 10,
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
   },
   noItemsText: {
     fontSize: 16,
-    color: "#666",
+    color: colors.textSecondary,
     textAlign: "center",
   },
 });
