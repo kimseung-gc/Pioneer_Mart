@@ -1,12 +1,10 @@
 import { Stack, Tabs } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { AppInitialier } from "@/components/AppInitializer";
 import { AnimatedTabBarButton } from "@/components/AnimatedTabBarButton";
 import { useAuth } from "../contexts/AuthContext";
-import { notificationsApi } from "@/services/notificationsApi";
-import { useNavigationState } from "@react-navigation/native";
 import { useNotification } from "../contexts/NotificationContext";
 
 // This defines the basic layout of the app after user's logged in

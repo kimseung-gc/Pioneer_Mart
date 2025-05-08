@@ -40,7 +40,7 @@ const HomeScreen = () => {
         <View
           style={{
             width: "100%",
-            maxWidth: Platform.OS === "web" ? 600 : "100%", // 2 columns will fit nicely here
+            maxWidth: 400, // 2 columns will fit nicely here
             flex: 1,
           }}
         >

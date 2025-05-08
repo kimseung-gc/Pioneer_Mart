@@ -26,7 +26,7 @@ type Props = {
   source?: string;
 };
 
-const width = Dimensions.get("window").width - 40;
+const width = Dimensions.get("window").width / 2 - 10;
 
 const SingleItem = ({ item, source }: Props) => {
   const route = useRoute();
@@ -162,8 +162,8 @@ export default React.memo(SingleItem);
 
 const styles = StyleSheet.create({
   container: {
-    // width: (width - 10) / 2,
-    width: 200,
+    width: width,
+    // width: 150,
     marginHorizontal: 5,
     position: "relative",
   },

@@ -488,6 +488,11 @@ const ItemDetails = () => {
                     <TouchableOpacity
                       style={styles.chatButton}
                       onPress={startChat}
+                      // onPress={() =>
+                      //   window.alert(
+                      //     "The chat feature is only available on IOS right now, not the web version. If you would like to chat, you can send the seller an email.\n\nThe PioneerMart team is working to get this feature out soon!"
+                      //   )
+                      // }
                       disabled={chatLoading}
                     >
                       {chatLoading ? (

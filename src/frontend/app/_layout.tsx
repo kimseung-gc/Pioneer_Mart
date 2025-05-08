@@ -107,7 +107,7 @@ export default function RootLayout() {
                 backgroundColor: "#FFF9F0",
               }}
             >
-              <View style={{ flex: 1, width: "100%", maxWidth: 500 }}>
+              <View style={{ flex: 1, width: "100%", maxWidth: 400 }}>
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen
                     name="(tabs)"
