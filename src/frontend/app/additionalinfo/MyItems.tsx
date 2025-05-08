@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
-
 import { router, Stack } from "expo-router";
-
 import { useAuth } from "../contexts/AuthContext";
 import { useItemsStore } from "@/stores/useSearchStore";
 import ProductList from "@/components/ProductList";
@@ -18,12 +16,13 @@ import { useTheme } from "../contexts/ThemeContext";
 
 const { colors } = useTheme();
 
-const ReportedItemsScreen = () => {
+const MyItems = () => {
   const { authToken } = useAuth();
   const { screens, setActiveScreen, loadItems, loadCategories, categories } =
     useItemsStore();
 
-  const screenId = "reported"; // current screen state
+  //current screen state
+  const screenId = "myItems";
   const { filteredItems, isLoading } = screens[screenId];
 
   useEffect(() => {
@@ -31,13 +30,6 @@ const ReportedItemsScreen = () => {
     loadItems(screenId, authToken || "");
     loadCategories(authToken || "");
   }, [authToken]);
-
-  const reportedItems =
-    screenId === "reported"
-      ? filteredItems
-          .filter((report: any) => report.item) // only keep reports with items
-          .map((report: any) => report.item)
-      : filteredItems;
 
   return (
     <>
@@ -64,7 +56,7 @@ const ReportedItemsScreen = () => {
           headerBackTitle: "Back",
           headerTintColor: colors.accent
         }}
-      />      
+      />   
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator
@@ -78,7 +70,7 @@ const ReportedItemsScreen = () => {
           <View style={{ flex: 1, backgroundColor: colors.background }}>
             <Categories screenId={screenId} categories={categories} />
             <ProductList
-              items={reportedItems}
+              items={filteredItems}
               isLoading={isLoading}
               source="myItems"
             />
@@ -88,12 +80,14 @@ const ReportedItemsScreen = () => {
     </>
   );
 };
-export default ReportedItemsScreen;
+
+export default MyItems;
+
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.background, 
   },
 });
