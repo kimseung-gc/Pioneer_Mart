@@ -10,7 +10,6 @@ import {
   Platform,
   SafeAreaView,
   Dimensions,
-  Linking,
 } from "react-native";
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -59,7 +58,7 @@ const WelcomeScreen = (props: Props) => {
     }
 
     try {
-      const OTP_URL = `${Constants.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
+      const OTP_URL = `${Constants?.expoConfig?.extra?.apiUrl}/otpauth/request-otp/`;
       const fullEmail = email.trim() + "@grinnell.edu";
       await api.post(
         OTP_URL,
@@ -171,6 +170,15 @@ const WelcomeScreen = (props: Props) => {
               </TouchableOpacity>
 
               <TouchableOpacity
+  style={[styles.skipButton, { borderColor: colors.border }]}
+  onPress={() => router.replace("/(tabs)")}
+>
+  <Text style={[styles.skipButtonText, { color: colors.textPrimary }]}>
+    Skip for Now
+  </Text>
+</TouchableOpacity>
+
+              <TouchableOpacity
                 style={styles.termsLinkContainer}
                 onPress={() => setModalVisible(true)}
               >
@@ -213,26 +221,8 @@ const WelcomeScreen = (props: Props) => {
 
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-          PioneerMart – Built by Grinnellians
+          PioneerMart - Built by Grinnellians
         </Text>
-        <TouchableOpacity
-          onPress={() =>
-            Linking.openURL("https://muhammad-khalid.vercel.app/privacy-policy")
-          }
-        >
-          <Text
-            style={[
-              styles.footerText,
-              {
-                color: colors.accent || "#007AFF",
-                marginTop: 4,
-                textDecorationLine: "underline",
-              },
-            ]}
-          >
-            Privacy Policy
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -364,4 +354,17 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 13,
   },
+  skipButton: {
+    width: "100%",
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  skipButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },  
 });
