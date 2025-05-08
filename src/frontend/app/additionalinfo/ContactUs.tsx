@@ -117,7 +117,7 @@ const ContactUs = () => {
             </Text>
             <View style={styles.emailContainer}>
               <Entypo name="mail" size={16} color="#4a4a4a" />
-              <Text style={styles.emailText}>email@gmail.com</Text>
+              <Text style={styles.emailText}>pioneermart6@gmail.com</Text>
             </View>
           </View>
         </View>

@@ -103,7 +103,7 @@ describe("TCModal Component", () => {
     fireEvent.press(getByTestId("section-eligibility"));
     expect(
       getByText(
-        /You must be a current Grinnell student with a valid Grinnell email address/
+        /You must be a current Grinnell student, faculty, or staff member with a valid Grinnell email address/
       )
     ).toBeTruthy();
 

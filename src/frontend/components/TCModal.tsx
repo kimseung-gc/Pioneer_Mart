@@ -96,10 +96,10 @@ const TCModal: React.FC<TCModalProps> = ({
             {sections.eligibility && (
               <View style={styles.sectionContent}>
                 <Text style={styles.termsText}>
-                  • You must be a current Grinnell student with a valid Grinnell
-                  email address.{"\n"}• Creating multiple accounts is
-                  prohibited.{"\n"}• You agree that your Grinnell email address
-                  will be visible to other users on items you post.
+                  • You must be a current Grinnell student, faculty, or staff
+                  member with a valid Grinnell email address.{"\n"}• You agree
+                  that your Grinnell email address will be visible to other
+                  users on items you post.
                 </Text>
               </View>
             )}

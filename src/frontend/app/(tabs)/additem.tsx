@@ -445,7 +445,9 @@ const AddItemScreen = () => {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>
+              Description & Preferred Payment Method
+            </Text>
             <TextInput
               style={[styles.input, styles.textarea]}
               value={formData.description}
