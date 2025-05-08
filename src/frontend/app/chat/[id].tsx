@@ -20,7 +20,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "../contexts/ThemeContext";
 
+const { colors } = useTheme();
 const ChatScreen = () => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const { id, username, user_id, itemTitle, receiver_id, item_id } =
@@ -191,6 +193,7 @@ const ChatScreen = () => {
             headerShown: true,
             headerTitleAlign: "center",
             headerBackTitle: "Back",
+            headerTintColor: colors.accent,
           }}
         />
         <View style={styles.unavailableContainer}>
@@ -223,6 +226,7 @@ const ChatScreen = () => {
           headerShown: true,
           headerTitleAlign: "center",
           headerBackTitle: "Back",
+          headerTintColor: colors.accent,
         }}
       />
       <SafeAreaView style={styles.container}>
@@ -269,7 +273,7 @@ const ChatScreen = () => {
               onPress={sendMessage}
               disabled={!messageText.trim()}
             >
-              <Entypo name="paper-plane" size={20} color="#fff" />
+              <Entypo name="paper-plane" size={20} color={colors.card}/>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -283,7 +287,7 @@ export default ChatScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.background,
   },
   keyboardAvoid: {
     flex: 1,
@@ -293,9 +297,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: colors.border,
   },
   roomName: {
     fontSize: 18,
@@ -323,12 +327,12 @@ const styles = StyleSheet.create({
     maxWidth: "80%",
   },
   myMessageBubble: {
-    backgroundColor: "#DCF8C6",
+    backgroundColor: colors.accentSecondary + "44",
     alignSelf: "flex-end",
     borderBottomRightRadius: 0,
   },
   otherMessageBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     alignSelf: "flex-start",
     borderBottomLeftRadius: 0,
   },
@@ -342,36 +346,36 @@ const styles = StyleSheet.create({
   },
   messageTime: {
     fontSize: 10,
-    color: "#888",
+    color: colors.textSecondary,
     alignSelf: "flex-end",
     marginTop: 4,
   },
   inputContainer: {
     flexDirection: "row",
     padding: 8,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderTopWidth: 1,
-    borderTopColor: "#ddd",
+    borderTopColor: colors.border,
   },
   input: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.background,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginRight: 8,
   },
   sendButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: colors.accent,
     borderRadius: 20,
     paddingHorizontal: 16,
     justifyContent: "center",
   },
   sendButtonDisabled: {
-    backgroundColor: "#cccccc",
+    backgroundColor: colors.border,
   },
   sendButtonText: {
-    color: "#fff",
+    color: colors.card,
     fontWeight: "bold",
   },
   unavailableContainer: {
@@ -383,7 +387,7 @@ const styles = StyleSheet.create({
   unavailableText: {
     textAlign: "center",
     fontSize: 16,
-    color: "#444",
+    color: colors.textPrimary,
     lineHeight: 24,
   },
 });

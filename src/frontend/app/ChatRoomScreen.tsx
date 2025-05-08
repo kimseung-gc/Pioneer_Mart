@@ -20,6 +20,7 @@ import { useAuth } from "./contexts/AuthContext";
 import Toast from "react-native-toast-message";
 import Constants from "expo-constants";
 import api from "@/types/api";
+import { useTheme } from "./contexts/ThemeContext";
 
 type RootStackParamList = {
   ChatRooms: ChatRoomsScreenRouteParams;
@@ -39,7 +40,7 @@ interface Props {
   // navigation: ChatRoomsScreenNavigationProp;
   route: ChatRoomsScreenRouteProp;
 }
-
+const { colors } = useTheme();
 const ChatRoomsScreen: React.FC<Props> = ({}) => {
   const BASE_URL = Constants?.expoConfig?.extra?.apiUrl;
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
@@ -227,6 +228,7 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
           headerBackTitle: "Back",
           headerTitleAlign: "center",
           headerShown: true,
+          headerTintColor: colors.accent,
         }}
       />
       <View style={styles.container}>
@@ -258,29 +260,29 @@ const ChatRoomsScreen: React.FC<Props> = ({}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
   },
   createButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: colors.accent,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   createButtonText: {
-    color: "#fff",
+    color: colors.card,
     fontWeight: "bold",
   },
   roomList: {
@@ -293,13 +295,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: "#888",
+    color: colors.textSecondary,
   },
   roomItem: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: colors.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -314,13 +316,13 @@ const styles = StyleSheet.create({
   },
   roomDetails: {
     fontSize: 14,
-    color: "#888",
+    color: colors.textSecondary,
   },
   roomContent: {
     flex: 1,
   },
   unreadBadge: {
-    backgroundColor: "#2196f3",
+    backgroundColor: colors.accent,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -329,14 +331,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   unreadText: {
-    color: "white",
+    color: colors.card,
     fontSize: 12,
     fontWeight: "bold",
   },
   unreadRoom: {
-    backgroundColor: "#f0f7ff", // Light blue background for unread messages
+    backgroundColor: colors.accentSecondary + "22", // Light blue background for unread messages
     borderLeftWidth: 4,
-    borderLeftColor: "#2196f3",
+    borderLeftColor: colors.accent,
   },
 });
 
