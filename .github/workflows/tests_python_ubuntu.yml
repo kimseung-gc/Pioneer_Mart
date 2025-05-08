@@ -1,5 +1,5 @@
 # Basic workflow
-name: PostGreSetUp-testing
+name: PostGreSetUp Django Testing-Ubuntu
 
 # Controls
 on:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: ['3.8', '3.9']
     defaults:
       run: 
