@@ -47,6 +47,7 @@ if not SECRET_KEY:
 
 # security settings for https
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = False
 
 
@@ -59,8 +60,11 @@ else:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud"]
-CSRF_TRUSTED_ORIGINS = ["https://env-2325023.us.reclaim.cloud"]
+ALLOWED_HOSTS = ["env-2325023.us.reclaim.cloud", "pioneer-mart.vercel.app"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://env-2325023.us.reclaim.cloud",
+    "https://pioneer-mart.vercel.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -83,12 +87,16 @@ INSTALLED_APPS = [
     "report",
     "storages",
     "notifications",
+    "corsheaders",
 ]
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ["https://pioneer-mart.vercel.app"]
 
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
@@ -107,7 +115,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "items.pagination.HttpsPageNumberPagination",
     "PAGE_SIZE": 10,
     "SEARCH_PARAM": "q",
 }
@@ -119,6 +127,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
